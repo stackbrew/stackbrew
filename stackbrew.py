@@ -2,9 +2,12 @@
 
 
 import os
+from os import chdir, listdir
 import sys
 import shutil
+from shutil import copytree, rmtree, copy
 import subprocess
+from time import strftime
 from random import random
 from multiprocessing import Process
 
@@ -27,6 +30,8 @@ def fork(fn):
 
 def detect_services(path):
     path = os.path.abspath(path)
+    if not os.path.exists(path):
+        raise IOError("No such file or directory: '{path}'".format(path=path))
     for filename in ['Stackfile', 'stackfile', 'dotcloud.yml', 'dotcloud_build.yml']:
         filepath = os.path.join(path, filename)
         if os.path.exists(filepath):
@@ -34,21 +39,45 @@ def detect_services(path):
     return { "main": {} }
 
 
+def mkversion():
+    return strftime("%Y-%m-%dT%Hh%Mm%Ss")
+
+def get_root(app, version=None):
+    path = os.path.expanduser("~/.stackbrew/{app}".format(app=app))
+    return "{path}/{version}".format(
+        path            = path,
+        version         = version if version else sorted(listdir(path))[-1]
+    )
+
+def get_src(app, version=None):
+    return "{root}/src".format(root=get_root(app, version))
+
+def get_build(app, version=None):
+    return "{root}/build".format(root=get_root(app, version))
+
+
 def main():
-    services = detect_services(".")
-    log("Detected services: {0}".format(", ".join(services)))
-    build = os.path.expanduser("~/.stackbrew/builds/{id}".format(id=os.path.basename(os.getcwd())))
-    if os.path.exists(build):
-        shutil.rmtree(build)
-    for (name, settings) in services.items():
+    app = os.path.basename(os.getcwd())
+    version = mkversion()
+    build = get_build(app, version)
+    src = get_src(app, version)
+    copytree(".", src)
+    for (name, settings) in detect_services(src).items():
         build_service(
             name    = name,
-            source  = '.',
-            dest    = os.path.join(build, name),
+            source  = src,
+            dest    = "{build}/{service}".format(build=build, service=name),
             **settings
         )
 
-def build_service(name, source, dest, **settings):
+def execute_script(path, home):
+    if os.path.exists(path):
+        os.environ["OLDHOME"] = os.environ["HOME"]
+        os.environ["HOME"] = home 
+        subprocess.call(path)
+        os.environ["HOME"] = os.environ["OLDHOME"]
+
+def build_service(name, source, dest, type=None, **settings):
     source = os.path.abspath(source)
     dest = os.path.abspath(dest)
     def build():
@@ -57,18 +86,23 @@ def build_service(name, source, dest, **settings):
         os.chdir(source)
         if "approot" in settings:
             os.chdir(settings["approot"])
-        # Check source
-        if os.path.exists("profile"):
-            print "Warning: 'profile' is a reserved file name - contents may be overwritten."
+        if type:
+            build_service(type, get_src(type), dest, **settings)
+            execute_script("{src}/extend".format(src=get_src(type)), home=dest)
         # Create dest
         if not os.path.exists(dest):
             os.makedirs(dest)
-        # Setup environment
-        os.environ["HOME"] = dest
         # Call build script
-        if os.path.exists("build"):
-            call("./build")
-    build()
+        execute_script("./build", home=dest)
+        # Copy execution files
+        if os.path.exists("profile"):
+            copy("profile", dest)
+        if os.path.exists("run"):
+            copy("run", dest)
+    p = Process(target=build)
+    p.start()
+    p.join()
+
 
 if __name__ == '__main__':
     main()
