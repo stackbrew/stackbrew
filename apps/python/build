@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Create virtualenv
+virtualenv --no-site-packages ~/.env
+

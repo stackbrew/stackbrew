@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+if [ -e .env ]; then
+    echo "Warning: '.env' is a reserved name."
+fi
+
+# Copy code
+rsync -aH --delete ./ ~/
+
+# Create virtualenv
+virtualenv --no-site-packages ~/.env
+
+# Source virtualenv at runtime
+cat <<eof > ~/profile
+. ~/.env/bin/activate
+eof
+
+# Install python requirements
+if [ -e requirements.txt ]; then
+    ~/.env/bin/pip install -r requirements.txt
+fi
