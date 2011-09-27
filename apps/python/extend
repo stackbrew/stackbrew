@@ -6,4 +6,4 @@ set -x
 rsync -aH ./ ~/
 
 # Install requirements
-pip install -r requirements.txt
+~/.env/bin/pip install -r requirements.txt

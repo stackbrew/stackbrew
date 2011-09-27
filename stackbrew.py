@@ -38,29 +38,27 @@ def detect_services(path):
             return yaml.load(file(filepath))
     return { "main": {} }
 
-
-def mkversion():
-    return strftime("%Y-%m-%dT%Hh%Mm%Ss")
-
-def get_root(app, version=None):
+def get_root(app):
     path = os.path.expanduser("~/.stackbrew/{app}".format(app=app))
-    return "{path}/{version}".format(
-        path            = path,
-        version         = version if version else sorted(listdir(path))[-1]
+    return "{path}".format(
+        path            = path
     )
 
-def get_src(app, version=None):
-    return "{root}/src".format(root=get_root(app, version))
+def get_src(app):
+    return "{root}/src".format(root=get_root(app))
 
-def get_build(app, version=None):
-    return "{root}/build".format(root=get_root(app, version))
+def get_build(app, service=None):
+    return "{root}/build/{service}".format(root=get_root(app), service = service or "")
 
-
-def main():
+def do_build():
     app = os.path.basename(os.getcwd())
-    version = mkversion()
-    build = get_build(app, version)
-    src = get_src(app, version)
+    if os.path.exists(get_root(app)):
+        print "Build already exists: {root}".format(root=get_root(app))
+        sys.exit(1)
+    build = get_build(app)
+    if os.path.exists(build):
+        print "removing {build}".format(build=build)
+    src = get_src(app)
     copytree(".", src)
     for (name, settings) in detect_services(src).items():
         build_service(
@@ -70,39 +68,66 @@ def main():
             **settings
         )
 
+def do_run(app, service, *cmd):
+    with pushdir(get_build(app, service)):
+        subprocess.call("[ -e profile ] && . profile; {cmd}".format(cmd=" ".join(cmd)),
+                shell=True,
+                env=dict(os.environ,
+                        PATH=".:" + os.environ["PATH"],
+                        HOME=".")
+            )
+
+
+def main():
+    eval("do_{cmd}".format(cmd=sys.argv[1]))(*sys.argv[2:])
+
+
 def execute_script(path, home):
+    """ Execute `path`, if it exists, with HOME set to `home`. """
     if os.path.exists(path):
         os.environ["OLDHOME"] = os.environ["HOME"]
         os.environ["HOME"] = home 
+        log("Executing {path:<30} in {cwd}".format(path=path, cwd=os.getcwd()))
         subprocess.call(path)
         os.environ["HOME"] = os.environ["OLDHOME"]
 
+
+class pushdir:
+    def __init__(self, dir):
+        self.dir = dir
+    def __enter__(self):
+        self.olddir = os.getcwd()
+        os.chdir(self.dir)
+    def __exit__(self, *args):
+        os.chdir(self.olddir)
+
+
+
 def build_service(name, source, dest, type=None, **settings):
     source = os.path.abspath(source)
+    sources = [source]
     dest = os.path.abspath(dest)
-    def build():
-        log("Building '{name}' to '{dest}'".format(name=name, dest=dest))
-        # Move to the code directory
-        os.chdir(source)
-        if "approot" in settings:
-            os.chdir(settings["approot"])
-        if type:
-            build_service(type, get_src(type), dest, **settings)
-            execute_script("{src}/extend".format(src=get_src(type)), home=dest)
-        # Create dest
-        if not os.path.exists(dest):
-            os.makedirs(dest)
-        # Call build script
-        execute_script("./build", home=dest)
-        # Copy execution files
-        if os.path.exists("profile"):
-            copy("profile", dest)
-        if os.path.exists("run"):
-            copy("run", dest)
-    p = Process(target=build)
-    p.start()
-    p.join()
-
+    log("Building  {name:<30} to {dest}".format(name=name, dest=dest))
+    # Move to the code directory
+    with pushdir(source):
+        with pushdir(settings.get("approot", ".")):
+            if type:
+                # Recursively build the parent service first
+                sources += build_service(type, get_src(type), dest, **settings)
+                # If the parent service has an 'extend' script, run it
+                for src in sources:
+                    execute_script("{src}/extend".format(src=src), home=dest)
+            # Create dest
+            if not os.path.exists(dest):
+                os.makedirs(dest)
+            # Call build script
+            execute_script("./build", home=dest)
+            # Copy execution files
+            if os.path.exists("profile"):
+                copy("profile", dest)
+            if os.path.exists("run"):
+                copy("run", dest)
+    return sources
 
 if __name__ == '__main__':
     main()
