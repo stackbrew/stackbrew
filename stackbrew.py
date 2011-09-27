@@ -44,8 +44,8 @@ def get_root(app):
         path            = path
     )
 
-def get_src(app):
-    return "{root}/src".format(root=get_root(app))
+def get_src(service):
+    return os.path.join(os.environ.get("SERVICES_LIBRARY", "."), service)
 
 def get_build(app, service=None):
     return "{root}/build/{service}".format(root=get_root(app), service = service or "")
@@ -58,8 +58,7 @@ def do_build():
     build = get_build(app)
     if os.path.exists(build):
         print "removing {build}".format(build=build)
-    src = get_src(app)
-    copytree(".", src)
+    src = "."
     for (name, settings) in detect_services(src).items():
         build_service(
             name    = name,
