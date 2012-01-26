@@ -45,7 +45,7 @@ def get_root(app):
     )
 
 def get_src(service):
-    return os.path.join(os.environ.get("SERVICES_LIBRARY", "."), service)
+    return os.path.join(os.environ.get("SERVICES_LIBRARY", os.path.join(os.path.dirname(__file__), "apps")), service)
 
 def get_build(app, service=None):
     return "{root}/build/{service}".format(root=get_root(app), service = service or "")
