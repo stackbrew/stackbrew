@@ -6,6 +6,7 @@ import yaml
 import shutil
 import subprocess
 
+import hurl
 
 def load_stack(app_dir):
     """ Load stack description from an app's directory """
@@ -18,7 +19,20 @@ def load_stack(app_dir):
             )
 
 
-def get_buildpack_dir(buildpack):
+def get_remote_buildpack(buildpack):
+    url = hurl.parse(buildpack)
+    dl_cache = '/tmp/stackbrew'
+    if (url.get('proto') == 'http' and url.get('path').endswith('.git')) or (url.get('proto') == 'git'):
+        dl_path = '{dl_cache}/{host}/{path}'.format(dl_cache=dl_cache, **url)
+        if os.path.exists(dl_path):
+            shutil.rmtree(dl_path)
+        os.makedirs(dl_path)
+        subprocess.call('git clone {buildpack} {dl_path}'.format(**locals()), shell=True)
+        return dl_path
+    return None
+
+
+def get_local_buildpack(buildpack):
     if os.path.exists(buildpack):
         return buildpack
     for buildpack_dir in os.environ.get("BUILDPACK_PATH", "").split(":"):
@@ -26,7 +40,18 @@ def get_buildpack_dir(buildpack):
         print "Checking for {path}".format(path=path)
         if os.path.exists(path):
             return path
-    raise IOError("No such file or directory: {buildpack}".format(buildpack=buildpack))
+    return None
+
+
+def get_buildpack_dir(buildpack):
+    remote = get_remote_buildpack(buildpack)
+    if remote:
+        return remote
+    local = get_local_buildpack(buildpack)
+    if local:
+        return local
+    if not dir:
+        raise KeyError("No such buildpack: {buildpack}".format(**locals()))
 
 
 def build_service(service_name, build_dir, buildpack):

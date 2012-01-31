@@ -1,2 +1,2 @@
 www:
-    type: python
+    type: http://github.com/heroku/heroku-buildpack-python.git
