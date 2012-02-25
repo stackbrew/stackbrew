@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -x
-
-# Copy code
-rsync -aH ./ ~/
-
-# Install requirements
-~/.env/bin/pip install -r requirements.txt
