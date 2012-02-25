@@ -7,7 +7,6 @@ import yaml
 import shutil
 import subprocess
 
-import hurl
 
 def load_stack(app_dir):
     """ Load stack description from an app's directory """
