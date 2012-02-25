@@ -48,11 +48,22 @@ def build_service(service_name, build_dir, buildpack):
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
     print "['{build_dir}'] building service '{service_name}' with buildpack '{buildpack}' and cache '{cache_dir}'".format(**locals())
-    subprocess.call(["{buildpack}/bin/compile".format(buildpack=buildpack_dir), build_dir, cache_dir])
-    release_script = "{buildpack}/bin/release".format(buildpack=buildpack_dir)
-    if not os.path.exists(release_script):
+    call_script(os.path.join(buildpack_dir, "bin/compile"), build_dir, cache_dir)
+    p = call_script(os.path.join(buildpack_dir, "bin/release"), build_dir, stdout=subprocess.PIPE)
+    if not p:
         return {}
-    return dict(yaml.load(subprocess.Popen([release_script, build_dir], stdout=subprocess.PIPE).stdout.read()))
+    return dict(yaml.load(p.stdout.read()))
+
+
+def call_script(path, *args, **kw):
+    print "Calling `{path}`".format(path=path)
+    if not os.path.exists(path):
+        return None
+    os.chmod(mkpath(path), 0700)
+    p = subprocess.Popen((path,) + args, **kw)
+    p.wait()
+    return p
+
 
 def mkpath(path):
     if type(path) == str:
