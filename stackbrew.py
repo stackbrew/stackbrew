@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 import yaml
 import shutil
 import subprocess
@@ -64,6 +65,10 @@ def build_service(service_name, build_dir, buildpack):
         os.makedirs(cache_dir)
     print "['{build_dir}'] building service '{service_name}' with buildpack '{buildpack}' and cache '{cache_dir}'".format(**locals())
     subprocess.call(["{buildpack}/bin/compile".format(buildpack=buildpack_dir), build_dir, cache_dir])
+    release_script = "{buildpack}/bin/release".format(buildpack=buildpack_dir)
+    if not os.path.exists(release_script):
+        return {}
+    return dict(yaml.load(subprocess.Popen([release_script, build_dir], stdout=subprocess.PIPE).stdout.read()))
 
 
 def copy(src, dst):
@@ -76,11 +81,13 @@ def build_app(source_dir, build_dir):
         The build will fail if build_dir alread exists.
     """
     os.makedirs(build_dir)
+    config = {}
     for (service, buildpack) in load_stack(source_dir).items():
         print "{service} -> {buildpack}".format(service=service, buildpack=buildpack)
         service_build_dir = "{build_dir}/{service}".format(**locals())
         copy(source_dir, service_build_dir)
-        build_service(service, service_build_dir, buildpack)
+        config[service] = build_service(service, service_build_dir, buildpack)
+    file("{build_dir}/deploy.json".format(**locals()), "w").write(json.dumps(config, indent=1))
 
 
 def main():
