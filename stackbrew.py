@@ -20,6 +20,9 @@ def get_service_root(app_dir, service):
     """ Return the root directory a service (as defined by its "approot" property in the stackfile) """
     return os.path.join(app_dir, load_stack(app_dir)[service].get("approot", "."))
 
+def get_service_buildpack(app_dir, service):
+    return load_stack(app_dir)[service]["type"]
+
 def get_service_buildscript(app_dir, service):
     """ Return the path to a service's build script (as defined by its "buildscript" property in the stackfile). """
     return mkpath((app_dir, load_stack(app_dir)[service]["buildscript"]))
@@ -33,10 +36,17 @@ def get_buildpack_dir(buildpack):
         return buildpack
     for buildpack_dir in os.environ.get("BUILDPACK_PATH", "").split(":"):
         path = os.path.join(buildpack_dir, buildpack)
-        print "Checking for {path}".format(path=path)
         if os.path.exists(path):
             return path
     raise KeyError("No such buildpack: {buildpack}".format(**locals()))
+
+
+def get_buildpack_requirements(buildpack_dir, build_dir):
+    """ Return the env requirements of a buildpack, as returned by its bin/require. """
+    p = call_script(os.path.join(buildpack_dir, "bin/require"), build_dir, stdout=subprocess.PIPE)
+    if not p:
+        return []
+    return [l.strip() for l in p.stdout.readlines()]
 
 
 def build_service(service_name, build_dir, buildpack):
@@ -56,7 +66,6 @@ def build_service(service_name, build_dir, buildpack):
 
 
 def call_script(path, *args, **kw):
-    print "Calling `{path}`".format(path=path)
     if not os.path.exists(path):
         return None
     os.chmod(mkpath(path), 0700)
@@ -96,6 +105,14 @@ def getfile(path):
     return file(mkpath(path))
 
 
+def cmd_buildreqs(source_dir):
+    reqs = set()
+    for service in load_stack(source_dir):
+        buildpack_dir = get_buildpack_dir(get_service_buildpack(source_dir, service))
+        reqs.update(get_buildpack_requirements(buildpack_dir, source_dir))
+    for req in reqs:
+        print req
+
 def cmd_build(source_dir, build_dir):
     """ Build the application source code at `source_dir` into `build_dir`.
         The build will fail if build_dir alread exists.
@@ -103,7 +120,7 @@ def cmd_build(source_dir, build_dir):
     os.makedirs(build_dir)
     config = {}
     for (service, config) in load_stack(source_dir).items():
-        buildpack = config["type"]
+        buildpack = get_service_buildpack(source_dir, service)
         print "{service} -> {buildpack}".format(service=service, buildpack=buildpack)
         service_build_dir = "{build_dir}/{service}".format(**locals())
         copy(source_dir, service_build_dir)
