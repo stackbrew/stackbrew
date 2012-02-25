@@ -14,10 +14,7 @@ def load_stack(app_dir):
     for filename in ['Stackfile', 'stackfile', 'dotcloud.yml', 'dotcloud_build.yml']:
         filepath = os.path.join(app_dir, filename)
         if os.path.exists(filepath):
-            return dict(
-                (key, value if type(value) == str else value.get("type"))
-                for key, value in yaml.load(file(filepath)).items()
-            )
+            return dict(yaml.load(file(filepath)))
 
 
 def get_remote_buildpack(buildpack):
@@ -76,22 +73,27 @@ def copy(src, dst):
     shutil.copytree(src, dst)
 
 
-def build_app(source_dir, build_dir):
+def cmd_build(source_dir, build_dir):
     """ Build the application source code at `source_dir` into `build_dir`.
         The build will fail if build_dir alread exists.
     """
     os.makedirs(build_dir)
     config = {}
-    for (service, buildpack) in load_stack(source_dir).items():
+    for (service, config) in load_stack(source_dir).items():
+        buildpack = config["type"]
         print "{service} -> {buildpack}".format(service=service, buildpack=buildpack)
         service_build_dir = "{build_dir}/{service}".format(**locals())
         copy(source_dir, service_build_dir)
         config[service] = build_service(service, service_build_dir, buildpack)
     file("{build_dir}/deploy.json".format(**locals()), "w").write(json.dumps(config, indent=1))
 
+def cmd_info(source_dir):
+    """ Dump the contents of an application stack. """
+    print json.dumps(load_stack(source_dir), indent=1)
 
 def main():
-    build_app(sys.argv[1], sys.argv[2])
+    cmd, args = sys.argv[1], sys.argv[2:]
+    eval("cmd_{cmd}".format(cmd=cmd))(*args)
 
 if __name__ == '__main__':
     main()
