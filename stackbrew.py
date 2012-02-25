@@ -24,21 +24,8 @@ def get_service_buildscript(app_dir, service):
     """ Return the path to a service's build script (as defined by its "buildscript" property in the stackfile). """
     return mkpath((app_dir, load_stack(app_dir)[service]["buildscript"]))
 
-def get_remote_buildpack(buildpack):
-    """ Download a buildpack from a remote location, and return the local path it was downloaded to. """
-    url = hurl.parse(buildpack)
-    dl_cache = '/tmp/stackbrew'
-    if (url.get('proto') == 'http' and url.get('path').endswith('.git')) or (url.get('proto') == 'git'):
-        dl_path = '{dl_cache}/{host}/{path}'.format(dl_cache=dl_cache, **url)
-        if os.path.exists(dl_path):
-            shutil.rmtree(dl_path)
-        os.makedirs(dl_path)
-        subprocess.call('git clone {buildpack} {dl_path}'.format(**locals()), shell=True)
-        return dl_path
-    return None
 
-
-def get_local_buildpack(buildpack):
+def get_buildpack_dir(buildpack):
     """ Search for `buildpack` using the BUILDPACK_PATH environment variable.
         Default to the litteral filesystem path.
     """
@@ -49,19 +36,7 @@ def get_local_buildpack(buildpack):
         print "Checking for {path}".format(path=path)
         if os.path.exists(path):
             return path
-    return None
-
-
-def get_buildpack_dir(buildpack):
-    """ Search for a buildpack using all available methods, and return the path to a local directory. """
-    remote = get_remote_buildpack(buildpack)
-    if remote:
-        return remote
-    local = get_local_buildpack(buildpack)
-    if local:
-        return local
-    if not dir:
-        raise KeyError("No such buildpack: {buildpack}".format(**locals()))
+    raise KeyError("No such buildpack: {buildpack}".format(**locals()))
 
 
 def build_service(service_name, build_dir, buildpack):
