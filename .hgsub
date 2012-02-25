@@ -1,1 +1,0 @@
-buildpacks/python = [git]https://github.com/heroku/heroku-buildpack-python
