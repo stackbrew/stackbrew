@@ -29,10 +29,10 @@ def get_service_buildscript(app_dir, service):
 
 def buildpacks():
     """ Return all available buildpacks and their filesystem path. """
-    if not os.environ.get("BUILDPACK_PATH"):
+    if not os.environ.get("BUILDPACKS"):
         return {}
     buildpacks = {}
-    for buildpack_dir in os.environ["BUILDPACK_PATH"].split(":"):
+    for buildpack_dir in os.environ["BUILDPACKS"].split(":"):
         for buildpack in os.listdir(buildpack_dir):
             if not buildpack.startswith("."):
                 if buildpack not in buildpacks:
@@ -40,7 +40,7 @@ def buildpacks():
     return buildpacks
 
 def get_buildpack_dir(buildpack):
-    """ Search for `buildpack` using the BUILDPACK_PATH environment variable.
+    """ Search for `buildpack` using the BUILDPACKS environment variable.
         Default to the litteral filesystem path.
     """
     if os.path.exists(buildpack):
