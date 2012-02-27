@@ -27,17 +27,25 @@ def get_service_buildscript(app_dir, service):
     return mkpath((app_dir, load_stack(app_dir)[service]["buildscript"]))
 
 
+def buildpacks():
+    """ Return all available buildpacks and their filesystem path. """
+    if not os.environ.get("BUILDPACK_PATH"):
+        return {}
+    buildpacks = {}
+    for buildpack_dir in os.environ["BUILDPACK_PATH"].split(":"):
+        for buildpack in os.listdir(buildpack_dir):
+            if not buildpack.startswith("."):
+                if buildpack not in buildpacks:
+                    buildpacks[buildpack] = os.path.join(buildpack_dir, buildpack)
+    return buildpacks
+
 def get_buildpack_dir(buildpack):
     """ Search for `buildpack` using the BUILDPACK_PATH environment variable.
         Default to the litteral filesystem path.
     """
     if os.path.exists(buildpack):
         return buildpack
-    for buildpack_dir in os.environ.get("BUILDPACK_PATH", "").split(":"):
-        path = os.path.join(buildpack_dir, buildpack)
-        if os.path.exists(path):
-            return path
-    raise KeyError("No such buildpack: {buildpack}".format(**locals()))
+    return buildpacks()[buildpack]
 
 
 def get_buildpack_requirements(buildpack_dir, build_dir):
@@ -175,6 +183,11 @@ def cmd_buildscript(source_dir, service):
 def cmd_services(source_dir):
     for service in sorted(load_stack(source_dir)):
         print service
+
+def cmd_buildpacks():
+    for (buildpack, dir) in sorted(buildpacks().items()):
+        print "{0}:\t{1}".format(buildpack, dir)
+
 
 def main():
     cmd, args = sys.argv[1], sys.argv[2:]
