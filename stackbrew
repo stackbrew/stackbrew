@@ -47,13 +47,19 @@ def get_buildpack_requirements(buildpack_dir, build_dir):
         return []
     return [l.strip() for l in p.stdout.readlines()]
 
+def get_buildpack_cache_root():
+    return os.path.expanduser("~/.stackbrew/cache")
+
+def get_buildpack_cache(buildpack):
+    return os.path.join(get_buildpack_cache_root(), buildpack)
+
 
 def build_service(service_name, build_dir, buildpack):
     """ Build the service in-place at `build_dir` using `buildpack`.
         `service_name` is provided as a convenience.
     """
     buildpack_dir = get_buildpack_dir(buildpack)
-    cache_dir = "{buildpack}/_cache".format(buildpack=buildpack_dir)
+    cache_dir = get_buildpack_cache(buildpack)
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
     print "['{build_dir}'] building service '{service_name}' with buildpack '{buildpack}' and cache '{cache_dir}'".format(**locals())
