@@ -129,7 +129,8 @@ def cmd_build(source_dir, build_dir):
         print "{service} -> {buildpack}".format(service=service, buildpack=buildpack)
         service_build_dir = "{build_dir}/{service}".format(**locals())
         copy(source_dir, service_build_dir)
-        config[service] = build_service(service, service_build_dir, buildpack)
+        service_base_config = build_service(service, service_build_dir, buildpack)
+        config[service] = dict(service_base_config, **service_config)
     file("{build_dir}/deploy.json".format(**locals()), "w").write(json.dumps(config, indent=1))
 
 def cmd_info(source_dir):
