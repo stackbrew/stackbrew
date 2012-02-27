@@ -124,7 +124,7 @@ def cmd_build(source_dir, build_dir):
     """
     os.makedirs(build_dir)
     config = {}
-    for (service, config) in load_stack(source_dir).items():
+    for (service, service_config) in load_stack(source_dir).items():
         buildpack = get_service_buildpack(source_dir, service)
         print "{service} -> {buildpack}".format(service=service, buildpack=buildpack)
         service_build_dir = "{build_dir}/{service}".format(**locals())
