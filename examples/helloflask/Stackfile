@@ -1,3 +1,0 @@
-web:
-  type: python
-  process: python app.py
