@@ -1,9 +1,13 @@
 package nodejs
 
+import (
+	"b.l/bl"
+)
+
 Container :: {
 	buildScript: string
 	runScript: string
 	environment: [string]: string
-	source: Directory
-	image: Directory
+	source: bl.Directory
+	image: bl.Directory
 }

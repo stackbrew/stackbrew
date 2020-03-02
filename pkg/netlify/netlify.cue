@@ -1,8 +1,12 @@
 package netlify
 
+import (
+	"b.l/bl"
+)
+
 Site :: {
 	// Contents of the application to deploy
-	contents: Directory
+	contents: bl.Directory
 
 	// Deploy to this Netlify site
 	name:   string
@@ -18,12 +22,12 @@ Site :: {
 	account:    string | *""
 
 	// Netlify authentication token
-	token: Secret & { value: string }
+	token: bl.Secret & { value: string }
 
 	// Deployment url
 	url: deploy.mount["/info/url"].contents
 
-	deploy: BashScript & {
+	deploy: bl.BashScript & {
 
 		mount: "/info/url": {
 			type: "value"

@@ -1,5 +1,9 @@
 package googlecloud
 
+import (
+	"b.l/bl"
+)
+
 Project :: {
 
 	activateUrl: string
@@ -21,7 +25,7 @@ Project :: {
 		// A GCR container repository
 		Repository: {
 			name: string
-			tag: [string]: Directory
+			tag: [string]: bl.Directory
 			unknownTags: "remove" | *"ignore" | "error"
 			ref: "gcr.io/\(name)"
 		}

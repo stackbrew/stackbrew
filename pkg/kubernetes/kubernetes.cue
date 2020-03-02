@@ -1,5 +1,9 @@
 package kubernetes
 
+import (
+	"b.l/bl"
+)
+
 App :: {
 	cluster: Cluster
 	namespace: string
@@ -31,5 +35,5 @@ Configuration :: {
 
 YamlDirectory :: {
 	config: Configuration
-	dir: Directory
+	dir: bl.Directory
 }

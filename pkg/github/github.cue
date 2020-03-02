@@ -1,7 +1,11 @@
 package github
 
+import (
+	"b.l/bl"
+)
+
 Repository :: {
-	token: Secret & { value: string }
+	token: bl.Secret & { value: string }
 	name: string
 	owner: string
 
@@ -16,7 +20,7 @@ Repository :: {
 			name: string
 			tip: {
 				commitId: string
-				checkout: Directory
+				checkout: bl.Directory
 			}
 		}
 	}

@@ -2,12 +2,14 @@ package yarn
 
 import (
 	"strings"
+
+	"b.l/bl"
 )
 
 // A javascript application built by Yarn
 App :: {
 	// Source code of the javascript application
-	source: Directory
+	source: bl.Directory
 
 	// Load the contents of `environment` into the yarn process?
 	loadEnv: bool | *true
@@ -27,7 +29,7 @@ App :: {
 	buildDirectory: string | *"build"
 
 	// Execute this script to build the app
-	action: build: BashScript & {
+	action: build: bl.BashScript & {
 		code: """
 			yarn install --network-timeout 1000000
 			yarn run "$YARN_BUILD_SCRIPT"
@@ -65,7 +67,7 @@ App :: {
 
 	// Output of yarn build
 	// FIXME: prevent escaping /src with ..
-	build: Directory & {
+	build: bl.Directory & {
 		root: action.build.rootfs
 		path: action.build.workdir + "/" + buildDirectory
 	}
