@@ -9,3 +9,7 @@ lint:
 .PHONY: test
 test:
 	@./.script/hack.sh test
+
+.PHONY: publish
+publish: all
+	@./.script/hack.sh publish

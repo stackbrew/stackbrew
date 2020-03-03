@@ -30,6 +30,15 @@ case "${1}" in
             )
         done
     ;;
+    publish)
+        for component in ${COMPONENTS}; do
+            (
+                echo "+++ PUBLISH stackbrew.io/${component}"
+                cd "${PKGDIR}/${component}"
+                bl-runtime publish stackbrew.io/${component}
+            )
+        done
+    ;;
     *)
         echo "usage: $0 [lint|test]"
         exit 1
