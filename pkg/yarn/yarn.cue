@@ -15,7 +15,7 @@ App :: {
 	loadEnv: bool | *true
 
 	// Set these environment variables during the build
-	environment: [string]: string
+	appEnv=environment: [string]: string
 
 	// Run this yarn script
 	yarnScript: string | *"build"
@@ -33,11 +33,11 @@ App :: {
 		code: """
 			yarn install --network-timeout 1000000
 			yarn run "$YARN_BUILD_SCRIPT"
-			mv "$YARN_BUILD_SCRIPT" "/output"
+			mv "$YARN_BUILD_DIRECTORY" /app/build
 			"""
 
 		if loadEnv {
-			environment: environment
+			environment: appEnv
 		}
 		environment: {
 			YARN_BUILD_SCRIPT:    yarnScript
@@ -52,7 +52,7 @@ App :: {
 			// FIXME: set a cache key?
 			"/cache/yarn": bl.Cache
 			if writeEnvFile != "" {
-				"/app/src/\(writeEnvFile)": strings.Join([ "\(k)=\(v)" for k, v in environment ], "\n")
+				"/app/src/\(writeEnvFile)": strings.Join([ "\(k)=\(v)" for k, v in appEnv ], "\n")
 			}
 		}
 
