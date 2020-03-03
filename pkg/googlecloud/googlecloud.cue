@@ -2,6 +2,8 @@ package googlecloud
 
 import (
 	"b.l/bl"
+
+	"stackbrew.io/kubernetes"
 )
 
 Project :: {

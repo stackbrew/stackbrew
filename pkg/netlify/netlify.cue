@@ -25,14 +25,14 @@ Site :: {
 	token: bl.Secret & { value: string }
 
 	// Deployment url
-	url: deploy.mount["/info/url"].contents
+	url: deploy.output["/info/url"]
 
 	deploy: bl.BashScript & {
 
-		mount: "/info/url": {
-			type: "value"
-			contents: string
-		}
+		workdir: "/site/contents"
+		input: "/site/contents": contents
+
+		output: "/info/url": string
 
 		environment: {
 			NETLIFY_AUTH_TOKEN: token.value
@@ -83,7 +83,7 @@ Site :: {
 			    site_id=$(create_site)
 			fi
 			netlify deploy \
-			    --dir="$(pwd)/input" \
+			    --dir="$(pwd)" \
 			    --auth="$NETLIFY_AUTH_TOKEN" \
 			    --site="$site_id" \
 			    --message="Blocklayer 'netlify deploy'" \

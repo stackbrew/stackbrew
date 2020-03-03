@@ -33,6 +33,7 @@ App :: {
 		code: """
 			yarn install --network-timeout 1000000
 			yarn run "$YARN_BUILD_SCRIPT"
+			mv "$YARN_BUILD_SCRIPT" "/output"
 			"""
 
 		if loadEnv {
@@ -41,23 +42,21 @@ App :: {
 		environment: {
 			YARN_BUILD_SCRIPT: yarnScript
 			YARN_CACHE_FOLDER: "/cache/yarn"
+			YARN_BUILD_DIRECTORY: buildDirectory
 		}
 
-		workdir: "/src"
-		mount: "/src": {
-			type: "copy"
-			from: source
-		}
-		mount: "/cache/yarn": {
-			type: "cache"
-		}
+		workdir: "/app/src"
 
-		if writeEnvFile != "" {
-			mount: writeEnvFile: {
-				type: "text"
-				contents: strings.Join(["\(k)=\(v)" for k, v in environment], "\n")
+		input: {
+			"/app/src": source
+			// FIXME: set a cache key?
+			"/cache/yarn": bl.Cache
+			if writeEnvFile != "" {
+				"/app/src/\(writeEnvFile)": strings.Join([ "\(k)=\(v)" for k, v in environment ], "\n")
 			}
 		}
+
+		output: "/app/build": bl.Directory
 
 		os: package: {
 			rsync: true
@@ -67,9 +66,5 @@ App :: {
 
 	// Output of yarn build
 	// FIXME: prevent escaping /src with ..
-	build: bl.Directory & {
-		root: action.build.rootfs
-		path: action.build.workdir + "/" + buildDirectory
-	}
+	build: action.build.output["/app/build"]
 }
-
