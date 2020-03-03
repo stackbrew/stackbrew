@@ -8,7 +8,7 @@ TEST_TARGET="${TARGET:-bl-registry:5001/stackbrew-test}"
 PKGDIR="./pkg"
 
 # FIXME: Not all packages are currently working.
-# COMPONENTS="$(ls -1 ${PKGDIR})"
+# COMPONENTS="$(ls -1 ${PKGDIR} | sort -n)"
 COMPONENTS="yarn"
 
 case "${1}" in
@@ -36,6 +36,19 @@ case "${1}" in
                 echo "+++ PUBLISH stackbrew.io/${component}"
                 cd "${PKGDIR}/${component}"
                 bl-runtime publish stackbrew.io/${component}
+            )
+        done
+    ;;
+    docs)
+        docs="$(pwd)/docs/README.md"
+        mkdir -p "$(dirname "$docs")"
+        echo "# Packages" > "$docs"
+        for component in ${COMPONENTS}; do
+            (
+                echo "+++ DOCUMENTING ${component}"
+                cd "${PKGDIR}/${component}"
+                echo >> "$docs"
+                bl-runtime doc -o md >> "$docs"
             )
         done
     ;;
