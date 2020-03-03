@@ -9,7 +9,7 @@ Site :: {
 	contents: bl.Directory
 
 	// Deploy to this Netlify site
-	name:   string
+	name: string
 
 	// Host the site at this address
 	domain: string
@@ -19,10 +19,10 @@ Site :: {
 
 	// Use this Netlify account name
 	// (also referred to as "team" in the Netlify docs)
-	account:    string | *""
+	account: string | *""
 
 	// Netlify authentication token
-	token: bl.Secret & { value: string }
+	token: bl.Secret & {value: string}
 
 	// Deployment url
 	url: deploy.output["/info/url"]
@@ -36,11 +36,11 @@ Site :: {
 
 		environment: {
 			NETLIFY_AUTH_TOKEN: token.value
-			NETLIFY_SITE_NAME: name
+			NETLIFY_SITE_NAME:  name
 			if (create) {
 				NETLIFY_SITE_CREATE: "1"
 			}
-			NETLIFY_DOMAIN: domain
+			NETLIFY_DOMAIN:  domain
 			NETLIFY_ACCOUNT: account
 		}
 

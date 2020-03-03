@@ -11,15 +11,13 @@ Project :: {
 	activateUrl: string
 
 	action: checkActivate: {
-		
+
 	}
 
 	id: string
-	account: {
-		key: {
-			// FIXME: google cloud service key schema
-			...
-		}
+	account: key: {
+		// FIXME: google cloud service key schema
+		...
 	}
 
 	GCR: {
@@ -29,7 +27,7 @@ Project :: {
 			name: string
 			tag: [string]: bl.Directory
 			unknownTags: "remove" | *"ignore" | "error"
-			ref: "gcr.io/\(name)"
+			ref:         "gcr.io/\(name)"
 		}
 
 	}
@@ -38,8 +36,8 @@ Project :: {
 
 		// A GKE cluster
 		Cluster: kubernetes.Cluster & {
-			name: string
-			zone: *"us-west1" | string
+			name:   string
+			zone:   *"us-west1" | string
 			create: *true | bool
 		}
 	}

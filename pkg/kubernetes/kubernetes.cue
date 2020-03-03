@@ -5,35 +5,26 @@ import (
 )
 
 App :: {
-	cluster: Cluster
-	namespace: string
-	config: Configuration
+	cluster:          Cluster
+	namespace:        string
+	config:           Configuration
 	unknownResources: "error" | "ignore" | "remove"
 }
 
-
 // TODO: portable kubernetes cluster interface
 Cluster :: {
-	namespace: [ns=string]: {
-		config: Configuration
-	}
+	namespace: [ns=string]: config: Configuration
 	...
 }
 
 // FIXME: native kubernetes config schema
 Configuration :: {
-	deployment: [string]: {
-		spec: _
-	}
-	ingress: [string]: {
-		spec: _
-	}
-	secret: [string]: {
-		stringData: _
-	}
+	deployment: [string]: spec:   _
+	ingress: [string]: spec:      _
+	secret: [string]: stringData: _
 }
 
 YamlDirectory :: {
 	config: Configuration
-	dir: bl.Directory
+	dir:    bl.Directory
 }

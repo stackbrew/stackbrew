@@ -5,16 +5,16 @@ import (
 )
 
 Repository :: {
-	token: bl.Secret & { value: string }
-	name: string
+	token: bl.Secret & {value: string}
+	name:  string
 	owner: string
 
 	pr: [prId=string]: {
-		id: prId
+		id:     prId
 		status: "open" | "closed"
 		comments: [commentId=string]: {
 			author: string
-			text: string
+			text:   string
 		}
 		branch: {
 			name: string

@@ -19,10 +19,10 @@ App :: {
 
 	// Run this yarn script
 	yarnScript: string | *"build"
-	
+
 	// Write the contents of `environment` to this file,
 	// in the "envfile" format.
-	writeEnvFile:   string | *""
+	writeEnvFile: string | *""
 
 	// Read build output from this directory
 	// (path must be relative to working directory).
@@ -40,8 +40,8 @@ App :: {
 			environment: environment
 		}
 		environment: {
-			YARN_BUILD_SCRIPT: yarnScript
-			YARN_CACHE_FOLDER: "/cache/yarn"
+			YARN_BUILD_SCRIPT:    yarnScript
+			YARN_CACHE_FOLDER:    "/cache/yarn"
 			YARN_BUILD_DIRECTORY: buildDirectory
 		}
 
@@ -60,7 +60,7 @@ App :: {
 
 		os: package: {
 			rsync: true
-			yarn: true
+			yarn:  true
 		}
 	}
 

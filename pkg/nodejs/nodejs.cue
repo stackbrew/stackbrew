@@ -6,8 +6,8 @@ import (
 
 Container :: {
 	buildScript: string
-	runScript: string
+	runScript:   string
 	environment: [string]: string
 	source: bl.Directory
-	image: bl.Directory
+	image:  bl.Directory
 }
