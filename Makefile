@@ -1,6 +1,10 @@
 # test must run before lint before it fetches the dependencies
 .PHONY: all
-all: test lint docs
+all: test fmt docs
+
+.PHONY: fmt
+fmt:
+	@./.script/hack.sh fmt
 
 .PHONY: lint
 lint:

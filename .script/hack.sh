@@ -11,13 +11,35 @@ PKGDIR="./pkg"
 # COMPONENTS="$(ls -1 ${PKGDIR} | sort -n)"
 COMPONENTS="yarn"
 
+modified_files() {
+    git status -s . | grep -e "^ M"  | cut -d ' ' -f3
+}
+
 case "${1}" in
+    fmt)
+        for component in ${COMPONENTS}; do
+            (
+                echo "+++ FMT ${component}"
+                cd "${PKGDIR}/${component}"
+                cue fmt -s
+                cue trim -s
+            )
+        done
+    ;;
     lint)
         for component in ${COMPONENTS}; do
             (
                 echo "+++ LINTING ${component}"
                 cd "${PKGDIR}/${component}"
+
+                dirty=$(modified_files)
+                [ -n "$dirty" ] && echo -e "uncommited changes\n$dirty" && exit 1
+
+                cue fmt -s
                 cue trim -s
+
+                dirty=$(modified_files)
+                [ -n "$dirty" ] && echo -e "files not properly cue fmt'ed or cue trim'ed\n$dirty" && exit 1
             )
         done
     ;;
