@@ -8,11 +8,10 @@ import (
 
 Project :: {
 
-	activateUrl: string
-
-	action: checkActivate: {
-
-	}
+	// activateUrl: string
+	// action: checkActivate: {
+	//
+	// }
 
 	id: string
 	account: key: {
