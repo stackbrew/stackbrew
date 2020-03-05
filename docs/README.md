@@ -1,5 +1,51 @@
 # Packages
 
+## file
+
+### Read
+Read reads the contents of a file.
+
+#### Fields
+| FIELD            | SPEC               | DOC                                |
+| -------------    |:-------------:     |:-------------:                     |
+|*filename*        |``!=""``            |filename names the file to read.    |
+|*contents*        |``string``          |contents is the read contents.      |
+|*source*          |``bl.Directory``    |source directory                    |
+
+### Create
+Create writes contents to the given file.
+
+#### Fields
+| FIELD            | SPEC                    | DOC                                                                          |
+| -------------    |:-------------:          |:-------------:                                                               |
+|*filename*        |``!=""``                 |filename names the file to write.                                             |
+|*contents*        |``(bytes \| string)``    |contents specifies the bytes to be written.                                   |
+|*permissions*     |``(int \| *420)``        |permissions defines the permissions to use if the file does not yet exist.    |
+|*source*          |``bl.Directory``         |source directory                                                              |
+|*result*          |``bl.Directory``         |result directory                                                              |
+
+### Append
+Append writes contents to the given file.
+
+#### Fields
+| FIELD            | SPEC                    | DOC                                                                          |
+| -------------    |:-------------:          |:-------------:                                                               |
+|*filename*        |``!=""``                 |filename names the file to append.                                            |
+|*contents*        |``(bytes \| string)``    |contents specifies the bytes to be written.                                   |
+|*permissions*     |``(int \| *420)``        |permissions defines the permissions to use if the file does not yet exist.    |
+|*source*          |``bl.Directory``         |source directory                                                              |
+|*result*          |``bl.Directory``         |result directory                                                              |
+
+### Glob
+Glob returns a list of files.
+
+#### Fields
+| FIELD            | SPEC               | DOC                                               |
+| -------------    |:-------------:     |:-------------:                                    |
+|*glob*            |``!=""``            |glob specifies the pattern to match files with.    |
+|*files*           |``_\|_``            |files that matched                                 |
+|*source*          |``bl.Directory``    |source directory                                   |
+
 ## github
 
 ### Repository
