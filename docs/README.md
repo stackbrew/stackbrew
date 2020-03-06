@@ -25,27 +25,27 @@
 
 
 #### Fields
-| FIELD            | SPEC              | DOC               |
-| -------------    |:-------------:    |:-------------:    |
 
 ### Cluster
 
 
 #### Fields
-| FIELD            | SPEC              | DOC               |
-| -------------    |:-------------:    |:-------------:    |
 
 ### Configuration
 
 
 #### Fields
-| FIELD            | SPEC              | DOC               |
-| -------------    |:-------------:    |:-------------:    |
 
 ### YamlDirectory
 
 
 #### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
 | FIELD            | SPEC              | DOC               |
 | -------------    |:-------------:    |:-------------:    |
 
@@ -55,8 +55,6 @@
 
 
 #### Fields
-| FIELD            | SPEC              | DOC               |
-| -------------    |:-------------:    |:-------------:    |
 
 ### Server
 
@@ -64,13 +62,28 @@
 #### Fields
 | FIELD            | SPEC              | DOC               |
 | -------------    |:-------------:    |:-------------:    |
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
 
 ## netlify
 
 ### Account
-
+A Netlify account
 
 #### Fields
+
+### Site
+A Netlify site
+
+#### Fields
+| FIELD            | SPEC                                                               | DOC                                            |
+| -------------    |:-------------:                                                     |:-------------:                                 |
+|*name*            |``string``                                                          |Deploy to this Netlify site                     |
+|*contents*        |``bl.Directory``                                                    |Contents of the application to deploy           |
+|*url*             |``string``                                                          |Deployment url                                  |
+|*account*         |``C{name: (string \| *""), token: (Secret & C{value: string})}``    |Netlify account this site is attached to        |
+|*domain*          |``string``                                                          |Host the site at this address                   |
+|*create*          |``(bool \| *true)``                                                 |Create the Netlify site if it doesn't exist?    |
 | FIELD            | SPEC                   | DOC                                                                              |
 | -------------    |:-------------:         |:-------------:                                                                   |
 |*name*            |``(string \| *"")``     |Use this Netlify account name (also referred to as "team" in the Netlify docs)    |
