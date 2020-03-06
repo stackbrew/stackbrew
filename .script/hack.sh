@@ -7,9 +7,7 @@ cd "$(dirname "$0")/.."
 TEST_TARGET="${TARGET:-bl-registry:5001/stackbrew-test}"
 PKGDIR="./pkg"
 
-# FIXME: Not all packages are currently working.
-# COMPONENTS="$(ls -1 ${PKGDIR} | sort -n)"
-COMPONENTS="yarn"
+COMPONENTS="$(ls -1 ${PKGDIR} | grep -v "cue.mod" | sort -n)"
 
 case "${1}" in
     fmt)

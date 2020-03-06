@@ -1,5 +1,90 @@
 # Packages
 
+## github
+
+### Repository
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
+## googlecloud
+
+### Project
+
+
+#### Fields
+| FIELD            | SPEC              | DOC                                               |
+| -------------    |:-------------:    |:-------------:                                    |
+|*id*              |``string``         |activateUrl: string action: checkActivate: {  }    |
+
+## kubernetes
+
+### App
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
+### Cluster
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
+### Configuration
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
+### YamlDirectory
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
+## mysql
+
+### Database
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
+### Server
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
+## netlify
+
+### Account
+
+
+#### Fields
+| FIELD            | SPEC                   | DOC                                                                              |
+| -------------    |:-------------:         |:-------------:                                                                   |
+|*name*            |``(string \| *"")``     |Use this Netlify account name (also referred to as "team" in the Netlify docs)    |
+|*token*           |``C{value: string}``    |Netlify authentication token                                                      |
+
+## nodejs
+
+### Container
+
+
+#### Fields
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+
 ## yarn
 
 ### App
