@@ -5,7 +5,7 @@ import (
 )
 
 Repository :: {
-	token: bl.Secret & {value: string}
+	token: bl.Secret
 	name:  string
 	owner: string
 

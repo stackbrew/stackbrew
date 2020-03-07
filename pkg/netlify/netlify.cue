@@ -11,7 +11,7 @@ Account :: {
 	name: string | *""
 
 	// Netlify authentication token
-	token: bl.Secret & {value: string}
+	token: bl.Secret
 }
 
 // A Netlify site
@@ -38,12 +38,12 @@ Site :: {
 
 		workdir: "/site/contents"
 		input: "/site/contents": contents
+		input: "/account/token": account.token
 
 		output: "/info/url": string
 
 		environment: {
-			NETLIFY_AUTH_TOKEN: account.token.value
-			NETLIFY_SITE_NAME:  name
+			NETLIFY_SITE_NAME: name
 			if (create) {
 				NETLIFY_SITE_CREATE: "1"
 			}
@@ -64,11 +64,12 @@ Site :: {
 		}
 
 		code: #"""
+			account_token="$(cat /account/token)"
 			create_site() {
 			    # FIXME: This doesn't enable HTTPS on the site.
 			    url="https://api.netlify.com/api/v1/${NETLIFY_ACCOUNT:-}/sites"
 
-			    response=$(curl -f -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+			    response=$(curl -f -H "Authorization: Bearer $account_token" \
 			                -X POST -H "Content-Type: application/json" \
 			                $url \
 			                -d '{"subdomain": "$NETLIFY_SITE_NAME", "custom_domain": "$NETLIFY_DOMAIN"}'
@@ -78,7 +79,7 @@ Site :: {
 			    echo $response | jq -r '.site_id'
 			}
 
-			site_id=$(curl -f -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+			site_id=$(curl -f -H "Authorization: Bearer $account_token" \
 			            https://api.netlify.com/api/v1/sites\?filter\=all | \
 			            jq -r ".[] | select(.name==\"$NETLIFY_SITE_NAME\") | .id" \
 			        )
@@ -91,7 +92,7 @@ Site :: {
 			fi
 			netlify deploy \
 			    --dir="$(pwd)" \
-			    --auth="$NETLIFY_AUTH_TOKEN" \
+			    --auth="$account_token" \
 			    --site="$site_id" \
 			    --message="Blocklayer 'netlify deploy'" \
 			    --prod \

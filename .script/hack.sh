@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 TEST_TARGET="${TARGET:-bl-registry:5001/stackbrew-test}"
 PKGDIR="./pkg"
 
-COMPONENTS="$(ls -1 ${PKGDIR} | grep -v "cue.mod" | sort -n)"
+COMPONENTS="$(ls -1 "${PKGDIR}" | grep -v "cue.mod" | sort -n)"
 
 case "${1}" in
     fmt)
@@ -45,7 +45,7 @@ case "${1}" in
             (
                 echo "+++ PUBLISH stackbrew.io/${component}"
                 cd "${PKGDIR}/${component}"
-                bl-runtime publish stackbrew.io/${component}
+                bl-runtime publish "stackbrew.io/${component}"
             )
         done
     ;;
