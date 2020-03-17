@@ -64,6 +64,8 @@ Site :: {
 		}
 
 		code: #"""
+			set +e
+
 			account_token="$(cat /account/token)"
 			create_site() {
 			    # FIXME: This doesn't enable HTTPS on the site.
