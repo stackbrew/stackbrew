@@ -35,6 +35,7 @@ Site :: {
 	url: deploy.output["/info/url"]
 
 	deploy: bl.BashScript & {
+		runPolicy: "always"
 
 		workdir: "/site/contents"
 		input: "/site/contents": contents
@@ -68,15 +69,16 @@ Site :: {
 
 			account_token="$(cat /account/token)"
 			create_site() {
-			    # FIXME: This doesn't enable HTTPS on the site.
 			    url="https://api.netlify.com/api/v1/${NETLIFY_ACCOUNT:-}/sites"
 
 			    response=$(curl -f -H "Authorization: Bearer $account_token" \
 			                -X POST -H "Content-Type: application/json" \
 			                $url \
-			                -d '{"subdomain": "$NETLIFY_SITE_NAME", "custom_domain": "$NETLIFY_DOMAIN"}'
+			                -d "{\"name\": \"${NETLIFY_SITE_NAME}\", \"custom_domain\": \"${NETLIFY_DOMAIN}\"}"
 			            )
-			    [ $? -ne 0 ] && echo "create site failed" && exit 1
+			    if [ $? -ne 0 ]; then
+					exit 1
+				fi
 
 			    echo $response | jq -r '.site_id'
 			}
@@ -91,6 +93,10 @@ Site :: {
 			        exit 1
 			    fi
 			    site_id=$(create_site)
+				if [ -z "$site_id" ]; then
+					echo "create site failed"
+					exit 1
+				fi
 			fi
 			netlify deploy \
 			    --dir="$(pwd)" \
