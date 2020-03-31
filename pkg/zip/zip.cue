@@ -5,31 +5,25 @@ import "b.l/bl"
 // Zip archive
 Archive :: {
 
-    // Source Directory, File or String to Zip from
-    source: bl.Directory | string
+	// Source Directory, File or String to Zip from
+	source: bl.Directory | string
 
-    // Archive file output
-    archive: {
-        from: run.output["/outputs/out"]
-        path: "file.zip"
-    }
+	// Archive file output
+	archive: {
+		from: run.output["/outputs/out"]
+		path: "file.zip"
+	}
 
-    run: bl.BashScript & {
-        input: {
-            "/inputs/source": source
-        }
+	run: bl.BashScript & {
+		input: "/inputs/source": source
 
-        output: {
-            "/outputs/out": bl.Directory
-        }
+		output: "/outputs/out": bl.Directory
 
-        os: package: {
-			zip: true
-		}
+		os: package: zip: true
 
-        code: #"""
+		code: #"""
             mkdir -p /outputs/out
             zip /outputs/out/file.zip /inputs/source
         """#
-    }
+	}
 }

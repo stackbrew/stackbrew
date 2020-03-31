@@ -3,7 +3,7 @@ package go
 import "b.l/bl"
 
 testGoBuild: {
-    run: App & {
+	run: App & {
 		source: bl.Directory & {
 			local: "./testdata"
 		}
@@ -14,5 +14,5 @@ testGoBuild: {
 		code: #"""
             [ "$(/inputs/binary)" = "hello world" ]
         """#
-    }
+	}
 }

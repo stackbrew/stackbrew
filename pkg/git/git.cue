@@ -1,62 +1,62 @@
 package git
 
 import (
-    "strings"
+	"strings"
 
-    "b.l/bl"
+	"b.l/bl"
 )
 
 // Git repository
 Repository :: {
 
-    // URL of the Repository
-    url: string
+	// URL of the Repository
+	url: string
 
-    // SSH key for private repositories
-    sshKey?: bl.Secret
+	// SSH key for private repositories
+	sshKey?: bl.Secret
 
-    // Git Ref to checkout
-    ref: *"master" | string
+	// Git Ref to checkout
+	ref: *"master" | string
 
-    // Keep .git directory after clone
-    keepGitDir: *false | bool
+	// Keep .git directory after clone
+	keepGitDir: *false | bool
 
-    // Output directory of the `git clone`
-    out: clone.output["/outputs/out"]
+	// Output directory of the `git clone`
+	out: clone.output["/outputs/out"]
 
-    // Output commit ID of the Repository
-    commit: strings.TrimRight(clone.output["/outputs/commit"], "\n")
+	// Output commit ID of the Repository
+	commit: strings.TrimRight(clone.output["/outputs/commit"], "\n")
 
-    // Output short-commit ID of the Repository
-    shortCommit: strings.TrimRight(clone.output["/outputs/short-commit"], "\n")
+	// Output short-commit ID of the Repository
+	shortCommit: strings.TrimRight(clone.output["/outputs/short-commit"], "\n")
 
-    clone: bl.BashScript & {
-        os: package: {
-			git: true
-            openssh: true
+	clone: bl.BashScript & {
+		os: package: {
+			git:     true
+			openssh: true
 		}
 
-        workdir: "/workdir"
+		workdir: "/workdir"
 
-        input: {
+		input: {
 			"/inputs/url": url
-            "/inputs/ref": ref
-            if (sshKey & bl.Secret) != _|_ {
-                "/inputs/ssh-key": sshKey
-            }
-            if keepGitDir {
-                "/inputs/keep-gitdir": "true"
-            }
-            "/cache/git": bl.Cache
-        }
+			"/inputs/ref": ref
+			if (sshKey & bl.Secret) != _|_ {
+				"/inputs/ssh-key": sshKey
+			}
+			if keepGitDir {
+				"/inputs/keep-gitdir": "true"
+			}
+			"/cache/git": bl.Cache
+		}
 
-        output: {
-            "/outputs/out": bl.Directory
-            "/outputs/commit": string
-            "/outputs/short-commit": string 
-        }
+		output: {
+			"/outputs/out":          bl.Directory
+			"/outputs/commit":       string
+			"/outputs/short-commit": string
+		}
 
-        code: #"""
+		code: #"""
             export GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no'
 
             if [ -f "/inputs/ssh-key" ]; then
@@ -94,42 +94,40 @@ Repository :: {
                 rm -rf /outputs/out/.git
             fi
         """#
-    }
+	}
 }
 
 // Retrieve commit IDs from a git working copy (ie. cloned repository)
 PathCommit :: {
 
-    // Source Directory (git working copy)
-    from: bl.Directory
+	// Source Directory (git working copy)
+	from: bl.Directory
 
-    // Optional path to retrieve git commit IDs from
-    path: *"./" | string
+	// Optional path to retrieve git commit IDs from
+	path: *"./" | string
 
-    // Output commit ID of the Repository
-    commit: strings.TrimRight(pathCommit.output["/outputs/commit"], "\n")
+	// Output commit ID of the Repository
+	commit: strings.TrimRight(pathCommit.output["/outputs/commit"], "\n")
 
-    // Output short-commit ID of the Repository
-    shortCommit: strings.TrimRight(pathCommit.output["/outputs/short-commit"], "\n")
+	// Output short-commit ID of the Repository
+	shortCommit: strings.TrimRight(pathCommit.output["/outputs/short-commit"], "\n")
 
-    pathCommit: bl.BashScript & {
-        os: package: {
-			git: true
+	pathCommit: bl.BashScript & {
+		os: package: git: true
+
+		workdir: "/workdir"
+
+		input: {
+			"/inputs/from": from
+			"/inputs/path": path
 		}
 
-        workdir: "/workdir"
+		output: {
+			"/outputs/commit":       string
+			"/outputs/short-commit": string
+		}
 
-        input: {
-            "/inputs/from": from
-            "/inputs/path": path
-        }
-
-        output: {
-            "/outputs/commit": string
-            "/outputs/short-commit": string
-        }
-
-        code: #"""
+		code: #"""
             git -C /inputs/from log -n 1 --format="%H" -- "$(cat /inputs/path)" > /outputs/commit
             git -C /inputs/from log -n 1 --format="%h" -- "$(cat /inputs/path)" > /outputs/short-commit
             if ! [ -s /outputs/commit ]; then
@@ -137,5 +135,5 @@ PathCommit :: {
                 exit 1
             fi
         """#
-    }
+	}
 }

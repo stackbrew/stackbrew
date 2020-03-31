@@ -5,65 +5,61 @@ import "b.l/bl"
 // Go application built with `go build`
 App :: {
 
-    // Source Directory to build
-    source: bl.Directory
+	// Source Directory to build
+	source: bl.Directory
 
-    // Go version to use
-    version: *"1.14.1" | string
+	// Go version to use
+	version: *"1.14.1" | string
 
-    // Run `go generate` before building
-    generate: *false | true
+	// Run `go generate` before building
+	generate: *false | true
 
-    // Target architecture
-    arch: *"amd64" | string
+	// Target architecture
+	arch: *"amd64" | string
 
-    // Target OS
-    osInput=os: *"linux" | string
+	// Target OS
+	osInput=os: *"linux" | string
 
-    // Build tags to use for building
-    tags: *"netgo" | string
+	// Build tags to use for building
+	tags: *"netgo" | string
 
-    // LDFLAGS to use for linking
-    ldflags: *"-w -extldflags \"-static\"" | string
+	// LDFLAGS to use for linking
+	ldflags: *"-w -extldflags \"-static\"" | string
 
-    // Specify the targeted binary name
-    binaryName?: string
+	// Specify the targeted binary name
+	binaryName?: string
 
-    // FIXME: specifying a default value above breaks (non-concrete value binaryName)
-    if (binaryName & string) == _|_ {
-        binaryName: "app"
-    }
+	// FIXME: specifying a default value above breaks (non-concrete value binaryName)
+	if (binaryName & string) == _|_ {
+		binaryName: "app"
+	}
 
-    // Binary file output of the Go build
-    binary: bl.Directory & {
-        from: build.output["/outputs/out"]
-        path: binaryName
-    }
+	// Binary file output of the Go build
+	binary: bl.Directory & {
+		from: build.output["/outputs/out"]
+		path: binaryName
+	}
 
-    build: bl.BashScript & {
-        input: {
-            "/inputs/source": source
-            "/inputs/version": version
-            if generate {
-                "/inputs/go-generate": "true"
-            }
-            "/inputs/binaryName": binaryName
-            "/inputs/arch": arch
-            "/inputs/os": osInput
-            "/inputs/tags": tags
-            "/inputs/ldflags": ldflags
-            "/cache/go": bl.Cache
-        }
-
-        output: {
-            "/outputs/out": bl.Directory
-        }
-
-        os: package: {
-			"libc6-compat": true
+	build: bl.BashScript & {
+		input: {
+			"/inputs/source":  source
+			"/inputs/version": version
+			if generate {
+				"/inputs/go-generate": "true"
+			}
+			"/inputs/binaryName": binaryName
+			"/inputs/arch":       arch
+			"/inputs/os":         osInput
+			"/inputs/tags":       tags
+			"/inputs/ldflags":    ldflags
+			"/cache/go":          bl.Cache
 		}
 
-        code: #"""
+		output: "/outputs/out": bl.Directory
+
+		os: package: "libc6-compat": true
+
+		code: #"""
             goVersion="$(cat /inputs/version)"
 
             export GOROOT="/cache/go/$goVersion"
@@ -93,5 +89,5 @@ App :: {
                 go build -a -v -tags "$tags" -ldflags "$ldflags" -o "$out"
             )
         """#
-    }
+	}
 }
