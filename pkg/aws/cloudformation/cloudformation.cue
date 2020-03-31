@@ -1,72 +1,70 @@
 package cloudformation
 
 import (
-    "strings"
-    "encoding/json"
+	"strings"
+	"encoding/json"
 
-    "b.l/bl"
-    "stackbrew.io/aws"
+	"b.l/bl"
+	"stackbrew.io/aws"
 )
 
 // AWS CloudFormation Stack
 Stack :: {
 
-    // AWS Config
-    config: aws.Config
+	// AWS Config
+	config: aws.Config
 
-    // Source is the Cloudformation template, either a Cue struct or a JSON/YAML string
-    {
-        source: string
-        sourceRaw: source
-    } | *{
-        source: {...}
-        sourceRaw: json.Marshal(source)
-    }
+	// Source is the Cloudformation template, either a Cue struct or a JSON/YAML string
+	{
+		source:    string
+		sourceRaw: source
+	} | *{
+		source: {...}
+		sourceRaw: json.Marshal(source)
+	}
 
-    sourceRaw: string
+	sourceRaw: string
 
-    // Stackname is the cloudformation stack
-    stackName: string
+	// Stackname is the cloudformation stack
+	stackName: string
 
-    // Stack parameters
-    parameters: [string]: string
+	// Stack parameters
+	parameters: [string]: string
 
-    // Output of the stack apply
-    stackOutput: run.output["/outputs/stack_output"]
+	// Output of the stack apply
+	stackOutput: run.output["/outputs/stack_output"]
 
-    run: bl.BashScript & {
-        input: {
-            "/inputs/aws/access_key": config.accessKey
-            "/inputs/aws/secret_key": config.secretKey
-            "/cache/aws": bl.Cache
-            "/inputs/source": sourceRaw
-            "/inputs/stack_name": stackName
-            if len(parameters) > 0 {
-                "/inputs/parameters": strings.Join(["\(key)=\(val)" for key, val in parameters], " ")
-            }
-        }
+	run: bl.BashScript & {
+		input: {
+			"/inputs/aws/access_key": config.accessKey
+			"/inputs/aws/secret_key": config.secretKey
+			"/cache/aws":             bl.Cache
+			"/inputs/source":         sourceRaw
+			"/inputs/stack_name":     stackName
+			if len(parameters) > 0 {
+				"/inputs/parameters": strings.Join([ "\(key)=\(val)" for key, val in parameters ], " ")
+			}
+		}
 
-        output: {
-            "/outputs/stack_output": string
-        }
+		output: "/outputs/stack_output": string
 
-        os: {
-            package: {
-                python: true
-                coreutils: true
-            }
+		os: {
+			package: {
+				python:    true
+				coreutils: true
+			}
 
-            extraCommand: [
-                "apk add --no-cache py-pip && pip install awscli && apk del py-pip"
-            ]
-        }
+			extraCommand: [
+				"apk add --no-cache py-pip && pip install awscli && apk del py-pip",
+			]
+		}
 
-        environment: {
-            AWS_DEFAULT_REGION: config.region
-            AWS_CONFIG_FILE: "/cache/aws/config"
-        }
+		environment: {
+			AWS_DEFAULT_REGION: config.region
+			AWS_CONFIG_FILE:    "/cache/aws/config"
+		}
 
-        code: #"""
+		code: #"""
             export AWS_ACCESS_KEY_ID="$(cat /inputs/aws/access_key)"
             export AWS_SECRET_ACCESS_KEY="$(cat /inputs/aws/secret_key)"
 
@@ -100,5 +98,5 @@ Stack :: {
                 --query 'Stacks[].Outputs' \
                 --output json > /output/stack_output
         """#
-    }
+	}
 }
