@@ -5,7 +5,7 @@ import (
     "encoding/json"
 
     "b.l/bl"
-    "bl.private/pkg/aws"
+    "stackbrew.io/aws"
 )
 
 // AWS CloudFormation Stack

@@ -2,7 +2,7 @@ package s3
 
 import (
     "b.l/bl"
-    "bl.private/pkg/aws"
+    "stackbrew.io/aws"
 )
 
 // S3 file or Directory upload

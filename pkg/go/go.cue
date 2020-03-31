@@ -26,8 +26,13 @@ App :: {
     // LDFLAGS to use for linking
     ldflags: *"-w -extldflags \"-static\"" | string
 
-    // Specify targetted binary name
-    binaryName: *"app" | string
+    // Specify the targeted binary name
+    binaryName?: string
+
+    // FIXME: specifying a default value above breaks (non-concrete value binaryName)
+    if (binaryName & string) == _|_ {
+        binaryName: "app"
+    }
 
     // Binary file output of the Go build
     binary: bl.Directory & {
