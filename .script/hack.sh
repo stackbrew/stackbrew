@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 TEST_TARGET="${TARGET:-bl-registry:5001/stackbrew-test}"
 PKGDIR="./pkg"
 
-COMPONENTS="$(ls -1 "${PKGDIR}" | grep -v "cue.mod" | grep -v "bl.sum" | sort -n)"
+COMPONENTS="$(find "${PKGDIR}" -type f -name "*.cue" | grep -v cue.mod | cut -d/ -f3- | sed -E 's=/[^/]+$==' | uniq | sort -n)"
 
 case "${1}" in
     fmt)
@@ -36,7 +36,7 @@ case "${1}" in
             (
                 echo "+++ TESTING ${component}"
                 cd "${PKGDIR}/${component}"
-                bl-runtime test -t "$TEST_TARGET:${component}"
+                bl-runtime test -t "$TEST_TARGET:${component/\//.}"
             )
         done
     ;;
@@ -56,9 +56,9 @@ case "${1}" in
         for component in ${COMPONENTS}; do
             (
                 echo "+++ DOCUMENTING ${component}"
-                cd "${PKGDIR}/${component}"
+                cd "${PKGDIR}"
                 echo >> "$docs"
-                bl-runtime doc -o md >> "$docs"
+                bl-runtime doc -c "${component}" -o md >> "$docs"
             )
         done
     ;;

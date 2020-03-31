@@ -1,5 +1,51 @@
 # Packages
 
+## aws
+
+### Config
+
+AWS Config shared by all AWS packages
+
+#### Fields
+
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+|*region*          |``string``         |N/A                |
+|*accessKey*       |``bl.Secret``      |N/A                |
+|*secretKey*       |``bl.Secret``      |N/A                |
+
+## cloudformation
+
+### Stack
+
+AWS CloudFormation Stack
+
+#### Fields
+
+| FIELD            | SPEC                                      | DOC                                     |
+| -------------    |:-------------:                            |:-------------:                          |
+|*config*          |``aws.Config``                             |AWS Config                               |
+|*source*          |``{...}``                                  |N/A                                      |
+|*sourceRaw*       |``"{}"``                                   |N/A                                      |
+|*stackName*       |``string``                                 |Stackname is the cloudformation stack    |
+|*parameters*      |``{ [string]: string }``                   |Stack parameters                         |
+|*stackOutput*     |``run.output["/outputs/stack_output"]``    |Output of the stack apply                |
+
+## s3
+
+### Put
+
+S3 file or Directory upload
+
+#### Fields
+
+| FIELD            | SPEC                             | DOC                                                        |
+| -------------    |:-------------:                   |:-------------:                                             |
+|*url*             |``run.output["/outputs/url"]``    |URL of the uploaded S3 object                               |
+|*config*          |``aws.Config``                    |AWS Config                                                  |
+|*source*          |``string \| bl.Directory``        |Source Directory, File or String to Upload to S3            |
+|*target*          |``string``                        |Target S3 URL (eg. s3://<bucket-name>/<path>/<sub-path>)    |
+
 ## file
 
 ### Read
@@ -54,6 +100,36 @@ Glob returns a list of files.
 |*files*           |``_\|_(cannot use string (type string) as bytes in argument 0 to encoding/json.Unmarshal: non-concrete value string)``    |files that matched                                 |
 |*source*          |``bl.Directory``                                                                                                          |source directory                                   |
 
+## git
+
+### Repository
+
+Git repository
+
+#### Fields
+
+| FIELD            | SPEC                                                                 | DOC                                        |
+| -------------    |:-------------:                                                       |:-------------:                             |
+|*url*             |``string``                                                            |URL of the Repository                       |
+|*ref*             |``*"master" \| string``                                               |Git Ref to checkout                         |
+|*keepGitDir*      |``*false \| bool``                                                    |Keep .git directory after clone             |
+|*out*             |``clone.output["/outputs/out"]``                                      |Output directory of the `git clone`         |
+|*commit*          |``strings.TrimRight(clone.output["/outputs/commit"], "\n")``          |Output commit ID of the Repository          |
+|*shortCommit*     |``strings.TrimRight(clone.output["/outputs/short-commit"], "\n")``    |Output short-commit ID of the Repository    |
+
+### PathCommit
+
+Retrieve commit IDs from a git working copy (ie. cloned repository)
+
+#### Fields
+
+| FIELD            | SPEC                                                                      | DOC                                             |
+| -------------    |:-------------:                                                            |:-------------:                                  |
+|*path*            |``*"./" \| string``                                                        |Optional path to retrieve git commit IDs from    |
+|*from*            |``bl.Directory``                                                           |Source Directory (git working copy)              |
+|*commit*          |``strings.TrimRight(pathCommit.output["/outputs/commit"], "\n")``          |Output commit ID of the Repository               |
+|*shortCommit*     |``strings.TrimRight(pathCommit.output["/outputs/short-commit"], "\n")``    |Output short-commit ID of the Repository         |
+
 ## github
 
 ### Repository
@@ -66,6 +142,26 @@ Glob returns a list of files.
 |*token*           |``bl.Secret``                                                                                                                                                                                             |N/A                |
 |*owner*           |``string``                                                                                                                                                                                                |N/A                |
 |*pr*              |``{ [prId=string]: { id: prId status: "open" \| "closed" comments: [commentId=string]: { author: string text: string } branch: { name: string tip: { commitId: string checkout: bl.Directory } } } }``    |N/A                |
+
+## go
+
+### App
+
+Go application built with `go build`
+
+#### Fields
+
+| FIELD            | SPEC                                                                         | DOC                                  |
+| -------------    |:-------------:                                                               |:-------------:                       |
+|*os*              |``*"linux" \| string``                                                        |Target OS                             |
+|*source*          |``bl.Directory``                                                              |Source Directory to build             |
+|*version*         |``*"1.14.1" \| string``                                                       |Go version to use                     |
+|*generate*        |``*false \| true``                                                            |Run `go generate` before building     |
+|*arch*            |``*"amd64" \| string``                                                        |Target architecture                   |
+|*tags*            |``*"netgo" \| string``                                                        |Build tags to use for building        |
+|*ldflags*         |``*"-w -extldflags \"-static\"" \| string``                                   |LDFLAGS to use for linking            |
+|*binaryName*      |``"app"``                                                                     |Specify the targeted binary name      |
+|*binary*          |``bl.Directory & { from: build.output["/outputs/out"] path: binaryName }``    |Binary file output of the Go build    |
 
 ## googlecloud
 
@@ -203,3 +299,16 @@ A javascript application built by Yarn
 |*writeEnvFile*      |``string \| *""``                        |Write the contents of `environment` to this file, in the "envfile" format.             |
 |*buildDirectory*    |``string \| *"build"``                   |Read build output from this directory (path must be relative to working directory).    |
 |*build*             |``action.build.output["/app/build"]``    |Output of yarn build                                                                   |
+
+## zip
+
+### Archive
+
+Zip archive
+
+#### Fields
+
+| FIELD            | SPEC                                                        | DOC                                            |
+| -------------    |:-------------:                                              |:-------------:                                 |
+|*source*          |``bl.Directory \| string``                                   |Source Directory, File or String to Zip from    |
+|*archive*         |``{ from: run.output["/outputs/out"] path: "file.zip" }``    |Archive file output                             |
