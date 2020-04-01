@@ -30,7 +30,7 @@ Read :: {
 // Create writes contents to the given file.
 Create :: {
 	// source directory
-	source: bl.Directory
+	source?: bl.Directory
 
 	// result directory
 	result: script.output["/result"]
@@ -45,7 +45,9 @@ Create :: {
 	contents: bytes | string
 
 	script: bl.BashScript & {
-		input: "/src":      source
+		if (source & bl.Directory) != _|_ {
+			input: "/src": source
+		}
 		input: "/contents": contents
 		output: "/result":  bl.Directory
 		environment: {
@@ -53,6 +55,7 @@ Create :: {
 			PERM:     strconv.FormatInt(permissions, 8)
 		}
 		code: """
+        [ ! -d /src ] && mkdir /src
         cp -a /src /result
         dest="/result/$FILENAME"
         cp /contents "$dest"

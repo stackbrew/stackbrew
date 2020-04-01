@@ -39,6 +39,20 @@ TestCreate: {
 	}
 }
 
+TestCreateNoSource: {
+	create: Create & {
+		filename: "/new"
+		contents: "new file"
+	}
+
+	test: bl.BashScript & {
+		input: "/test": create.result
+		code: """
+        test "$(cat /test/new)" = "new file"
+        """
+	}
+}
+
 TestAppend: {
 	append: Append & {
 		source: bl.Directory & {
