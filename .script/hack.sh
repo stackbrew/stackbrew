@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 TEST_TARGET="${TARGET:-bl-registry:5001/stackbrew-test}"
 PKGDIR="./pkg"
 
-COMPONENTS="$(find "${PKGDIR}" -type f -name "*.cue" | grep -v cue.mod | cut -d/ -f3- | sed -E 's=/[^/]+$==' | uniq | sort -n)"
+COMPONENTS="${COMPONENTS:=$(find "${PKGDIR}" -type f -name "*.cue" | grep -v cue.mod | cut -d/ -f3- | sed -E 's=/[^/]+$==' | uniq | sort -n)}"
 
 case "${1}" in
     fmt)
