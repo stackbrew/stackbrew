@@ -9,6 +9,8 @@ PKGDIR="./pkg"
 
 COMPONENTS="${COMPONENTS:=$(find "${PKGDIR}" -type f -name "*.cue" | grep -v cue.mod | cut -d/ -f3- | sed -E 's=/[^/]+$==' | uniq | sort -n)}"
 
+TEST_CONFIG="$(pwd)/testconfig.secret.json"
+
 case "${1}" in
     fmt)
         for component in ${COMPONENTS}; do
@@ -36,7 +38,7 @@ case "${1}" in
             (
                 echo "+++ TESTING ${component}"
                 cd "${PKGDIR}/${component}"
-                bl-runtime test -t "$TEST_TARGET:${component/\//.}"
+                bl-runtime test -f "$TEST_CONFIG" -t "$TEST_TARGET:${component/\//.}"
             )
         done
     ;;
