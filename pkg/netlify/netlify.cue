@@ -35,7 +35,7 @@ Site :: {
 	url: deploy.output["/info/url"]
 
 	deploy: bl.BashScript & {
-		runPolicy: "always"
+		policy: "always"
 
 		workdir: "/site/contents"
 		input: "/site/contents": contents
