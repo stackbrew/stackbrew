@@ -29,6 +29,21 @@ AWS CloudFormation Stack
 |*parameters*      |``{ [string]: string }``                   |Stack parameters                         |
 |*stackOutput*     |``run.output["/outputs/stack_output"]``    |Output of the stack apply                |
 
+## ecr
+
+### Credentials
+
+Credentials retriever for ECR
+
+#### Fields
+
+| FIELD            | SPEC                                                                                                                                                                                                                      | DOC                             |
+| -------------    |:-------------:                                                                                                                                                                                                            |:-------------:                  |
+|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``    |URL of the uploaded S3 object    |
+|*target*          |``string``                                                                                                                                                                                                                 |Target is the ECR image          |
+|*config*          |``aws.Config``                                                                                                                                                                                                             |AWS Config                       |
+|*helperUrl*       |``"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"``                                                                                               |N/A                              |
+
 ## eks
 
 ### AuthConfig
@@ -195,7 +210,7 @@ Go application built with `go build`
 | FIELD            | SPEC                                                                                                                                                                 | DOC                                               |
 | -------------    |:-------------:                                                                                                                                                       |:-------------:                                    |
 |*id*              |``string``                                                                                                                                                            |activateUrl: string action: checkActivate: {  }    |
-|*account*         |``{ key: { ... } }``                                                                                                                                                  |N/A                                                |
+|*account*         |``{ key: { // FIXME: google cloud service key schema ... } }``                                                                                                        |N/A                                                |
 |*GCR*             |``{ // A GCR container repository Repository: { name: string tag: [string]: bl.Directory unknownTags: "remove" \| *"ignore" \| "error" ref: "gcr.io/\(name)" } }``    |N/A                                                |
 |*GKE*             |``{ // A GKE cluster Cluster: kubernetes.Cluster & { name: string zone: *"us-west1" \| string create: *true \| bool } }``                                             |N/A                                                |
 |*SQL*             |``{}``                                                                                                                                                                |N/A                                                |
