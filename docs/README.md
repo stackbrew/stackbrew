@@ -11,8 +11,6 @@ AWS Config shared by all AWS packages
 | FIELD            | SPEC              | DOC               |
 | -------------    |:-------------:    |:-------------:    |
 |*region*          |``string``         |N/A                |
-|*accessKey*       |``bl.Secret``      |N/A                |
-|*secretKey*       |``bl.Secret``      |N/A                |
 
 ## cloudformation
 
@@ -24,12 +22,40 @@ AWS CloudFormation Stack
 
 | FIELD            | SPEC                                      | DOC                                     |
 | -------------    |:-------------:                            |:-------------:                          |
-|*config*          |``aws.Config``                             |AWS Config                               |
 |*source*          |``{...}``                                  |N/A                                      |
+|*config*          |``aws.Config``                             |AWS Config                               |
 |*sourceRaw*       |``"{}"``                                   |N/A                                      |
 |*stackName*       |``string``                                 |Stackname is the cloudformation stack    |
 |*parameters*      |``{ [string]: string }``                   |Stack parameters                         |
 |*stackOutput*     |``run.output["/outputs/stack_output"]``    |Output of the stack apply                |
+
+## eks
+
+### AuthConfig
+
+AuthConfig config outputs a valid kube-auth-config for kubectl client
+
+#### Fields
+
+| FIELD              | SPEC                              | DOC                |
+| -------------      |:-------------:                    |:-------------:     |
+|*config*            |``aws.Config``                     |AWS Config          |
+|*eksClusterName*    |``string``                         |EKS cluster name    |
+|*out*               |``run.output["/outputs/auth"]``    |N/A                 |
+
+### Deployment
+
+Deployment of a kubernetes configuration on an AWS EKS cluster
+
+#### Fields
+
+| FIELD              | SPEC                       | DOC                                 |
+| -------------      |:-------------:             |:-------------:                      |
+|*config*            |``aws.Config``              |AWS Config                           |
+|*kubeConfigYAML*    |``string``                  |Kubernetes config to deploy          |
+|*namespace*         |``string``                  |Kubernetes Namespace to deploy to    |
+|*version*           |``*"v1.14.7" \| string``    |Version of kubectl client            |
+|*kubeAuthConfig*    |``string``                  |Kube auth config file                |
 
 ## s3
 
@@ -42,9 +68,9 @@ S3 file or Directory upload
 | FIELD            | SPEC                             | DOC                                                        |
 | -------------    |:-------------:                   |:-------------:                                             |
 |*url*             |``run.output["/outputs/url"]``    |URL of the uploaded S3 object                               |
-|*config*          |``aws.Config``                    |AWS Config                                                  |
 |*source*          |``string \| bl.Directory``        |Source Directory, File or String to Upload to S3            |
 |*target*          |``string``                        |Target S3 URL (eg. s3://<bucket-name>/<path>/<sub-path>)    |
+|*config*          |``aws.Config``                    |AWS Config                                                  |
 
 ## file
 
@@ -71,7 +97,6 @@ Create writes contents to the given file.
 |*filename*        |``!=""``                        |filename names the file to write.                                             |
 |*contents*        |``bytes \| string``             |contents specifies the bytes to be written.                                   |
 |*permissions*     |``int \| *0o644``               |permissions defines the permissions to use if the file does not yet exist.    |
-|*source*          |``bl.Directory``                |source directory                                                              |
 |*result*          |``script.output["/result"]``    |result directory                                                              |
 
 ### Append
@@ -139,7 +164,6 @@ Retrieve commit IDs from a git working copy (ie. cloned repository)
 | FIELD            | SPEC                                                                                                                                                                                                     | DOC               |
 | -------------    |:-------------:                                                                                                                                                                                           |:-------------:    |
 |*name*            |``string``                                                                                                                                                                                                |N/A                |
-|*token*           |``bl.Secret``                                                                                                                                                                                             |N/A                |
 |*owner*           |``string``                                                                                                                                                                                                |N/A                |
 |*pr*              |``{ [prId=string]: { id: prId status: "open" \| "closed" comments: [commentId=string]: { author: string text: string } branch: { name: string tip: { commitId: string checkout: bl.Directory } } } }``    |N/A                |
 
@@ -151,17 +175,16 @@ Go application built with `go build`
 
 #### Fields
 
-| FIELD            | SPEC                                                                         | DOC                                  |
-| -------------    |:-------------:                                                               |:-------------:                       |
-|*os*              |``*"linux" \| string``                                                        |Target OS                             |
-|*source*          |``bl.Directory``                                                              |Source Directory to build             |
-|*version*         |``*"1.14.1" \| string``                                                       |Go version to use                     |
-|*generate*        |``*false \| true``                                                            |Run `go generate` before building     |
-|*arch*            |``*"amd64" \| string``                                                        |Target architecture                   |
-|*tags*            |``*"netgo" \| string``                                                        |Build tags to use for building        |
-|*ldflags*         |``*"-w -extldflags \"-static\"" \| string``                                   |LDFLAGS to use for linking            |
-|*binaryName*      |``"app"``                                                                     |Specify the targeted binary name      |
-|*binary*          |``bl.Directory & { from: build.output["/outputs/out"] path: binaryName }``    |Binary file output of the Go build    |
+| FIELD            | SPEC                                          | DOC                                 |
+| -------------    |:-------------:                                |:-------------:                      |
+|*os*              |``*"linux" \| string``                         |Target OS                            |
+|*source*          |``bl.Directory``                               |Source Directory to build            |
+|*version*         |``*"1.14.1" \| string``                        |Go version to use                    |
+|*generate*        |``*false \| true``                             |Run `go generate` before building    |
+|*arch*            |``*"amd64" \| string``                         |Target architecture                  |
+|*tags*            |``*"netgo" \| string``                         |Build tags to use for building       |
+|*ldflags*         |``*"-w -extldflags \"-static\"" \| string``    |LDFLAGS to use for linking           |
+|*binaryName*      |``"app"``                                      |Specify the targeted binary name     |
 
 ## googlecloud
 
@@ -172,7 +195,7 @@ Go application built with `go build`
 | FIELD            | SPEC                                                                                                                                                                 | DOC                                               |
 | -------------    |:-------------:                                                                                                                                                       |:-------------:                                    |
 |*id*              |``string``                                                                                                                                                            |activateUrl: string action: checkActivate: {  }    |
-|*account*         |``{ key: { // FIXME: google cloud service key schema ... } }``                                                                                                        |N/A                                                |
+|*account*         |``{ key: { ... } }``                                                                                                                                                  |N/A                                                |
 |*GCR*             |``{ // A GCR container repository Repository: { name: string tag: [string]: bl.Directory unknownTags: "remove" \| *"ignore" \| "error" ref: "gcr.io/\(name)" } }``    |N/A                                                |
 |*GKE*             |``{ // A GKE cluster Cluster: kubernetes.Cluster & { name: string zone: *"us-west1" \| string create: *true \| bool } }``                                             |N/A                                                |
 |*SQL*             |``{}``                                                                                                                                                                |N/A                                                |
@@ -204,9 +227,9 @@ Go application built with `go build`
 
 | FIELD            | SPEC                              | DOC               |
 | -------------    |:-------------:                    |:-------------:    |
+|*secret*          |``{ [string]: stringData: _ }``    |N/A                |
 |*deployment*      |``{ [string]: spec: _ }``          |N/A                |
 |*ingress*         |``{ [string]: spec: _ }``          |N/A                |
-|*secret*          |``{ [string]: stringData: _ }``    |N/A                |
 
 ### YamlDirectory
 
@@ -251,7 +274,6 @@ A Netlify account
 | FIELD            | SPEC                | DOC                                                                              |
 | -------------    |:-------------:      |:-------------:                                                                   |
 |*name*            |``string \| *""``    |Use this Netlify account name (also referred to as "team" in the Netlify docs)    |
-|*token*           |``bl.Secret``        |Netlify authentication token                                                      |
 
 ### Site
 
@@ -276,11 +298,11 @@ A Netlify site
 
 | FIELD            | SPEC                       | DOC               |
 | -------------    |:-------------:             |:-------------:    |
+|*image*           |``bl.Directory``            |N/A                |
 |*environment*     |``{ [string]: string }``    |N/A                |
+|*source*          |``bl.Directory``            |N/A                |
 |*buildScript*     |``string``                  |N/A                |
 |*runScript*       |``string``                  |N/A                |
-|*source*          |``bl.Directory``            |N/A                |
-|*image*           |``bl.Directory``            |N/A                |
 
 ## yarn
 
@@ -292,13 +314,13 @@ A javascript application built by Yarn
 
 | FIELD              | SPEC                                    | DOC                                                                                   |
 | -------------      |:-------------:                          |:-------------:                                                                        |
+|*build*             |``action.build.output["/app/build"]``    |Output of yarn build                                                                   |
 |*environment*       |``{ [string]: string }``                 |Set these environment variables during the build                                       |
 |*source*            |``bl.Directory``                         |Source code of the javascript application                                              |
 |*loadEnv*           |``bool \| *true``                        |Load the contents of `environment` into the yarn process?                              |
 |*yarnScript*        |``string \| *"build"``                   |Run this yarn script                                                                   |
 |*writeEnvFile*      |``string \| *""``                        |Write the contents of `environment` to this file, in the "envfile" format.             |
 |*buildDirectory*    |``string \| *"build"``                   |Read build output from this directory (path must be relative to working directory).    |
-|*build*             |``action.build.output["/app/build"]``    |Output of yarn build                                                                   |
 
 ## zip
 
