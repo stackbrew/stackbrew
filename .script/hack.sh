@@ -17,7 +17,8 @@ case "${1}" in
             (
                 echo "+++ FMT ${component}"
                 cd "${PKGDIR}/${component}"
-                cue fmt -s
+                # FIXME: fmt is broken with _test.cue files
+                #cue fmt -s
                 cue trim -s
             )
         done
