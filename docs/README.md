@@ -57,6 +57,51 @@ KubeConfig config outputs a valid kube-auth-config for kubectl client
 |*config*          |``aws.Config``     |AWS Config          |
 |*cluster*         |``string``         |EKS cluster name    |
 
+### elasticbeanstalk
+
+#### Application
+
+Elastic Beanstalk Application
+
+##### Fields
+
+| FIELD               | SPEC                             | DOC                          |
+| -------------       |:-------------:                   |:-------------:               |
+|*config*             |``aws.Config``                    |AWS Config                    |
+|*applicationName*    |``string``                        |Beanstalk application name    |
+|*out*                |``run.output["/outputs/out"]``    |N/A                           |
+
+#### Environment
+
+Elastic Beanstalk Environment
+
+##### Fields
+
+| FIELD               | SPEC                                                                                                                                                            | DOC                                                    |
+| -------------       |:-------------:                                                                                                                                                  |:-------------:                                         |
+|*platform*           |``string``                                                                                                                                                       |Elastic Beanstalk platform to use                       |
+|*source*             |``bl.Directory``                                                                                                                                                 |Source code to deploy                                   |
+|*config*             |``aws.Config``                                                                                                                                                   |AWS Config                                              |
+|*applicationName*    |``string``                                                                                                                                                       |Application name                                        |
+|*out*                |``run.output["/outputs/out"]``                                                                                                                                   |N/A                                                     |
+|*environmentName*    |``string``                                                                                                                                                       |Beanstalk environment name                              |
+|*createOptions*      |``{ cname?: string tier?: string instance_type?: string instance_profile?: string service_role?: string keyname?: string scale?: string elb_type?: string }``    |Environment create options; check `eb create --help`    |
+|*cname*              |``run.output["/outputs/cname"]``                                                                                                                                 |N/A                                                     |
+
+#### Deployment
+
+Elastic Beanstalk Deployment
+
+##### Fields
+
+| FIELD               | SPEC                               | DOC                          |
+| -------------       |:-------------:                     |:-------------:               |
+|*source*             |``bl.Directory``                    |Source code to deploy         |
+|*config*             |``aws.Config``                      |AWS Config                    |
+|*applicationName*    |``string``                          |Application name              |
+|*environmentName*    |``string``                          |Beanstalk environment name    |
+|*cname*              |``run.output["/outputs/cname"]``    |N/A                           |
+
 ### s3
 
 #### Put
