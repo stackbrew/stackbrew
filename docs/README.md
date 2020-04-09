@@ -37,12 +37,12 @@ Credentials retriever for ECR
 
 ##### Fields
 
-| FIELD            | SPEC                                                                                                                                                                                                                      | DOC                             |
-| -------------    |:-------------:                                                                                                                                                                                                            |:-------------:                  |
-|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``    |URL of the uploaded S3 object    |
-|*target*          |``string``                                                                                                                                                                                                                 |Target is the ECR image          |
-|*config*          |``aws.Config``                                                                                                                                                                                                             |AWS Config                       |
-|*helperUrl*       |``"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"``                                                                                               |N/A                              |
+| FIELD            | SPEC                                                                                                                                                                                                                      | DOC                       |
+| -------------    |:-------------:                                                                                                                                                                                                            |:-------------:            |
+|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``    |Registry Credentials       |
+|*target*          |``string``                                                                                                                                                                                                                 |Target is the ECR image    |
+|*config*          |``aws.Config``                                                                                                                                                                                                             |AWS Config                 |
+|*helperUrl*       |``"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"``                                                                                               |N/A                        |
 
 ### eks
 
@@ -198,6 +198,21 @@ Google Cloud Config shared by all packages
 | -------------    |:-------------:    |:-------------:    |
 |*region*          |``string``         |N/A                |
 |*project*         |``string``         |N/A                |
+
+### gcr
+
+#### Credentials
+
+Credentials retriever for GCR
+
+##### Fields
+
+| FIELD            | SPEC                                                                                                                                                                                                                      | DOC                       |
+| -------------    |:-------------:                                                                                                                                                                                                            |:-------------:            |
+|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``    |Registry Credentials       |
+|*target*          |``string``                                                                                                                                                                                                                 |Target is the GCR image    |
+|*config*          |``googlecloud.Config``                                                                                                                                                                                                     |GCP Config                 |
+|*helperUrl*       |``"https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.1/docker-credential-gcr_linux_amd64-2.0.1.tar.gz"``                                                                                 |N/A                        |
 
 ### gke
 

@@ -15,7 +15,7 @@ Credentials :: {
 	// Target is the ECR image
 	target: string
 
-	// URL of the uploaded S3 object
+	// Registry Credentials
 	credentials: bl.RegistryCredentials & {
 		username: run.output["/outputs/username"]
 		secret:   bl.Secret & {
