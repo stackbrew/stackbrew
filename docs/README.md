@@ -203,17 +203,44 @@ Go application built with `go build`
 
 ## googlecloud
 
-### Project
+### Config
+
+Google Cloud Config shared by all packages
 
 #### Fields
 
-| FIELD            | SPEC                                                                                                                                                                 | DOC                                               |
-| -------------    |:-------------:                                                                                                                                                       |:-------------:                                    |
-|*id*              |``string``                                                                                                                                                            |activateUrl: string action: checkActivate: {  }    |
-|*account*         |``{ key: { // FIXME: google cloud service key schema ... } }``                                                                                                        |N/A                                                |
-|*GCR*             |``{ // A GCR container repository Repository: { name: string tag: [string]: bl.Directory unknownTags: "remove" \| *"ignore" \| "error" ref: "gcr.io/\(name)" } }``    |N/A                                                |
-|*GKE*             |``{ // A GKE cluster Cluster: kubernetes.Cluster & { name: string zone: *"us-west1" \| string create: *true \| bool } }``                                             |N/A                                                |
-|*SQL*             |``{}``                                                                                                                                                                |N/A                                                |
+| FIELD            | SPEC              | DOC               |
+| -------------    |:-------------:    |:-------------:    |
+|*region*          |``string``         |N/A                |
+|*project*         |``string``         |N/A                |
+
+## gke
+
+### AuthConfig
+
+AuthConfig config outputs a valid kube-auth-config for kubectl client
+
+#### Fields
+
+| FIELD              | SPEC                              | DOC                |
+| -------------      |:-------------:                    |:-------------:     |
+|*config*            |``googlecloud.Config``             |GCP Config          |
+|*gkeClusterName*    |``string``                         |GKE cluster name    |
+|*out*               |``run.output["/outputs/auth"]``    |N/A                 |
+
+### Deployment
+
+Deployment of a kubernetes configuration on an GKE cluster
+
+#### Fields
+
+| FIELD              | SPEC                       | DOC                                 |
+| -------------      |:-------------:             |:-------------:                      |
+|*config*            |``googlecloud.Config``      |GCP Config                           |
+|*kubeConfigYAML*    |``string``                  |Kubernetes config to deploy          |
+|*namespace*         |``string``                  |Kubernetes Namespace to deploy to    |
+|*version*           |``*"v1.14.7" \| string``    |Version of kubectl client            |
+|*kubeAuthConfig*    |``string``                  |Kube auth config file                |
 
 ## kubernetes
 
