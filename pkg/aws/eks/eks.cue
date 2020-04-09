@@ -11,100 +11,62 @@ AuthConfig :: {
 	config: aws.Config
 
 	// EKS cluster name
-	eksClusterName: string
+	cluster: string
 
-	out: run.output["/outputs/auth"]
-
-	run: bl.BashScript & {
-		input: {
-			"/inputs/aws/access_key": config.accessKey
-			"/inputs/aws/secret_key": config.secretKey
-			"/inputs/cluster_name":   eksClusterName
-			"/cache/aws":             bl.Cache
-		}
-
-		output: "/outputs/auth": string
-
-		os: {
-			package: {
-				python:    true
-				coreutils: true
-			}
-
-			extraCommand: [
-				"apk add --no-cache py-pip && pip install awscli && apk del py-pip",
-			]
-		}
-
-		environment: {
-			AWS_DEFAULT_REGION: config.region
-			AWS_CONFIG_FILE:    "/cache/aws/config"
-		}
-
-		code: """
-            export AWS_ACCESS_KEY_ID="$(cat /inputs/aws/access_key)"
-            export AWS_SECRET_ACCESS_KEY="$(cat /inputs/aws/secret_key)"
-
-            aws eks update-kubeconfig --name "$(cat /inputs/cluster_name)"
-            cp ~/.kube/config /outputs/auth
-        """
-	}
-}
-
-// Deployment of a kubernetes configuration on an AWS EKS cluster
-Deployment :: {
-	// AWS Config
-	config: aws.Config
-
-	// Kubernetes config to deploy
-	kubeConfigYAML: string
-
-	// Kubernetes Namespace to deploy to
-	namespace: string
+	kubeconfig: run.output["/outputs/kubeconfig"]
 
 	// Version of kubectl client
-	version: *"v1.14.7" | string
+	kubectlVersion: "v1.14.7"
 
-	// Kube auth config file
-	kubeAuthConfig: string
-
-	deploy: bl.BashScript & {
+	run: bl.BashScript & {
 		runPolicy: "always"
 
 		input: {
-			"/kube/config.yaml":      kubeConfigYAML
-			"/kube/auth":             kubeAuthConfig
-			"/kube/namespace":        namespace
-			"/inputs/aws/access_key": config.accessKey
-			"/inputs/aws/secret_key": config.secretKey
+			"/inputs/access_key": config.accessKey
+			"/inputs/secret_key": config.secretKey
+			"/cache/aws":         bl.Cache
 		}
+
+		output: "/outputs/kubeconfig": string
 
 		os: {
 			package: {
-				curl:      true
-				python:    true
-				coreutils: true
+				python: true
+				curl:   true
 			}
 
 			extraCommand: [
 				"apk add --no-cache py-pip && pip install awscli && apk del py-pip",
-				"curl -L https://dl.k8s.io/\(version)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl",
+				"curl -L https://dl.k8s.io/\(kubectlVersion)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl",
 			]
 		}
 
 		environment: {
-			AWS_DEFAULT_REGION: config.region
 			AWS_CONFIG_FILE:    "/cache/aws/config"
+			AWS_DEFAULT_REGION: config.region
+			EKS_CLUSTER:        cluster
 		}
 
-		code: """
-            export AWS_ACCESS_KEY_ID="$(cat /inputs/aws/access_key)"
-            export AWS_SECRET_ACCESS_KEY="$(cat /inputs/aws/secret_key)"
-            export KUBECONFIG=/kube/auth
+		code: #"""
+            export KUBECONFIG=/outputs/kubeconfig
+            export AWS_ACCESS_KEY_ID="$(cat /inputs/access_key)"
+            export AWS_SECRET_ACCESS_KEY="$(cat /inputs/secret_key)"
 
-            namespace="$(cat /kube/namespace)"
-            kubectl create namespace "$namespace" || true
-            kubectl --namespace "$namespace" apply -f /kube/config.yaml
-        """
+            # Generate a kube configiration
+            aws eks update-kubeconfig --name "$EKS_CLUSTER"
+
+            # Figure out the kubernetes username
+            CONTEXT="$(kubectl config current-context)"
+            USER="$(kubectl config view -o json | \
+                jq -r ".contexts[] | select(.name==\"$CONTEXT\") | .context.user")"
+
+            # Grab a kubernetes access token
+            ACCESS_TOKEN="$(aws eks get-token --cluster-name "$EKS_CLUSTER" | \
+                jq -r .status.token)"
+
+            # Remove the user config and replace it with the token
+            kubectl config unset "users.${USER}"
+            kubectl config set-credentials "$USER" --token "$ACCESS_TOKEN"
+        """#
 	}
 }

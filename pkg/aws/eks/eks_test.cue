@@ -3,6 +3,7 @@ package eks
 import (
 	"b.l/bl"
 	"stackbrew.io/aws"
+	"stackbrew.io/kubernetes"
 )
 
 TestConfig: {
@@ -10,21 +11,7 @@ TestConfig: {
     eksClusterName: string
 }
 
-TestAuthConfig: {
-    authenticate: AuthConfig & {
-        config: TestConfig.awsConfig
-        eksClusterName: TestConfig.eksClusterName
-    }
-
-    test: bl.BashScript & {
-        input: "/auth": authenticate.out
-        code: """
-        test -n /auth
-        """
-    }
-}
-
-TestDeployment: {
+TestEKS: {
 	// Generate some random
 	genRandom: bl.BashScript & {
 		runPolicy: "always"
@@ -39,20 +26,20 @@ TestDeployment: {
     // Authenticate against EKS
     authenticate: AuthConfig & {
         config: TestConfig.awsConfig
-        eksClusterName: TestConfig.eksClusterName
+        cluster: TestConfig.eksClusterName
     }
 
     // Deploy a dummy config
-    deploy: Deployment & {
-        config: TestConfig.awsConfig
-        kubeAuthConfig: authenticate.out
+    deploy: kubernetes.Apply & {
+        kubeconfig: authenticate.kubeconfig
         namespace: "stackbrew-test"
-        kubeConfigYAML: #"""
+        source: #"""
             apiVersion: v1
             kind: Pod
             metadata:
                 name: "kubernetes-test-\#(random)"
             spec:
+                restartPolicy: "Never"
                 containers:
                     - name: test
                       image: hello-world

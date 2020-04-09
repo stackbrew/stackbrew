@@ -1,17 +1,17 @@
-package gke
+package kubernetes
 
 import (
 	"b.l/bl"
-	"stackbrew.io/googlecloud"
-	"stackbrew.io/kubernetes"
+	"stackbrew.io/aws"
+	"stackbrew.io/aws/eks"
 )
 
 TestConfig: {
-	gcpConfig:     googlecloud.Config
-    gkeClusterName: string
+	awsConfig:     aws.Config
+    eksClusterName: string
 }
 
-TestGKE: {
+TestEKS: {
 	// Generate some random
 	genRandom: bl.BashScript & {
 		runPolicy: "always"
@@ -23,14 +23,14 @@ TestGKE: {
 
 	random: genRandom.output["/rand"]
 
-    // Authenticate against GKE
-    authenticate: AuthConfig & {
-        config: TestConfig.gcpConfig
-        cluster: TestConfig.gkeClusterName
+    // Authenticate against EKS
+    authenticate: eks.AuthConfig & {
+        config: TestConfig.awsConfig
+        cluster: TestConfig.eksClusterName
     }
 
-    // Deploy a dummy config
-    deploy: kubernetes.Apply & {
+    // Deploy a dummy inline config
+    deployString: Apply & {
         kubeconfig: authenticate.kubeconfig
         namespace: "stackbrew-test"
         source: #"""
@@ -44,5 +44,13 @@ TestGKE: {
                     - name: test
                       image: hello-world
             """#
+    }
+
+    deployDirectory: Apply & {
+        kubeconfig: authenticate.kubeconfig
+        namespace: "stackbrew-test"
+        source: bl.Directory & {
+            local: "./testdata"
+        }
     }
 }

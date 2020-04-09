@@ -11,109 +11,66 @@ AuthConfig :: {
 	config: googlecloud.Config
 
 	// GKE cluster name
-	gkeClusterName: string
+	cluster: string
 
-	out: run.output["/outputs/auth"]
-
-	run: bl.BashScript & {
-		input: {
-			"/inputs/service_key": config.serviceKey
-			"/cache/googlecloud":  bl.Cache
-		}
-
-		output: "/outputs/auth": string
-
-		os: {
-			package: {
-				python:    true
-				coreutils: true
-				curl:      true
-			}
-
-			extraCommand: [
-				"curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-288.0.0-linux-x86_64.tar.gz | tar -C /var -zx",
-			]
-		}
-
-		environment: {
-			CLOUDSDK_CONFIG: "/cache/gcloud/gcloud-config"
-			GKE_REGION:      config.region
-			GKE_PROJECT:     config.project
-			GKE_CLUSTER:     gkeClusterName
-		}
-
-		code: """
-        export PATH="/var/google-cloud-sdk/bin:${PATH}"
-
-        gcloud -q auth activate-service-account --key-file=/inputs/service_key
-        gcloud -q config set project "$GKE_PROJECT"
-        gcloud -q config set compute/zone "$GKE_REGION"
-
-        gcloud -q container clusters get-credentials "$GKE_CLUSTER"
-
-        cp ~/.kube/config /outputs/auth
-        """
-	}
-}
-
-// Deployment of a kubernetes configuration on an GKE cluster
-Deployment :: {
-	// GCP Config
-	config: googlecloud.Config
-
-	// Kubernetes config to deploy
-	kubeConfigYAML: string
-
-	// Kubernetes Namespace to deploy to
-	namespace: string
+	kubeconfig: run.output["/outputs/kubeconfig"]
 
 	// Version of kubectl client
-	version: *"v1.14.7" | string
+	kubectlVersion: "v1.14.7"
 
-	// Kube auth config file
-	kubeAuthConfig: string
-
-	deploy: bl.BashScript & {
+	run: bl.BashScript & {
 		runPolicy: "always"
 
 		input: {
-			"/kube/config.yaml":   kubeConfigYAML
-			"/kube/auth":          kubeAuthConfig
 			"/inputs/service_key": config.serviceKey
 			"/cache/googlecloud":  bl.Cache
 		}
 
+		output: "/outputs/kubeconfig": string
+
 		os: {
 			package: {
-				curl:      true
-				python:    true
-				coreutils: true
+				python: true
+				curl:   true
 			}
 
 			extraCommand: [
-				"curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-288.0.0-linux-x86_64.tar.gz | tar -C /var -zx",
-				"curl -L https://dl.k8s.io/\(version)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl",
+				"curl -S https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-288.0.0-linux-x86_64.tar.gz | tar -C /usr/local -zx",
+				"curl -S -L https://dl.k8s.io/\(kubectlVersion)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl",
 			]
 		}
 
 		environment: {
 			CLOUDSDK_CONFIG: "/cache/gcloud/gcloud-config"
-			GKE_REGION:      config.region
-			GKE_PROJECT:     config.project
-			KUBE_NAMESPACE:  namespace
+			GCP_REGION:      config.region
+			GCP_PROJECT:     config.project
+			GKE_CLUSTER:     cluster
 		}
 
-		code: """
-            export PATH="/var/google-cloud-sdk/bin:${PATH}"
+		code: #"""
+            export PATH="/usr/local/google-cloud-sdk/bin:${PATH}"
+            export KUBECONFIG=/outputs/kubeconfig
 
+            # Setup the gcloud environment
             gcloud -q auth activate-service-account --key-file=/inputs/service_key
-            gcloud -q config set project "$GKE_PROJECT"
-            gcloud -q config set compute/zone "$GKE_REGION"
+            gcloud -q config set project "$GCP_PROJECT"
+            gcloud -q config set compute/zone "$GCP_REGION"
 
-            export KUBECONFIG=/kube/auth
+            # Generate a kube configiration
+            gcloud -q container clusters get-credentials "$GKE_CLUSTER"
 
-            kubectl create namespace "$KUBE_NAMESPACE" || true
-            kubectl --namespace "$KUBE_NAMESPACE" apply -f /kube/config.yaml
-        """
+            # Figure out the kubernetes username
+            CONTEXT="$(kubectl config current-context)"
+            USER="$(kubectl config view -o json | \
+                jq -r ".contexts[] | select(.name==\"$CONTEXT\") | .context.user")"
+
+            # Grab a kubernetes access token
+            ACCESS_TOKEN="$(gcloud -q config config-helper --format json --min-expiry 1h | \
+                jq -r .credential.access_token)"
+
+            # Remove the user config and replace it with the token
+            kubectl config unset "users.${USER}"
+            kubectl config set-credentials "$USER" --token "$ACCESS_TOKEN"
+            """#
 	}
 }
