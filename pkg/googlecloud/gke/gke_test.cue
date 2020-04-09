@@ -24,7 +24,7 @@ TestGKE: {
 	random: genRandom.output["/rand"]
 
     // Authenticate against GKE
-    authenticate: AuthConfig & {
+    authenticate: KubeConfig & {
         config: TestConfig.gcpConfig
         cluster: TestConfig.gkeClusterName
     }

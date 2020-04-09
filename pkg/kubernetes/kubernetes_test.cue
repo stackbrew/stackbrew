@@ -24,7 +24,7 @@ TestEKS: {
 	random: genRandom.output["/rand"]
 
     // Authenticate against EKS
-    authenticate: eks.AuthConfig & {
+    authenticate: eks.KubeConfig & {
         config: TestConfig.awsConfig
         cluster: TestConfig.eksClusterName
     }

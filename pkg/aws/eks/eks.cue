@@ -3,20 +3,22 @@ package eks
 import (
 	"b.l/bl"
 	"stackbrew.io/aws"
+	"encoding/base64"
 )
 
-// AuthConfig config outputs a valid kube-auth-config for kubectl client
-AuthConfig :: {
+// KubeConfig config outputs a valid kube-auth-config for kubectl client
+KubeConfig :: {
 	// AWS Config
 	config: aws.Config
 
 	// EKS cluster name
 	cluster: string
 
-	kubeconfig: run.output["/outputs/kubeconfig"]
-
-	// Version of kubectl client
-	kubectlVersion: "v1.14.7"
+	// kubeconfig is the generated kube configuration file
+	kubeconfig: bl.Secret & {
+		// FIXME: we should be able to output a bl.Secret directly
+		value: base64.Encode(null, run.output["/outputs/kubeconfig"])
+	}
 
 	run: bl.BashScript & {
 		runPolicy: "always"
@@ -37,7 +39,7 @@ AuthConfig :: {
 
 			extraCommand: [
 				"apk add --no-cache py-pip && pip install awscli && apk del py-pip",
-				"curl -L https://dl.k8s.io/\(kubectlVersion)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl",
+				"curl -L https://dl.k8s.io/v1.14.7/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl",
 			]
 		}
 

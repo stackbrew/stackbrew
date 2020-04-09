@@ -46,31 +46,16 @@ Credentials retriever for ECR
 
 ## eks
 
-### AuthConfig
+### KubeConfig
 
-AuthConfig config outputs a valid kube-auth-config for kubectl client
-
-#### Fields
-
-| FIELD              | SPEC                              | DOC                |
-| -------------      |:-------------:                    |:-------------:     |
-|*config*            |``aws.Config``                     |AWS Config          |
-|*eksClusterName*    |``string``                         |EKS cluster name    |
-|*out*               |``run.output["/outputs/auth"]``    |N/A                 |
-
-### Deployment
-
-Deployment of a kubernetes configuration on an AWS EKS cluster
+KubeConfig config outputs a valid kube-auth-config for kubectl client
 
 #### Fields
 
-| FIELD              | SPEC                       | DOC                                 |
-| -------------      |:-------------:             |:-------------:                      |
-|*config*            |``aws.Config``              |AWS Config                           |
-|*kubeConfigYAML*    |``string``                  |Kubernetes config to deploy          |
-|*namespace*         |``string``                  |Kubernetes Namespace to deploy to    |
-|*version*           |``*"v1.14.7" \| string``    |Version of kubectl client            |
-|*kubeAuthConfig*    |``string``                  |Kube auth config file                |
+| FIELD            | SPEC              | DOC                |
+| -------------    |:-------------:    |:-------------:     |
+|*config*          |``aws.Config``     |AWS Config          |
+|*cluster*         |``string``         |EKS cluster name    |
 
 ## s3
 
@@ -216,71 +201,30 @@ Google Cloud Config shared by all packages
 
 ## gke
 
-### AuthConfig
+### KubeConfig
 
-AuthConfig config outputs a valid kube-auth-config for kubectl client
-
-#### Fields
-
-| FIELD              | SPEC                              | DOC                |
-| -------------      |:-------------:                    |:-------------:     |
-|*config*            |``googlecloud.Config``             |GCP Config          |
-|*gkeClusterName*    |``string``                         |GKE cluster name    |
-|*out*               |``run.output["/outputs/auth"]``    |N/A                 |
-
-### Deployment
-
-Deployment of a kubernetes configuration on an GKE cluster
+KubeConfig config outputs a valid kube-auth-config for kubectl client
 
 #### Fields
 
-| FIELD              | SPEC                       | DOC                                 |
-| -------------      |:-------------:             |:-------------:                      |
-|*config*            |``googlecloud.Config``      |GCP Config                           |
-|*kubeConfigYAML*    |``string``                  |Kubernetes config to deploy          |
-|*namespace*         |``string``                  |Kubernetes Namespace to deploy to    |
-|*version*           |``*"v1.14.7" \| string``    |Version of kubectl client            |
-|*kubeAuthConfig*    |``string``                  |Kube auth config file                |
+| FIELD            | SPEC                     | DOC                |
+| -------------    |:-------------:           |:-------------:     |
+|*config*          |``googlecloud.Config``    |GCP Config          |
+|*cluster*         |``string``                |GKE cluster name    |
 
 ## kubernetes
 
-### App
+### Apply
+
+Apply a Kubernetes configuration
 
 #### Fields
 
-| FIELD                | SPEC                                  | DOC               |
-| -------------        |:-------------:                        |:-------------:    |
-|*cluster*             |``Cluster``                            |N/A                |
-|*namespace*           |``string``                             |N/A                |
-|*config*              |``Configuration``                      |N/A                |
-|*unknownResources*    |``"error" \| "ignore" \| "remove"``    |N/A                |
-
-### Cluster
-
-#### Fields
-
-| FIELD            | SPEC                                         | DOC               |
-| -------------    |:-------------:                               |:-------------:    |
-|*namespace*       |``{ [ns=string]: config: Configuration }``    |N/A                |
-
-### Configuration
-
-#### Fields
-
-| FIELD            | SPEC                              | DOC               |
-| -------------    |:-------------:                    |:-------------:    |
-|*secret*          |``{ [string]: stringData: _ }``    |N/A                |
-|*deployment*      |``{ [string]: spec: _ }``          |N/A                |
-|*ingress*         |``{ [string]: spec: _ }``          |N/A                |
-
-### YamlDirectory
-
-#### Fields
-
-| FIELD            | SPEC                | DOC               |
-| -------------    |:-------------:      |:-------------:    |
-|*config*          |``Configuration``    |N/A                |
-|*dir*             |``bl.Directory``     |N/A                |
+| FIELD            | SPEC                         | DOC                                 |
+| -------------    |:-------------:               |:-------------:                      |
+|*source*          |``string \| bl.Directory``    |Kubernetes config to deploy          |
+|*namespace*       |``string``                    |Kubernetes Namespace to deploy to    |
+|*version*         |``*"v1.14.7" \| string``      |Version of kubectl client            |
 
 ## mysql
 

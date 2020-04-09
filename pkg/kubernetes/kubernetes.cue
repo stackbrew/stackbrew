@@ -16,7 +16,7 @@ Apply :: {
 	version: *"v1.14.7" | string
 
 	// Kube config file
-	kubeconfig: string
+	kubeconfig: bl.Secret
 
 	deploy: bl.BashScript & {
 		runPolicy: "always"
