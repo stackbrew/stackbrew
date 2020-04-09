@@ -55,7 +55,7 @@ case "${1}" in
     docs)
         docs="$(pwd)/docs/README.md"
         mkdir -p "$(dirname "$docs")"
-        echo "# Packages" > "$docs"
+        echo "# Stackbrew Packages" > "$docs"
         for component in ${COMPONENTS}; do
             (
                 echo "+++ DOCUMENTING ${component}"
