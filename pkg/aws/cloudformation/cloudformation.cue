@@ -96,7 +96,7 @@ Stack :: {
             aws cloudformation describe-stacks \
                 --stack-name "$stack_name" \
                 --query 'Stacks[].Outputs' \
-                --output json > /output/stack_output
+                --output json > /outputs/stack_output
         """#
 	}
 }
