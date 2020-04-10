@@ -272,6 +272,33 @@ KubeConfig config outputs a valid kube-auth-config for kubectl client
 |*config*          |``googlecloud.Config``    |GCP Config          |
 |*cluster*         |``string``                |GKE cluster name    |
 
+## krane
+
+#### Render
+
+Render a Krane template
+
+##### Fields
+
+| FIELD            | SPEC                              | DOC                           |
+| -------------    |:-------------:                    |:-------------:                |
+|*source*          |``string \| bl.Directory``         |Kubernetes config to render    |
+|*version*         |``string \| *"1.1.2"``             |Krane version                  |
+|*result*          |``run.output["/krane/result"]``    |Rendered config                |
+
+#### Deploy
+
+Deploy a Kubernetes configuration using Krane
+
+##### Fields
+
+| FIELD            | SPEC                         | DOC                                                                  |
+| -------------    |:-------------:               |:-------------:                                                       |
+|*source*          |``string \| bl.Directory``    |Kubernetes config to deploy                                           |
+|*version*         |``string \| *"1.1.2"``        |Krane version                                                         |
+|*namespace*       |``string``                    |Kubernetes Namespace to deploy to                                     |
+|*prune*           |``bool \| *true``             |Prune resources that are no longer in your Kubernetes template set    |
+
 ## kubernetes
 
 #### Apply
