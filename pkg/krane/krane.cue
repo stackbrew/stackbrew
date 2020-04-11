@@ -95,6 +95,7 @@ Deploy :: {
             OPTS=""
             [ "$KRANE_NO_PRUNE" = "true" ] && OPTS="$OPTS --no-prune"
 
+            kubectl create namespace "$KUBE_NAMESPACE" || true
             krane deploy \
                 "$KUBE_NAMESPACE" "$(kubectl config current-context)" \
                 -f /kube/source.yaml \
