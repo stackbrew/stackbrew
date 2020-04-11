@@ -272,6 +272,26 @@ KubeConfig config outputs a valid kube-auth-config for kubectl client
 |*config*          |``googlecloud.Config``    |GCP Config          |
 |*cluster*         |``string``                |GKE cluster name    |
 
+## helm
+
+#### Chart
+
+Install a Helm chart
+
+##### Fields
+
+| FIELD            | SPEC                                                                 | DOC                                                                                                                                                                                                                           |
+| -------------    |:-------------:                                                       |:-------------:                                                                                                                                                                                                                |
+|*name*            |``string``                                                            |Helm deployment name                                                                                                                                                                                                           |
+|*chart*           |``string \| bl.Directory``                                            |Helm chart to install                                                                                                                                                                                                          |
+|*repository*      |``*"https://kubernetes-charts.storage.googleapis.com/" \| string``    |Helm chart repository (defaults to stable)                                                                                                                                                                                     |
+|*namespace*       |``string``                                                            |Kubernetes Namespace to deploy to                                                                                                                                                                                              |
+|*action*          |``*"installOrUpgrade" \| "install" \| "upgrade"``                     |Helm action to apply                                                                                                                                                                                                           |
+|*timeout*         |``string \| *"5m"``                                                   |time to wait for any individual Kubernetes operation (like Jobs for hooks)                                                                                                                                                     |
+|*wait*            |``*true \| bool``                                                     |if set, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment, StatefulSet, or ReplicaSet are in a ready state before marking the release as successful. It will wait for as long as timeout    |
+|*atomic*          |``*true \| bool``                                                     |if set, installation process purges chart on fail. The --wait flag will be set automatically if --atomic is used                                                                                                               |
+|*version*         |``string \| *"3.1.2"``                                                |Helm version                                                                                                                                                                                                                   |
+
 ## krane
 
 #### Render
