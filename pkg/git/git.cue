@@ -15,6 +15,12 @@ Repository :: {
 	// SSH key for private repositories
 	sshKey?: bl.Secret
 
+	// SSH or HTTP username to use in the git URL
+	username?: string
+
+	// HTTP password
+	httpPassword?: bl.Secret
+
 	// Git Ref to checkout
 	ref: *"master" | string
 
@@ -47,6 +53,12 @@ Repository :: {
 			if keepGitDir {
 				"/inputs/keep-gitdir": "true"
 			}
+			if (username & string) != _|_ {
+				"/inputs/username": username
+			}
+			if (httpPassword & bl.Secret) != _|_ {
+				"/inputs/http-password": httpPassword
+			}
 			"/cache/git": bl.Cache
 		}
 
@@ -67,6 +79,16 @@ Repository :: {
                 export GIT_SSH_COMMAND="$GIT_SSH_COMMAND -i /tmp/ssh-key"
             fi
 
+            url="$(cat /inputs/url)"
+
+            if [ -f /inputs/username ]; then
+                creds="$(cat /inputs/username)"
+                if [ -f /inputs/http-password ]; then
+                    creds="$creds:$(cat /inputs/http-password)"
+                fi
+                url="${url/\/\////$creds@}"
+            fi
+
             ref="$(cat /inputs/ref)"
 
             cache_key="$(base64 < /inputs/url)"
@@ -74,13 +96,13 @@ Repository :: {
 
             # Set up a mirror as a cache
             if [ ! -d "$mirror" ]; then
-                git clone --progress --verbose --mirror "$(cat /inputs/url)" -- "$mirror"
+                git clone --progress --verbose --mirror "$url" -- "$mirror"
             fi
             # Refresh the cache.
             git -C "$mirror" remote update
 
             # Fetch the repository, using the cache
-            git clone --dissociate --reference "$mirror" -- "$(cat /inputs/url)" /outputs/out
+            git clone --dissociate --reference "$mirror" -- "$url" /outputs/out
 
             # Checkout ref
             git -C /outputs/out reset --hard "$ref"
