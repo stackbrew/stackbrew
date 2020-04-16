@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"b.l/bl"
+    "encoding/yaml"
 	"stackbrew.io/aws"
 	"stackbrew.io/aws/eks"
 )
@@ -53,4 +54,29 @@ TestEKS: {
             local: "./testdata"
         }
     }
+}
+
+TestKustomize: {
+    kubeConfig: Kustomize & {
+        source: bl.Directory & {
+            local: "./testdata"
+        }
+        kustomization: yaml.Marshal({
+            resources: ["test.yaml"]
+            images: [{
+                name: "hello-world"
+                newTag: "linux"
+            }]
+        })
+    }
+
+    changeImageName: bl.BashScript & {
+		runPolicy: "always"
+
+        input: "/kube/config.yaml": kubeConfig.out
+
+		code: """
+        grep hello-world:linux /kube/config.yaml
+        """
+	}
 }

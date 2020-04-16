@@ -4,6 +4,48 @@ import (
 	"b.l/bl"
 )
 
+// Exposes `kubectl kustomize`
+Kustomize :: {
+	// Kubernetes config to take as input
+	source: string | bl.Directory
+
+	// Optionnal kustomization.yaml
+	kustomization?: string
+
+	// Version of kubectl client
+	version: *"v1.14.7" | string
+
+	// Output of kustomize
+	out: kustomize.output["/kube/out"]
+
+	kustomize: bl.BashScript & {
+		input: {
+			"/kube/source": source
+			if (kustomization & string) != _|_ {
+				"/kube/kustomization.yaml": kustomization
+			}
+		}
+
+		output: "/kube/out": string
+
+		os: {
+			package: curl: true
+
+			extraCommand: [
+				"curl -L https://dl.k8s.io/\(version)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl",
+			]
+		}
+
+		code: """
+            cp -a /kube/source /tmp
+            if [ -f /kube/kustomization.yaml ]; then
+                cp /kube/kustomization.yaml /tmp/source
+            fi
+            kubectl kustomize /tmp/source > /kube/out
+        """
+	}
+}
+
 // Apply a Kubernetes configuration
 Apply :: {
 	// Kubernetes config to deploy
