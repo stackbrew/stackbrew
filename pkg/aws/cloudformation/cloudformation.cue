@@ -2,7 +2,6 @@ package cloudformation
 
 import (
 	"strings"
-	"encoding/json"
 
 	"b.l/bl"
 	"stackbrew.io/aws"
@@ -15,15 +14,7 @@ Stack :: {
 	config: aws.Config
 
 	// Source is the Cloudformation template, either a Cue struct or a JSON/YAML string
-	{
-		source:    string
-		sourceRaw: source
-	} | *{
-		source: {...}
-		sourceRaw: json.Marshal(source)
-	}
-
-	sourceRaw: string
+	source: string
 
 	// Stackname is the cloudformation stack
 	stackName: string
@@ -39,7 +30,7 @@ Stack :: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
 			"/cache/aws":             bl.Cache
-			"/inputs/source":         sourceRaw
+			"/inputs/source":         source
 			"/inputs/stack_name":     stackName
 			if len(parameters) > 0 {
 				"/inputs/parameters": strings.Join([ "\(key)=\(val)" for key, val in parameters ], " ")
