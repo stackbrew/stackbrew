@@ -80,6 +80,7 @@ Stack :: {
                 --stack-name "$stack_name" \
                 --template-file "/inputs/source" \
                 --capabilities CAPABILITY_IAM \
+                --no-fail-on-empty-changeset \
                 $parameters \
             |& tee /tmp/out
 
