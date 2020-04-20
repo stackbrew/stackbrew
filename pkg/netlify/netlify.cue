@@ -60,7 +60,7 @@ Site :: {
 				rsync: true
 			}
 			extraCommand: [
-				"yarn global add netlify-cli",
+				"yarn global add netlify-cli@2.47.0",
 			]
 		}
 
@@ -109,7 +109,7 @@ Site :: {
 			# enable SSL
 			curl -i -X POST "https://api.netlify.com/api/v1/sites/${site_id}/ssl"
 
-			</tmp/stdout sed -n -e 's/^Live URL:.*\(https:\/\/.*\)$/\1/p' > /info/url
+			</tmp/stdout sed -n -e 's/^Website URL:.*\(https:\/\/.*\)$/\1/p' > /info/url
 			"""#
 	}
 }
