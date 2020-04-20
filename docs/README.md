@@ -61,10 +61,11 @@ Credentials retriever for ECR
 
 ##### Fields
 
-| FIELD            | SPEC              | DOC               |
-| -------------    |:-------------:    |:-------------:    |
-|*Name*            |``string``         |N/A                |
-|*Image*           |``string``         |N/A                |
+| FIELD            | SPEC                | DOC               |
+| -------------    |:-------------:      |:-------------:    |
+|*Command*         |``[string, ...]``    |N/A                |
+|*Name*            |``string``           |N/A                |
+|*Image*           |``string``           |N/A                |
 
 #### Service
 
