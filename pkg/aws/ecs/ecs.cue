@@ -12,6 +12,7 @@ import (
 Container :: {
 	Name:       string
 	Image:      string
+	Command:    [string, ...]
 	Essential?: bool
 	PortMappings?: [{
 		ContainerPort?: uint
