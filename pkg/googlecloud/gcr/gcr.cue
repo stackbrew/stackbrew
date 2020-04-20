@@ -24,6 +24,17 @@ Credentials :: {
 		}
 	}
 
+	// Authentication for GCR Registries
+	// This list is hardcoded from:
+	// https://github.com/GoogleCloudPlatform/docker-credential-gcr/blob/be7633a109f04f19953c4d830ec5788709c16df4/config/const.go#L50
+	auth: bl.RegistryAuth
+	auth: "gcr.io": credentials
+	auth: "asia.gcr.io": credentials
+	auth: "eu.gcr.io": credentials
+	auth: "marketplace.gcr.io": credentials
+	auth: "staging-k8s.gcr.io": credentials
+	auth: "us.gcr.io": credentials
+
 	helperUrl:
 		"https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.1/docker-credential-gcr_linux_amd64-2.0.1.tar.gz"
 

@@ -15,7 +15,7 @@ Credentials :: {
 	// Target is the ECR image
 	target: string
 
-	// Registry Credentials
+	// ECR credentials
 	credentials: bl.RegistryCredentials & {
 		username: run.output["/outputs/username"]
 		secret:   bl.Secret & {
@@ -23,6 +23,13 @@ Credentials :: {
 			value: base64.Encode(null, run.output["/outputs/secret"])
 		}
 	}
+
+	// ECR registry name associated with target
+	registry: run.output["/outputs/registry"]
+
+	// Authentication for ECR Registries
+	auth: bl.RegistryAuth
+	auth: registry: credentials
 
 	helperUrl:
 		"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"
@@ -35,6 +42,7 @@ Credentials :: {
 		}
 
 		output: {
+			"/outputs/registry": string
 			"/outputs/username": string
 
 			// FIXME: this should be bl.Secret
@@ -63,6 +71,10 @@ Credentials :: {
 
             echo $credentials | jq -j .Username > /outputs/username
             echo $credentials | jq -j .Secret > /outputs/secret
+            echo $credentials | \
+                jq -j .ServerURL | \
+                sed "s=http[s]*://==" | \
+                cut -d'/' -f1 > /outputs/registry
         """#
 	}
 }
