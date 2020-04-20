@@ -19,7 +19,8 @@ case "${1}" in
                 cd "${PKGDIR}/${component}"
                 # FIXME: fmt is broken with _test.cue files
                 #cue fmt -s
-                cue trim -s
+                # FIXME: trim -s is breaking list comprehensions in yarn and cloudformation
+                #cue trim -s
             )
         done
     ;;
