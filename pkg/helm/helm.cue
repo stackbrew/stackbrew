@@ -36,7 +36,7 @@ Chart :: {
 	wait: *true | bool
 
 	// if set, installation process purges chart on fail.
-	// The --wait flag will be set automatically if --atomic is used
+	// The wait option will be set automatically if atomic is used
 	atomic: *true | bool
 
 	// Kube config file
