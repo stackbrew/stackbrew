@@ -121,7 +121,7 @@ Service :: {
 				ServiceName: serviceName
 				TaskDefinition: Ref: "ECSTaskDefinition"
 				DeploymentConfiguration: {
-					MaximumPercent:        200
+					MaximumPercent:        100
 					MinimumHealthyPercent: 50
 				}
 			}
