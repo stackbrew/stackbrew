@@ -43,19 +43,18 @@ TestECR: {
 	export: bl.Push & {
 		source:      build.image
 		target:      image
-		credentials: login.credentials
+		auth:        login.auth
 	}
 
-	// FIXME: credentials broken
 	// Pull the image and verify
-	// test: bl.Build & {
-	// 	dockerfile:  #"""
-	// 		FROM \#(image)
-	// 		# create a dependency between this task and export
-	// 		RUN echo \#(export.ref)
-	// 		RUN cat /test
-	// 		RUN test "$(cat /test)" = "\#(rand)"
-	// 	"""#
-	// 	credentials: login.credentials
-	// }
+	test: bl.Build & {
+		dockerfile:  #"""
+			FROM \#(image)
+			# create a dependency between this task and export
+			RUN echo \#(export.ref)
+			RUN cat /test
+			RUN test "$(cat /test)" = "\#(rand)"
+		"""#
+		auth: login.auth
+	}
 }

@@ -1,16 +1,15 @@
-package gcr
+package dockerhub
 
 import (
 	"b.l/bl"
-	"stackbrew.io/googlecloud"
 )
 
 TestConfig : {
-	gcpConfig:     googlecloud.Config
-	gcrRepository: string
+	dockerHubConfig:     Credentials.config
+	dockerHubRepository: string
 }
 
-TestGCR: {
+TestDockerHub: {
 	// Generate some random
 	random: bl.BashScript & {
 		runPolicy: "always"
@@ -23,7 +22,7 @@ TestGCR: {
 	rand: random.output["/rand"]
 
 	// Target GCR image for our tests (with a random tag)
-	image: "\(TestConfig.gcrRepository):test-gcr-\(rand)"
+	image: "\(TestConfig.dockerHubRepository):test-dh-\(rand)"
 
 	// Build a test image
 	build: bl.Build & {
@@ -35,7 +34,7 @@ TestGCR: {
 
 	// Get the GCR credentials
 	login: Credentials & {
-		config: TestConfig.gcpConfig
+		config: TestConfig.dockerHubConfig
 		target: image
 	}
 
