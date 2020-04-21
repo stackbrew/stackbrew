@@ -36,12 +36,14 @@ Credentials retriever for ECR
 
 ##### Fields
 
-| FIELD            | SPEC                                                                                                                                                                                                                      | DOC                       |
-| -------------    |:-------------:                                                                                                                                                                                                            |:-------------:            |
-|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``    |Registry Credentials       |
-|*target*          |``string``                                                                                                                                                                                                                 |Target is the ECR image    |
-|*config*          |``aws.Config``                                                                                                                                                                                                             |AWS Config                 |
-|*helperUrl*       |``"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"``                                                                                               |N/A                        |
+| FIELD            | SPEC                                                                                                                                                                                                                      | DOC                                        |
+| -------------    |:-------------:                                                                                                                                                                                                            |:-------------:                             |
+|*auth*            |``C{[]: (host: string)-\>RegistryCredentials, registry: credentials}``                                                                                                                                                     |Authentication for ECR Registries           |
+|*target*          |``string``                                                                                                                                                                                                                 |Target is the ECR image                     |
+|*config*          |``aws.Config``                                                                                                                                                                                                             |AWS Config                                  |
+|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``    |ECR credentials                             |
+|*registry*        |``run.output["/outputs/registry"]``                                                                                                                                                                                        |ECR registry name associated with target    |
+|*helperUrl*       |``"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"``                                                                                               |N/A                                         |
 
 ### ecs
 
@@ -173,6 +175,21 @@ S3 file or Directory upload
 |*source*          |``string \| bl.Directory``        |Source Directory, File or String to Upload to S3                  |
 |*target*          |``string``                        |Target S3 URL (eg. s3://\<bucket-name\>/\<path\>/\<sub-path\>)    |
 |*config*          |``aws.Config``                    |AWS Config                                                        |
+
+## dockerhub
+
+#### Credentials
+
+Credentials retriever for Docker Hub
+
+##### Fields
+
+| FIELD            | SPEC                                                                                          | DOC                              |
+| -------------    |:-------------:                                                                                |:-------------:                   |
+|*auth*            |``C{[]: (host: string)-\>RegistryCredentials, "https://index.docker.io/v1/": credentials}``    |Authentication for Docker Hub     |
+|*target*          |``string``                                                                                     |Target is the Docker Hub image    |
+|*config*          |``{ username: string password: bl.Secret }``                                                   |Docker Hub Config                 |
+|*credentials*     |``bl.RegistryCredentials & { username: config.username secret: config.password }``             |Registry Credentials              |
 
 ## file
 
@@ -309,12 +326,13 @@ Credentials retriever for GCR
 
 ##### Fields
 
-| FIELD            | SPEC                                                                                                                                                                                                                      | DOC                       |
-| -------------    |:-------------:                                                                                                                                                                                                            |:-------------:            |
-|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``    |Registry Credentials       |
-|*target*          |``string``                                                                                                                                                                                                                 |Target is the GCR image    |
-|*config*          |``googlecloud.Config``                                                                                                                                                                                                     |GCP Config                 |
-|*helperUrl*       |``"https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.1/docker-credential-gcr_linux_amd64-2.0.1.tar.gz"``                                                                                 |N/A                        |
+| FIELD            | SPEC                                                                                                                                                                                                                           | DOC                                                                                                                                                                                             |
+| -------------    |:-------------:                                                                                                                                                                                                                 |:-------------:                                                                                                                                                                                  |
+|*auth*            |``C{[]: (host: string)-\>RegistryCredentials, "gcr.io": credentials, "asia.gcr.io": credentials, "eu.gcr.io": credentials, "marketplace.gcr.io": credentials, "staging-k8s.gcr.io": credentials, "us.gcr.io": credentials}``    |Authentication for GCR Registries This list is hardcoded from: https://github.com/GoogleCloudPlatform/docker-credential-gcr/blob/be7633a109f04f19953c4d830ec5788709c16df4/config/const.go#L50    |
+|*target*          |``string``                                                                                                                                                                                                                      |Target is the GCR image                                                                                                                                                                          |
+|*config*          |``googlecloud.Config``                                                                                                                                                                                                          |GCP Config                                                                                                                                                                                       |
+|*credentials*     |``bl.RegistryCredentials & { username: run.output["/outputs/username"] secret: bl.Secret & { // FIXME: we should be able to output a bl.Secret directly value: base64.Encode(null, run.output["/outputs/secret"]) } }``         |Registry Credentials                                                                                                                                                                             |
+|*helperUrl*       |``"https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.1/docker-credential-gcr_linux_amd64-2.0.1.tar.gz"``                                                                                      |N/A                                                                                                                                                                                              |
 
 ### gke
 
@@ -346,7 +364,7 @@ Install a Helm chart
 |*action*          |``*"installOrUpgrade" \| "install" \| "upgrade"``                     |Helm action to apply                                                                                                                                                                                                           |
 |*timeout*         |``string \| *"5m"``                                                   |time to wait for any individual Kubernetes operation (like Jobs for hooks)                                                                                                                                                     |
 |*wait*            |``*true \| bool``                                                     |if set, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment, StatefulSet, or ReplicaSet are in a ready state before marking the release as successful. It will wait for as long as timeout    |
-|*atomic*          |``*true \| bool``                                                     |if set, installation process purges chart on fail. The --wait flag will be set automatically if --atomic is used                                                                                                               |
+|*atomic*          |``*true \| bool``                                                     |if set, installation process purges chart on fail. The wait option will be set automatically if atomic is used                                                                                                                 |
 |*version*         |``string \| *"3.1.2"``                                                |Helm version                                                                                                                                                                                                                   |
 
 ## krane
