@@ -21,6 +21,8 @@ Put :: {
 	url: run.output["/outputs/url"]
 
 	run: bl.BashScript & {
+		runPolicy: "always"
+
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
