@@ -1,6 +1,8 @@
 package netlify
 
 import (
+	"strings"
+
 	"b.l/bl"
 )
 
@@ -32,7 +34,7 @@ Site :: {
 	create: bool | *true
 
 	// Deployment url
-	url: deploy.output["/info/url"]
+	url: strings.TrimRight(deploy.output["/info/url"], "\n")
 
 	deploy: bl.BashScript & {
 		runPolicy: "always"
