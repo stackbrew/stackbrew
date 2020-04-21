@@ -35,6 +35,8 @@ Credentials :: {
 		"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"
 
 	run: bl.BashScript & {
+		runPolicy: "always"
+
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey

@@ -39,6 +39,8 @@ Credentials :: {
 		"https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.1/docker-credential-gcr_linux_amd64-2.0.1.tar.gz"
 
 	run: bl.BashScript & {
+		runPolicy: "always"
+
 		input: {
 			"/inputs/gcp/service_key": config.serviceKey
 			"/inputs/target":          target
