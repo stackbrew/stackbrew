@@ -120,6 +120,10 @@ Service :: {
 				}]
 				ServiceName: serviceName
 				TaskDefinition: Ref: "ECSTaskDefinition"
+				DeploymentConfiguration: {
+					MaximumPercent:        100
+					MinimumHealthyPercent: 50
+				}
 			}
 			DependsOn: "ECSListenerRule"
 		}
