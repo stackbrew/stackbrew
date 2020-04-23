@@ -10,7 +10,7 @@ Kustomize :: {
 	source: string | bl.Directory
 
 	// Optionnal kustomization.yaml
-	kustomization?: string
+	kustomization: *"" | string
 
 	// Version of kubectl client
 	version: *"v1.14.7" | string
@@ -21,9 +21,7 @@ Kustomize :: {
 	kustomize: bl.BashScript & {
 		input: {
 			"/kube/source": source
-			if (kustomization & string) != _|_ {
-				"/kube/kustomization.yaml": kustomization
-			}
+			"/kube/kustomization.yaml": kustomization
 		}
 
 		output: "/kube/out": string
@@ -38,7 +36,7 @@ Kustomize :: {
 
 		code: """
             cp -a /kube/source /tmp
-            if [ -f /kube/kustomization.yaml ]; then
+            if [ -s /kube/kustomization.yaml ]; then
                 cp /kube/kustomization.yaml /tmp/source
             fi
             kubectl kustomize /tmp/source > /kube/out
