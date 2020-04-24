@@ -1,59 +1,62 @@
 package http
 
 import (
-	"b.l/bl"
-	"encoding/json"
+    "b.l/bl"
+    "encoding/json"
 )
 
-Get:    Request & {method: "GET"}
-Post:   Request & {method: "POST"}
-Put:    Request & {method: "PUT"}
-Delete: Request & {method: "DELETE"}
+Get:    Do & {method: "GET"}
+Post:   Do & {method: "POST"}
+Put:    Do & {method: "PUT"}
+Delete: Do & {method: "DELETE"}
 
-Request :: {
-	url:  string
-	body: string | *""
-	header: [string]: string | [...string]
-	token?: bl.Secret
-	method: "GET" | "POST" | "PUT" | "DELETE" | "PATH" | "HEAD"
+Do :: {
+    url:  string
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATH" | "HEAD"
 
-	output: [string]: string
-	response: output["/response"]
+    request: {
+        body: string | *""
+        header: [string]: string | [...string]
+        token?: bl.Secret
+    }
 
-	bl.BashScript & {
-		runPolicy: "always"
-		os: package: curl: true
-		input: {
-			"/method":  method
-			"/headers": json.Marshal(header)
-			if (token & bl.Secret) != _|_ {
-				"/token": token
-			}
-			"/body": body
-			"/url":  url
-		}
-		output: "/response": string
-		code:
-			#"""
-			curlArgs=(
-				"$(cat /url)"
-				-L --fail --silent --show-error
-				--write-out "%{http_code}"
-				-X "$(cat /method)"
-				-d "$(cat /body)"
-				-o /response
-			)
+    output: [string]: string
+    response: body: output["/response"]
 
-			headers="$(cat /headers | jq -r 'to_entries | map(.key + ": " + (.value | tostring) + "\n") | add')"
-			while read h; do
-				curlArgs+=("-H" "$h")
-			done <<< "$headers"
+    bl.BashScript & {
+        runPolicy: "always"
+        os: package: curl: true
+        input: {
+            "/method":  method
+            "/headers": json.Marshal(request.header)
+            if (request.token & bl.Secret) != _|_ {
+                "/token": request.token
+            }
+            "/body": request.body
+            "/url":  url
+        }
+        output: "/response": string
+        code:
+            #"""
+            curlArgs=(
+                "$(cat /url)"
+                -L --fail --silent --show-error
+                --write-out "%{http_code}"
+                -X "$(cat /method)"
+                -d "$(cat /body)"
+                -o /response
+            )
 
-			if [ -e /token ]; then
-				curlArgs+=("-H" "Authorization: bearer $(cat /token)")
-			fi
+            headers="$(cat /headers | jq -r 'to_entries | map(.key + ": " + (.value | tostring) + "\n") | add')"
+            while read h; do
+                curlArgs+=("-H" "$h")
+            done <<< "$headers"
 
-			curl "${curlArgs[@]}"
-			"""#
-	}
+            if [ -e /token ]; then
+                curlArgs+=("-H" "Authorization: bearer $(cat /token)")
+            fi
+
+            curl "${curlArgs[@]}"
+            """#
+    }
 }
