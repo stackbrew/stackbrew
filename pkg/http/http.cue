@@ -3,6 +3,7 @@ package http
 import (
     "b.l/bl"
     "encoding/json"
+    "strconv"
 )
 
 Get:    Do & {method: "GET"}
@@ -21,7 +22,10 @@ Do :: {
     }
 
     output: [string]: string
-    response: body: output["/response"]
+    response: {
+        body: output["/response"]
+        statusCode: strconv.Atoi(output["/status"])
+    }
 
     bl.BashScript & {
         runPolicy: "always"
@@ -35,7 +39,10 @@ Do :: {
             "/body": request.body
             "/url":  url
         }
-        output: "/response": string
+        output: {
+            "/response": string
+            "/status": string
+        }
         code:
             #"""
             curlArgs=(
@@ -56,7 +63,7 @@ Do :: {
                 curlArgs+=("-H" "Authorization: bearer $(cat /token)")
             fi
 
-            curl "${curlArgs[@]}"
+            curl "${curlArgs[@]}" > /status
             """#
     }
 }
