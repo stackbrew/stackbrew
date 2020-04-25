@@ -1,5 +1,10 @@
 package github
 
+import (
+    "b.l/bl"
+    "stackbrew.io/git"
+)
+
 PullRequest :: {
     id:     string
     state:  string
@@ -67,6 +72,21 @@ GetPullRequest :: {
     data:        _
     pullRequest: PullRequest
     pullRequest: data.repository.pullRequest
+}
+
+// FIXME: this should be PullRequest::Checkout
+CheckoutPullRequest :: {
+    pullRequest: PullRequest
+
+    // Github API token
+    token: bl.Secret
+
+    git.Repository & {
+        url:          pullRequest.headRepository.url
+        ref:          pullRequest.headRef.target.oid
+        username:     "apikey"
+        httpPassword: token
+    }
 }
 
 ListPullRequests :: {

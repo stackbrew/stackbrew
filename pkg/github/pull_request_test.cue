@@ -50,6 +50,30 @@ TestGetPullRequestOpen: {
     }
 }
 
+TestCheckoutPullRequest: {
+    query: GetPullRequest & {
+        token:  TestConfig.githubToken
+        number: 2
+        repo: {
+            owner: "stackbrew-test"
+            name:  "gh-test"
+        }
+    }
+
+    checkout: CheckoutPullRequest & {
+        token: TestConfig.githubToken
+        pullRequest: query.pullRequest
+    }
+
+    test: bl.BashScript & {
+        runPolicy: "always"
+        input: "/checkout": checkout.out
+        code: """
+        grep -q "FROM PR2" /checkout/README.md
+        """
+    }
+}
+
 TestListPullRequests: {
     query: ListPullRequests & {
         token:    TestConfig.githubToken
