@@ -27,16 +27,17 @@ Repository :: {
 	// Keep .git directory after clone
 	keepGitDir: *false | bool
 
+	output: _
 	// Output directory of the `git clone`
-	out: clone.output["/outputs/out"]
+	out: output["/outputs/out"]
 
 	// Output commit ID of the Repository
-	commit: strings.TrimRight(clone.output["/outputs/commit"], "\n")
+	commit: strings.TrimRight(output["/outputs/commit"], "\n")
 
 	// Output short-commit ID of the Repository
-	shortCommit: strings.TrimRight(clone.output["/outputs/short-commit"], "\n")
+	shortCommit: strings.TrimRight(output["/outputs/short-commit"], "\n")
 
-	clone: bl.BashScript & {
+	bl.BashScript & {
 		os: package: {
 			git:     true
 			openssh: true
