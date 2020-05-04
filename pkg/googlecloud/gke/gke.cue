@@ -1,7 +1,7 @@
 package gke
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 	"stackbrew.io/googlecloud"
 	"encoding/base64"
 )

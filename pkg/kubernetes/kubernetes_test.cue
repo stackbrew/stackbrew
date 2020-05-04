@@ -1,7 +1,7 @@
 package kubernetes
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
     "encoding/yaml"
 	"stackbrew.io/aws"
 	"stackbrew.io/aws/eks"

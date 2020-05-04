@@ -1,6 +1,6 @@
 package googlecloud
 
-import "b.l/bl"
+import "blocklayer.dev/bl"
 
 // Google Cloud Config shared by all packages
 Config :: {

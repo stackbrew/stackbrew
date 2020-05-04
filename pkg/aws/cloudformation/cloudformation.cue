@@ -3,7 +3,7 @@ package cloudformation
 import (
 	"strings"
 
-	"b.l/bl"
+	"blocklayer.dev/bl"
 	"stackbrew.io/aws"
 )
 

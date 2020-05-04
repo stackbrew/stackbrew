@@ -1,7 +1,7 @@
 package nodejs
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 )
 
 Container :: {

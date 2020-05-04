@@ -3,7 +3,7 @@ package git
 import (
 	"strings"
 
-	"b.l/bl"
+	"blocklayer.dev/bl"
 )
 
 // Git repository

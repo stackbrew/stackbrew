@@ -1,6 +1,6 @@
 package go
 
-import "b.l/bl"
+import "blocklayer.dev/bl"
 
 testGoBuild: {
 	run: App & {

@@ -1,7 +1,7 @@
 package github
 
 import (
-    "b.l/bl"
+    "blocklayer.dev/bl"
 )
 
 TestConfig: githubToken: bl.Secret

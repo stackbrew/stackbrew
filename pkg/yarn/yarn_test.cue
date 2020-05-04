@@ -1,6 +1,6 @@
 package yarn
 
-import "b.l/bl"
+import "blocklayer.dev/bl"
 
 TestYarn : {
 	run: App & {

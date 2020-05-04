@@ -1,7 +1,7 @@
 package s3
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 	"stackbrew.io/aws"
 )
 
