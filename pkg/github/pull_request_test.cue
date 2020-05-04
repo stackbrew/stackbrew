@@ -1,10 +1,11 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
+    "stackbrew.io/bash"
+    "stackbrew.io/secret"
 )
 
-TestConfig: githubToken: bl.Secret
+TestConfig: githubToken: secret.Secret
 
 TestGetPullRequestMerged: {
     query: GetPullRequest & {
@@ -16,7 +17,7 @@ TestGetPullRequestMerged: {
         }
     }
 
-    test: bl.BashScript & {
+    test: bash.BashScript & {
         runPolicy: "always"
         environment: state: query.pullRequest.state
         code: """
@@ -35,7 +36,7 @@ TestGetPullRequestOpen: {
         }
     }
 
-    test: bl.BashScript & {
+    test: bash.BashScript & {
         runPolicy: "always"
         environment: {
             state:  query.pullRequest.state
@@ -65,7 +66,7 @@ TestCheckoutPullRequest: {
         pullRequest: query.pullRequest
     }
 
-    test: bl.BashScript & {
+    test: bash.BashScript & {
         runPolicy: "always"
         input: "/checkout": checkout.out
         code: """
@@ -85,7 +86,7 @@ TestListPullRequests: {
         }
     }
 
-    test: bl.BashScript & {
+    test: bash.BashScript & {
         runPolicy: "always"
         environment: {
             FIRST_PR_STATE: "\(query.pullRequests[0].state)"

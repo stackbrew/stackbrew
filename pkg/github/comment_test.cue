@@ -1,11 +1,12 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
     "encoding/json"
+
+    "stackbrew.io/secret"
 )
 
-TestConfig: githubToken: bl.Secret
+TestConfig: githubToken: secret.Secret
 
 TestComment: {
     query: GetPullRequest & {

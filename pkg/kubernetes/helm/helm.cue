@@ -3,7 +3,9 @@ package helm
 import (
 	"strconv"
 
-	"blocklayer.dev/bl"
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+    "stackbrew.io/secret"
 )
 
 // Install a Helm chart
@@ -12,7 +14,7 @@ Chart :: {
 	name: string
 
 	// Helm chart to install
-	chart: string | bl.Directory
+	chart: string | fs.Directory
 
 	// Helm chart repository (defaults to stable)
 	repository: *"https://kubernetes-charts.storage.googleapis.com/" | string
@@ -40,12 +42,12 @@ Chart :: {
 	atomic: *true | bool
 
 	// Kube config file
-	kubeconfig: bl.Secret
+	kubeconfig: secret.Secret
 
 	// Helm version
 	version: string | *"3.1.2"
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		runPolicy: "always"
 
 		os: {

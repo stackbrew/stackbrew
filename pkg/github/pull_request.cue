@@ -1,8 +1,8 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
     "stackbrew.io/git"
+    "stackbrew.io/secret"
 )
 
 PullRequest :: {
@@ -79,7 +79,7 @@ CheckoutPullRequest :: {
     pullRequest: PullRequest
 
     // Github API token
-    token: bl.Secret
+    token: secret.Secret
 
     git.Repository & {
         url:          pullRequest.headRepository.url

@@ -3,7 +3,9 @@ package git
 import (
 	"strings"
 
-	"blocklayer.dev/bl"
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+    "stackbrew.io/secret"
 )
 
 // Git repository
@@ -13,13 +15,13 @@ Repository :: {
 	url: string
 
 	// SSH key for private repositories
-	sshKey?: bl.Secret
+	sshKey?: secret.Secret
 
 	// SSH or HTTP username to use in the git URL
 	username?: string
 
 	// HTTP password
-	httpPassword?: bl.Secret
+	httpPassword?: secret.Secret
 
 	// Git Ref to checkout
 	ref: *"master" | string
@@ -37,7 +39,7 @@ Repository :: {
 	// Output short-commit ID of the Repository
 	shortCommit: strings.TrimRight(output["/outputs/short-commit"], "\n")
 
-	bl.BashScript & {
+	bash.BashScript & {
 		os: package: {
 			git:     true
 			openssh: true
@@ -48,7 +50,7 @@ Repository :: {
 		input: {
 			"/inputs/url": url
 			"/inputs/ref": ref
-			if (sshKey & bl.Secret) != _|_ {
+			if (sshKey & secret.Secret) != _|_ {
 				"/inputs/ssh-key": sshKey
 			}
 			if keepGitDir {
@@ -57,14 +59,14 @@ Repository :: {
 			if (username & string) != _|_ {
 				"/inputs/username": username
 			}
-			if (httpPassword & bl.Secret) != _|_ {
+			if (httpPassword & secret.Secret) != _|_ {
 				"/inputs/http-password": httpPassword
 			}
-			"/cache/git": bl.Cache
+			"/cache/git": fs.Cache
 		}
 
 		output: {
-			"/outputs/out":          bl.Directory
+			"/outputs/out":          fs.Directory
 			"/outputs/commit":       string
 			"/outputs/short-commit": string
 		}
@@ -124,7 +126,7 @@ Repository :: {
 PathCommit :: {
 
 	// Source Directory (git working copy)
-	from: bl.Directory
+	from: fs.Directory
 
 	// Optional path to retrieve git commit IDs from
 	path: *"./" | string
@@ -135,7 +137,7 @@ PathCommit :: {
 	// Output short-commit ID of the Repository
 	shortCommit: strings.TrimRight(pathCommit.output["/outputs/short-commit"], "\n")
 
-	pathCommit: bl.BashScript & {
+	pathCommit: bash.BashScript & {
 		os: package: git: true
 
 		workdir: "/workdir"

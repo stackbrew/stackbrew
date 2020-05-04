@@ -3,9 +3,9 @@ package helm
 import (
     "encoding/yaml"
 
-    "blocklayer.dev/bl"
 	"stackbrew.io/aws"
 	"stackbrew.io/aws/eks"
+	"stackbrew.io/fs"
 )
 
 TestConfig: {
@@ -44,7 +44,7 @@ TestHelmCustomChart: {
 
     install: Chart & {
         name: "stackbrew-test-helm-local"
-        chart: bl.Directory & {
+        chart: fs.Directory & {
             local: "./testdata/mychart"
         }
 

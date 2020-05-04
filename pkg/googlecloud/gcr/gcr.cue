@@ -1,9 +1,12 @@
 package gcr
 
 import (
-	"blocklayer.dev/bl"
-	"stackbrew.io/googlecloud"
 	"encoding/base64"
+
+	"stackbrew.io/bash"
+	"stackbrew.io/container"
+	"stackbrew.io/googlecloud"
+	"stackbrew.io/secret"
 )
 
 // Credentials retriever for GCR
@@ -16,23 +19,23 @@ Credentials :: {
 	target: string
 
 	// Registry Credentials
-	credentials: bl.RegistryCredentials & {
+	credentials: container.RegistryCredentials & {
 		username: output["/outputs/username"]
-		secret:   bl.Secret & {
-			// FIXME: we should be able to output a bl.Secret directly
+		"secret":   secret.Secret & {
+			// FIXME: we should be able to output a secret.Secret directly
 			value: base64.Encode(null, output["/outputs/secret"])
 		}
 	}
 
 	// Authentication for GCR Registries
-	auth: bl.RegistryAuth
+	auth: container.RegistryAuth
 	auth: "\(target)": credentials
 
 	helperUrl:
 		"https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.1/docker-credential-gcr_linux_amd64-2.0.1.tar.gz"
 
 	output: _
-	bl.BashScript & {
+	bash.BashScript & {
 		runPolicy: "always"
 
 		input: {
@@ -43,7 +46,7 @@ Credentials :: {
 		output: {
 			"/outputs/username": string
 
-			// FIXME: this should be bl.Secret
+			// FIXME: this should be secret.Secret
 			"/outputs/secret": string
 		}
 

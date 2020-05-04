@@ -1,8 +1,9 @@
 package http
 
 import (
-    "blocklayer.dev/bl"
     "encoding/json"
+
+    "stackbrew.io/bash"
 )
 
 TestRequest: {
@@ -14,7 +15,7 @@ TestRequest: {
         }
     }
 
-    testRaw: bl.BashScript & {
+    testRaw: bash.BashScript & {
         environment: STATUS: "\(req.response.statusCode)"
         input: "/content.json": req.response.body
         code: """
@@ -23,7 +24,7 @@ TestRequest: {
             """
     }
 
-    testJSON: bl.BashScript & {
+    testJSON: bash.BashScript & {
         environment: STATUS: "\(req.response.statusCode)"
         environment: CONTENT: json.Unmarshal(req.response.body).current_user_url
         code: """

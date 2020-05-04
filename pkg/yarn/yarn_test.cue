@@ -1,15 +1,18 @@
 package yarn
 
-import "blocklayer.dev/bl"
+import (
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+)
 
 TestYarn : {
 	run: App & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata/src"
 		}
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/build": run.build
 		code: """
         test "$(cat /build/test)" = "output"
@@ -19,7 +22,7 @@ TestYarn : {
 
 TestYarnEnvFile : {
 	run: App & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata/src"
 		}
 		loadEnv: true
@@ -27,7 +30,7 @@ TestYarnEnvFile : {
 		writeEnvFile: ".env"
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/build": run.build
 		code: """
         grep "FOO=BAR" /build/.env

@@ -1,13 +1,15 @@
 package krane
 
 import (
-	"blocklayer.dev/bl"
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+    "stackbrew.io/secret"
 )
 
 // Render a Krane template
 Render :: {
 	// Kubernetes config to render
-	source: string | bl.Directory
+	source: string | fs.Directory
 
 	// Krane version
 	version: string | *"1.1.2"
@@ -15,7 +17,7 @@ Render :: {
 	// Rendered config
 	result: run.output["/krane/result"]
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		runPolicy: "always"
 
 		os: {
@@ -48,13 +50,13 @@ Render :: {
 // Deploy a Kubernetes configuration using Krane
 Deploy :: {
 	// Kubernetes config to deploy
-	source: string | bl.Directory
+	source: string | fs.Directory
 
 	// Kubernetes Namespace to deploy to
 	namespace: string
 
 	// Kube config file
-	kubeconfig: bl.Secret
+	kubeconfig: secret.Secret
 
 	// Krane version
 	version: string | *"1.1.2"
@@ -62,7 +64,7 @@ Deploy :: {
 	// Prune resources that are no longer in your Kubernetes template set
 	prune: bool | *true
 
-	deploy: bl.BashScript & {
+	deploy: bash.BashScript & {
 		runPolicy: "always"
 
 		os: {

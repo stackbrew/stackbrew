@@ -3,7 +3,9 @@ package netlify
 import (
 	"strings"
 
-	"blocklayer.dev/bl"
+	"stackbrew.io/bash"
+    "stackbrew.io/fs"
+    "stackbrew.io/secret"
 )
 
 // A Netlify account
@@ -13,7 +15,7 @@ Account :: {
 	name: string | *""
 
 	// Netlify authentication token
-	token: bl.Secret
+	token: secret.Secret
 }
 
 // A Netlify site
@@ -22,7 +24,7 @@ Site :: {
 	account: Account
 
 	// Contents of the application to deploy
-	contents: bl.Directory
+	contents: fs.Directory
 
 	// Deploy to this Netlify site
 	name: string
@@ -36,7 +38,7 @@ Site :: {
 	// Deployment url
 	url: strings.TrimRight(deploy.output["/info/url"], "\n")
 
-	deploy: bl.BashScript & {
+	deploy: bash.BashScript & {
 		runPolicy: "always"
 
 		workdir: "/site/contents"

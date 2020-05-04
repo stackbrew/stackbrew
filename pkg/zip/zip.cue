@@ -1,12 +1,15 @@
 package zip
 
-import "blocklayer.dev/bl"
+import (
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+)
 
 // Zip archive
 Archive :: {
 
 	// Source Directory, File or String to Zip from
-	source: bl.Directory | string
+	source: fs.Directory | string
 
 	// Archive file output
 	archive: {
@@ -14,10 +17,10 @@ Archive :: {
 		path: "file.zip"
 	}
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		input: "/inputs/source": source
 
-		output: "/outputs/out": bl.Directory
+		output: "/outputs/out": fs.Directory
 
 		os: package: zip: true
 

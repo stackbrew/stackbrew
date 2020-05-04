@@ -3,8 +3,9 @@ package cloudformation
 import (
 	"strings"
 
-	"blocklayer.dev/bl"
 	"stackbrew.io/aws"
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
 )
 
 // AWS CloudFormation Stack
@@ -25,11 +26,11 @@ Stack :: {
 	// Output of the stack apply
 	stackOutput: run.output["/outputs/stack_output"]
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             fs.Cache
 			"/inputs/source":         source
 			"/inputs/stack_name":     stackName
 			if len(parameters) > 0 {

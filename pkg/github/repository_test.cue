@@ -1,10 +1,11 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
+    "stackbrew.io/bash"
+    "stackbrew.io/secret"
 )
 
-TestConfig: githubToken: bl.Secret
+TestConfig: githubToken: secret.Secret
 
 TestRepository: {
     repository: Repository & {
@@ -22,7 +23,7 @@ TestRepository: {
         token: TestConfig.githubToken
     }
 
-    test: bl.BashScript & {
+    test: bash.BashScript & {
         runPolicy: "always"
         input: "/checkout": checkout.out
         code: """

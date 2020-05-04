@@ -1,10 +1,12 @@
 package kubernetes
 
 import (
-	"blocklayer.dev/bl"
     "encoding/yaml"
+
 	"stackbrew.io/aws"
 	"stackbrew.io/aws/eks"
+	"stackbrew.io/bash"
+	"stackbrew.io/fs"
 )
 
 TestConfig: {
@@ -14,7 +16,7 @@ TestConfig: {
 
 TestEKS: {
 	// Generate some random
-	genRandom: bl.BashScript & {
+	genRandom: bash.BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand
@@ -50,7 +52,7 @@ TestEKS: {
     deployDirectory: Apply & {
         kubeconfig: authenticate.kubeconfig
         namespace: "stackbrew-test"
-        source: bl.Directory & {
+        source: fs.Directory & {
             local: "./testdata"
         }
     }
@@ -58,7 +60,7 @@ TestEKS: {
 
 TestKustomize: {
     kubeConfig: Kustomize & {
-        source: bl.Directory & {
+        source: fs.Directory & {
             local: "./testdata"
         }
         kustomization: yaml.Marshal({
@@ -70,7 +72,7 @@ TestKustomize: {
         })
     }
 
-    changeImageName: bl.BashScript & {
+    changeImageName: bash.BashScript & {
 		runPolicy: "always"
 
         input: "/kube/config.yaml": kubeConfig.out

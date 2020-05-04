@@ -1,13 +1,15 @@
 package kubernetes
 
 import (
-	"blocklayer.dev/bl"
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+    "stackbrew.io/secret"
 )
 
 // Exposes `kubectl kustomize`
 Kustomize :: {
 	// Kubernetes config to take as input
-	source: string | bl.Directory
+	source: string | fs.Directory
 
 	// Optionnal kustomization.yaml
 	kustomization: *"" | string
@@ -18,7 +20,7 @@ Kustomize :: {
 	// Output of kustomize
 	out: kustomize.output["/kube/out"]
 
-	kustomize: bl.BashScript & {
+	kustomize: bash.BashScript & {
 		input: {
 			"/kube/source": source
 			"/kube/kustomization.yaml": kustomization
@@ -47,7 +49,7 @@ Kustomize :: {
 // Apply a Kubernetes configuration
 Apply :: {
 	// Kubernetes config to deploy
-	source: string | bl.Directory
+	source: string | fs.Directory
 
 	// Kubernetes Namespace to deploy to
 	namespace: string
@@ -56,9 +58,9 @@ Apply :: {
 	version: *"v1.14.7" | string
 
 	// Kube config file
-	kubeconfig: bl.Secret
+	kubeconfig: secret.Secret
 
-	deploy: bl.BashScript & {
+	deploy: bash.BashScript & {
 		runPolicy: "always"
 
 		input: {

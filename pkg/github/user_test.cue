@@ -1,17 +1,18 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
+    "stackbrew.io/bash"
+    "stackbrew.io/secret"
 )
 
-TestConfig: githubToken: bl.Secret
+TestConfig: githubToken: secret.Secret
 
 TestViewer: {
     query: GetViewer & {
         token: TestConfig.githubToken
     }
 
-    test: bl.BashScript & {
+    test: bash.BashScript & {
         runPolicy: "always"
         environment: login: query.user.login
         code: """

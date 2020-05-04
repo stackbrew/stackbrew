@@ -1,9 +1,12 @@
 package eks
 
 import (
-	"blocklayer.dev/bl"
-	"stackbrew.io/aws"
 	"encoding/base64"
+
+	"stackbrew.io/aws"
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+    "stackbrew.io/secret"
 )
 
 // KubeConfig config outputs a valid kube-auth-config for kubectl client
@@ -15,18 +18,18 @@ KubeConfig :: {
 	cluster: string
 
 	// kubeconfig is the generated kube configuration file
-	kubeconfig: bl.Secret & {
-		// FIXME: we should be able to output a bl.Secret directly
+	kubeconfig: secret.Secret & {
+		// FIXME: we should be able to output a secret.Secret directly
 		value: base64.Encode(null, run.output["/outputs/kubeconfig"])
 	}
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		runPolicy: "always"
 
 		input: {
 			"/inputs/access_key": config.accessKey
 			"/inputs/secret_key": config.secretKey
-			"/cache/aws":         bl.Cache
+			"/cache/aws":         fs.Cache
 		}
 
 		output: "/outputs/kubeconfig": string

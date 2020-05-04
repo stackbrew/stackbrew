@@ -1,9 +1,9 @@
 package elasticbeanstalk
 
 import (
-	"blocklayer.dev/bl"
-
 	"stackbrew.io/aws"
+	"stackbrew.io/bash"
+	"stackbrew.io/fs"
 )
 
 // Elastic Beanstalk Application
@@ -17,11 +17,11 @@ Application :: {
 
 	out: run.output["/outputs/out"]
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             fs.Cache
 		}
 
 		output: "/outputs/out": string
@@ -66,7 +66,7 @@ Environment :: {
 	config: aws.Config
 
 	// Source code to deploy
-	source: bl.Directory
+	source: fs.Directory
 
 	// Beanstalk environment name
 	environmentName: string
@@ -92,11 +92,11 @@ Environment :: {
 	out:   run.output["/outputs/out"]
 	cname: run.output["/outputs/cname"]
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             fs.Cache
 			"/inputs/source":         source
 
 			// Maps createOptions optionnally
@@ -202,7 +202,7 @@ Deployment :: {
 	config: aws.Config
 
 	// Source code to deploy
-	source: bl.Directory
+	source: fs.Directory
 
 	// Beanstalk environment name
 	environmentName: string
@@ -212,11 +212,11 @@ Deployment :: {
 
 	cname: run.output["/outputs/cname"]
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             fs.Cache
 			"/inputs/source":         source
 		}
 

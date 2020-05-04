@@ -1,13 +1,13 @@
 package nodejs
 
 import (
-	"blocklayer.dev/bl"
+	"stackbrew.io/fs"
 )
 
 Container :: {
 	buildScript: string
 	runScript:   string
 	environment: [string]: string
-	source: bl.Directory
-	image:  bl.Directory
+	source: fs.Directory
+	image:  fs.Directory
 }

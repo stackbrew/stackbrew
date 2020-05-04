@@ -1,15 +1,17 @@
 package file
 
 import (
-	"blocklayer.dev/bl"
 	"strconv"
 	"encoding/json"
+
+	"stackbrew.io/bash"
+	"stackbrew.io/fs"
 )
 
 // Read reads the contents of a file.
 Read :: {
 	// source directory
-	source: bl.Directory
+	source: fs.Directory
 
 	// filename names the file to read.
 	filename: !=""
@@ -17,7 +19,7 @@ Read :: {
 	// contents is the read contents.
 	contents: script.output["/output"]
 
-	script: bl.BashScript & {
+	script: bash.BashScript & {
 		input: "/src":         source
 		output: "/output":     string
 		environment: FILENAME: filename
@@ -30,7 +32,7 @@ Read :: {
 // Create writes contents to the given file.
 Create :: {
 	// source directory
-	source?: bl.Directory
+	source?: fs.Directory
 
 	// result directory
 	result: script.output["/result"]
@@ -44,12 +46,12 @@ Create :: {
 	// contents specifies the bytes to be written.
 	contents: bytes | string
 
-	script: bl.BashScript & {
-		if (source & bl.Directory) != _|_ {
+	script: bash.BashScript & {
+		if (source & fs.Directory) != _|_ {
 			input: "/src": source
 		}
 		input: "/contents": contents
-		output: "/result":  bl.Directory
+		output: "/result":  fs.Directory
 		environment: {
 			FILENAME: filename
 			PERM:     strconv.FormatInt(permissions, 8)
@@ -67,7 +69,7 @@ Create :: {
 // Append writes contents to the given file.
 Append :: {
 	// source directory
-	source: bl.Directory
+	source: fs.Directory
 
 	// result directory
 	result: script.output["/result"]
@@ -81,10 +83,10 @@ Append :: {
 	// contents specifies the bytes to be written.
 	contents: bytes | string
 
-	script: bl.BashScript & {
+	script: bash.BashScript & {
 		input: "/src":      source
 		input: "/contents": contents
-		output: "/result":  bl.Directory
+		output: "/result":  fs.Directory
 		environment: {
 			FILENAME: filename
 			PERM:     strconv.FormatInt(permissions, 8)
@@ -104,7 +106,7 @@ Append :: {
 // Glob returns a list of files.
 Glob :: {
 	// source directory
-	source: bl.Directory
+	source: fs.Directory
 
 	// glob specifies the pattern to match files with.
 	glob: !=""
@@ -113,7 +115,7 @@ Glob :: {
 	files: [...string]
 	files: json.Unmarshal(script.output["/result.json"])
 
-	script: bl.BashScript & {
+	script: bash.BashScript & {
 		input: "/src":          source
 		output: "/result.json": string
 		environment: GLOB:      glob

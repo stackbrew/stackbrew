@@ -1,7 +1,7 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
+    "stackbrew.io/secret"
 )
 
 Repository :: {
@@ -12,7 +12,7 @@ Repository :: {
     owner: string
 
     // Github API token
-    token: bl.Secret
+    token: secret.Secret
 
     "GetPullRequest" :: GetPullRequest & {
         "token": token

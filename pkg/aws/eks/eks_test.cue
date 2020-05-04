@@ -1,8 +1,8 @@
 package eks
 
 import (
-	"blocklayer.dev/bl"
 	"stackbrew.io/aws"
+	"stackbrew.io/bash"
 	"stackbrew.io/kubernetes"
 )
 
@@ -13,7 +13,7 @@ TestConfig: {
 
 TestEKS: {
 	// Generate some random
-	genRandom: bl.BashScript & {
+	genRandom: bash.BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand

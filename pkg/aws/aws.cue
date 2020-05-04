@@ -1,10 +1,12 @@
 package aws
 
-import "blocklayer.dev/bl"
+import (
+    "stackbrew.io/secret"
+)
 
 // AWS Config shared by all AWS packages
 Config :: {
 	region:    string
-	accessKey: bl.Secret
-	secretKey: bl.Secret
+	accessKey: secret.Secret
+	secretKey: secret.Secret
 }

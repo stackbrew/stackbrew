@@ -1,6 +1,8 @@
 package git
 
-import "blocklayer.dev/bl"
+import (
+	"stackbrew.io/bash"
+)
 
 testClone: {
 	run: Repository & {
@@ -8,7 +10,7 @@ testClone: {
 		ref: "2dd1ba045e7dc4e382ae89529b0e9e2107a076bb"
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: {
 			"/inputs/out":          run.out
 			"/inputs/commit":       run.commit
@@ -31,7 +33,7 @@ testCloneWithGitDir: {
 		keepGitDir: true
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/inputs/out": run.out
 
 		code: #"""
@@ -51,7 +53,7 @@ testPathCommit: {
 		from: repos.out
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: {
 			"/inputs/commit":       run.commit
 			"/inputs/short-commit": run.shortCommit

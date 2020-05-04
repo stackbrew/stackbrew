@@ -1,10 +1,10 @@
 package krane
 
 import (
-	"blocklayer.dev/bl"
-	"stackbrew.io/file"
 	"stackbrew.io/aws"
 	"stackbrew.io/aws/eks"
+	"stackbrew.io/bash"
+	"stackbrew.io/file"
 )
 
 TestConfig: {
@@ -35,7 +35,7 @@ TestRender: {
         source: kubeCfgString
     }
 
-    testString: bl.BashScript & {
+    testString: bash.BashScript & {
         input: "/config": renderString.result
         code: #"""
         grep -q kubernetes-test- /config
@@ -53,7 +53,7 @@ TestRender: {
         source: kubeCfgDirectory.contents
     }
 
-    testDirectory: bl.BashScript & {
+    testDirectory: bash.BashScript & {
         input: "/config": renderString.result
         code: #"""
         grep -q kubernetes-test- /config
@@ -69,7 +69,7 @@ TestRender: {
 
 TestDeploy: {
 	// Generate some random
-	genRandom1: bl.BashScript & {
+	genRandom1: bash.BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand
@@ -78,7 +78,7 @@ TestDeploy: {
 	}
 
 
-	genRandom2: bl.BashScript & {
+	genRandom2: bash.BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand

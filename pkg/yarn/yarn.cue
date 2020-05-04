@@ -3,13 +3,14 @@ package yarn
 import (
 	"strings"
 
-	"blocklayer.dev/bl"
+	"stackbrew.io/bash"
+	"stackbrew.io/fs"
 )
 
 // A javascript application built by Yarn
 App :: {
 	// Source code of the javascript application
-	source: bl.Directory
+	source: fs.Directory
 
 	// Load the contents of `environment` into the yarn process?
 	loadEnv: bool | *true
@@ -29,7 +30,7 @@ App :: {
 	buildDirectory: string | *"build"
 
 	// Execute this script to build the app
-	action: build: bl.BashScript & {
+	action: build: bash.BashScript & {
 		code: """
 			yarn install --network-timeout 1000000
 			yarn run "$YARN_BUILD_SCRIPT"
@@ -50,13 +51,13 @@ App :: {
 		input: {
 			"/app/src": source
 			// FIXME: set a cache key?
-			"/cache/yarn": bl.Cache
+			"/cache/yarn": fs.Cache
 			if writeEnvFile != "" {
 				"/app/src/\(writeEnvFile)": strings.Join([ "\(k)=\(v)" for k, v in appEnv ], "\n")
 			}
 		}
 
-		output: "/app/build": bl.Directory
+		output: "/app/build": fs.Directory
 
 		os: package: {
 			rsync: true

@@ -1,18 +1,19 @@
 package file
 
 import (
-	"blocklayer.dev/bl"
+	"stackbrew.io/bash"
+	"stackbrew.io/fs"
 )
 
 TestRead: {
 	read: Read & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata"
 		}
 		filename: "/file"
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/test": read.contents
 		code: """
         test "$(cat /test)" = "testfile"
@@ -22,7 +23,7 @@ TestRead: {
 
 TestCreate: {
 	create: Create & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata"
 		}
 		filename:    "/new"
@@ -30,7 +31,7 @@ TestCreate: {
 		permissions: 0o755
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/test": create.result
 		code: """
         test -x "/test/new"
@@ -45,7 +46,7 @@ TestCreateNoSource: {
 		contents: "new file"
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/test": create.result
 		code: """
         test "$(cat /test/new)" = "new file"
@@ -55,7 +56,7 @@ TestCreateNoSource: {
 
 TestAppend: {
 	append: Append & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata"
 		}
 		filename: "/file"
@@ -63,7 +64,7 @@ TestAppend: {
 	}
 
 	create: Append & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata"
 		}
 		filename:    "/new"
@@ -71,7 +72,7 @@ TestAppend: {
 		permissions: 0o755
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/append": append.result
 		input: "/create": create.result
 		code: """
@@ -85,13 +86,13 @@ TestAppend: {
 
 TestGlob: {
 	glob: Glob & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata"
 		}
 		glob: "f*"
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/result.json": glob.files[0]
 		code: """
         test "$(cat /result.json)" = "file"

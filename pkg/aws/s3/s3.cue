@@ -1,8 +1,9 @@
 package s3
 
 import (
-	"blocklayer.dev/bl"
 	"stackbrew.io/aws"
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
 )
 
 // S3 file or Directory upload
@@ -12,7 +13,7 @@ Put :: {
 	config: aws.Config
 
 	// Source Directory, File or String to Upload to S3
-	source: string | bl.Directory
+	source: string | fs.Directory
 
 	// Target S3 URL (eg. s3://<bucket-name>/<path>/<sub-path>)
 	target: string
@@ -20,7 +21,7 @@ Put :: {
 	// URL of the uploaded S3 object
 	url: run.output["/outputs/url"]
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		runPolicy: "always"
 
 		input: {
@@ -28,7 +29,7 @@ Put :: {
 			"/inputs/aws/secret_key": config.secretKey
 			"/inputs/source":         source
 			"/inputs/target":         target
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             fs.Cache
 		}
 
 		output: "/outputs/url": string

@@ -1,12 +1,15 @@
 package go
 
-import "blocklayer.dev/bl"
+import (
+	"stackbrew.io/bash"
+	"stackbrew.io/fs"
+)
 
 // Go application built with `go build`
 App :: {
 
 	// Source Directory to build
-	source: bl.Directory
+	source: fs.Directory
 
 	// Go version to use
 	version: *"1.14.1" | string
@@ -35,12 +38,12 @@ App :: {
 	}
 
 	// Binary file output of the Go build
-	binary: bl.Directory & {
+	binary: fs.Directory & {
 		from: build.output["/outputs/out"]
 		path: binaryName
 	}
 
-	build: bl.BashScript & {
+	build: bash.BashScript & {
 		input: {
 			"/inputs/source":  source
 			"/inputs/version": version
@@ -52,10 +55,10 @@ App :: {
 			"/inputs/os":         osInput
 			"/inputs/tags":       tags
 			"/inputs/ldflags":    ldflags
-			"/cache/go":          bl.Cache
+			"/cache/go":          fs.Cache
 		}
 
-		output: "/outputs/out": bl.Directory
+		output: "/outputs/out": fs.Directory
 
 		os: package: "libc6-compat": true
 

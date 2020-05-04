@@ -1,9 +1,11 @@
 package http
 
 import (
-    "blocklayer.dev/bl"
     "encoding/json"
     "strconv"
+
+    "stackbrew.io/bash"
+    "stackbrew.io/secret"
 )
 
 Get:    Do & {method: "GET"}
@@ -18,7 +20,7 @@ Do :: {
     request: {
         body: string | *""
         header: [string]: string | [...string]
-        token?: bl.Secret
+        token?: secret.Secret
     }
 
     output: [string]: string
@@ -27,13 +29,13 @@ Do :: {
         statusCode: strconv.Atoi(output["/status"])
     }
 
-    bl.BashScript & {
+    bash.BashScript & {
         runPolicy: "always"
         os: package: curl: true
         input: {
             "/method":  method
             "/headers": json.Marshal(request.header)
-            if (request.token & bl.Secret) != _|_ {
+            if (request.token & secret.Secret) != _|_ {
                 "/token": request.token
             }
             "/body": request.body

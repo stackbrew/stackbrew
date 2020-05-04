@@ -1,15 +1,18 @@
 package go
 
-import "blocklayer.dev/bl"
+import (
+	"stackbrew.io/bash"
+	"stackbrew.io/fs"
+)
 
 testGoBuild: {
 	run: App & {
-		source: bl.Directory & {
+		source: fs.Directory & {
 			local: "./testdata"
 		}
 	}
 
-	test: bl.BashScript & {
+	test: bash.BashScript & {
 		input: "/inputs/binary": run.binary
 		code: #"""
             [ "$(/inputs/binary)" = "hello world" ]

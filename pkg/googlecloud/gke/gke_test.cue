@@ -1,7 +1,7 @@
 package gke
 
 import (
-	"blocklayer.dev/bl"
+	"stackbrew.io/bash"
 	"stackbrew.io/googlecloud"
 	"stackbrew.io/kubernetes"
 )
@@ -13,7 +13,7 @@ TestConfig: {
 
 TestGKE: {
 	// Generate some random
-	genRandom: bl.BashScript & {
+	genRandom: bash.BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand

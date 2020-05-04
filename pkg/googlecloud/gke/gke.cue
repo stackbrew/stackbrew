@@ -1,9 +1,12 @@
 package gke
 
 import (
-	"blocklayer.dev/bl"
-	"stackbrew.io/googlecloud"
 	"encoding/base64"
+
+    "stackbrew.io/bash"
+    "stackbrew.io/fs"
+	"stackbrew.io/googlecloud"
+    "stackbrew.io/secret"
 )
 
 // KubeConfig config outputs a valid kube-auth-config for kubectl client
@@ -15,17 +18,17 @@ KubeConfig :: {
 	cluster: string
 
 	// kubeconfig is the generated kube configuration file
-	kubeconfig: bl.Secret & {
-		// FIXME: we should be able to output a bl.Secret directly
+	kubeconfig: secret.Secret & {
+		// FIXME: we should be able to output a secret.Secret directly
 		value: base64.Encode(null, run.output["/outputs/kubeconfig"])
 	}
 
-	run: bl.BashScript & {
+	run: bash.BashScript & {
 		runPolicy: "always"
 
 		input: {
 			"/inputs/service_key": config.serviceKey
-			"/cache/googlecloud":  bl.Cache
+			"/cache/googlecloud":  fs.Cache
 		}
 
 		output: "/outputs/kubeconfig": string

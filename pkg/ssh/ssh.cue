@@ -2,7 +2,9 @@ package ssh
 
 import (
 	"strings"
-	"blocklayer.dev/bl"
+
+	"stackbrew.io/bash"
+	"stackbrew.io/secret"
 )
 
 // A SSH endpoint
@@ -17,7 +19,7 @@ Endpoint :: {
 	user: string
 
 	// Endpoint private key
-	key: bl.Secret
+	key: secret.Secret
 
 	// Run a command remotely on this endpoint
 	RunCommand :: {
@@ -27,7 +29,7 @@ Endpoint :: {
 
 		output: _
 
-		bl.BashScript & {
+		bash.BashScript & {
 			input: {
 				"/key": key
 			}

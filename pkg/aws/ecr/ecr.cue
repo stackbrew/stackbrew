@@ -1,9 +1,12 @@
 package ecr
 
 import (
-	"blocklayer.dev/bl"
-	"stackbrew.io/aws"
 	"encoding/base64"
+
+	"stackbrew.io/aws"
+	"stackbrew.io/bash"
+	"stackbrew.io/container"
+	"stackbrew.io/secret"
 )
 
 // Credentials retriever for ECR
@@ -16,16 +19,16 @@ Credentials :: {
 	target: string
 
 	// ECR credentials
-	credentials: bl.RegistryCredentials & {
+	credentials: container.RegistryCredentials & {
 		username: output["/outputs/username"]
-		secret:   bl.Secret & {
+		"secret": secret.Secret & {
 			// FIXME: we should be able to output a bl.Secret directly
 			value: base64.Encode(null, output["/outputs/secret"])
 		}
 	}
 
 	// Authentication for ECR Registries
-	auth: bl.RegistryAuth
+	auth: container.RegistryAuth
 	auth: "\(target)": credentials
 
 	helperUrl:
@@ -33,7 +36,7 @@ Credentials :: {
 
 	output: _
 
-	bl.BashScript & {
+	bash.BashScript & {
 		runPolicy: "always"
 
 		input: {
@@ -46,7 +49,7 @@ Credentials :: {
 			"/outputs/registry": string
 			"/outputs/username": string
 
-			// FIXME: this should be bl.Secret
+			// FIXME: this should be secret.Secret
 			"/outputs/secret": string
 		}
 
