@@ -1,6 +1,6 @@
 package zip
 
-import "b.l/bl"
+import "blocklayer.dev/bl"
 
 // Zip archive
 Archive :: {

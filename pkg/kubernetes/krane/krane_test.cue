@@ -1,7 +1,7 @@
 package krane
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 	"stackbrew.io/file"
 	"stackbrew.io/aws"
 	"stackbrew.io/aws/eks"

@@ -1,7 +1,7 @@
 package gcr
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 	"stackbrew.io/googlecloud"
 )
 

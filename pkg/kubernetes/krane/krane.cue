@@ -1,7 +1,7 @@
 package krane
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 )
 
 // Render a Krane template

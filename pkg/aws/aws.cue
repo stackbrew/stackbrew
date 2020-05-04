@@ -1,6 +1,6 @@
 package aws
 
-import "b.l/bl"
+import "blocklayer.dev/bl"
 
 // AWS Config shared by all AWS packages
 Config :: {

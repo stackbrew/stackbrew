@@ -3,7 +3,7 @@ package helm
 import (
     "encoding/yaml"
 
-    "b.l/bl"
+    "blocklayer.dev/bl"
 	"stackbrew.io/aws"
 	"stackbrew.io/aws/eks"
 )

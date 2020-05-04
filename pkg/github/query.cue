@@ -4,7 +4,7 @@ package github
 // Reference: https://developer.github.com/v4/
 
 import (
-    "b.l/bl"
+    "blocklayer.dev/bl"
     "stackbrew.io/graphql"
 )
 

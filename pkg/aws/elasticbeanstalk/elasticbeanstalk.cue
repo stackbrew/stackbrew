@@ -1,7 +1,7 @@
 package elasticbeanstalk
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 
 	"stackbrew.io/aws"
 )

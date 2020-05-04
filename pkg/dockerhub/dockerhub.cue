@@ -1,7 +1,7 @@
 package dockerhub
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 )
 
 // Credentials retriever for Docker Hub

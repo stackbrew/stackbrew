@@ -3,7 +3,7 @@ package helm
 import (
 	"strconv"
 
-	"b.l/bl"
+	"blocklayer.dev/bl"
 )
 
 // Install a Helm chart

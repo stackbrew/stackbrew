@@ -1,7 +1,7 @@
 package eks
 
 import (
-	"b.l/bl"
+	"blocklayer.dev/bl"
 	"stackbrew.io/aws"
 	"encoding/base64"
 )

@@ -1,6 +1,6 @@
 package go
 
-import "b.l/bl"
+import "blocklayer.dev/bl"
 
 // Go application built with `go build`
 App :: {

@@ -3,7 +3,7 @@ package netlify
 import (
 	"strings"
 
-	"b.l/bl"
+	"blocklayer.dev/bl"
 )
 
 // A Netlify account

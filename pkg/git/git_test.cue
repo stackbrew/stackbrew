@@ -1,6 +1,6 @@
 package git
 
-import "b.l/bl"
+import "blocklayer.dev/bl"
 
 testClone: {
 	run: Repository & {

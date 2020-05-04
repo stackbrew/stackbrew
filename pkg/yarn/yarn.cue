@@ -3,7 +3,7 @@ package yarn
 import (
 	"strings"
 
-	"b.l/bl"
+	"blocklayer.dev/bl"
 )
 
 // A javascript application built by Yarn
