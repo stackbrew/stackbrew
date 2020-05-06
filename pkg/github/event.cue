@@ -5,9 +5,6 @@ package github
 Event :: {
     name: string
 
-    after:  string
-    before: string
-
     sender: {...}
     repository?: {...}
     organization?: {...}
@@ -37,6 +34,9 @@ PullRequestEvent :: {
         "unlocked" |
         "reopened" |
         "synchronize"
+
+    after?:  string
+    before?: string
 
     // The pull request number.
     number: int
