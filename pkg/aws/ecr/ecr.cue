@@ -4,6 +4,7 @@ import (
 	"blocklayer.dev/bl"
 	"stackbrew.io/aws"
 	"encoding/base64"
+	"strings"
 )
 
 // Credentials retriever for ECR
@@ -25,11 +26,11 @@ Credentials :: {
 	}
 
 	// ECR registry name associated with target
-	registry: run.output["/outputs/registry"]
+	registry: strings.TrimRight(run.output["/outputs/registry"], "\n")
 
 	// Authentication for ECR Registries
 	auth: bl.RegistryAuth
-	auth: registry: credentials
+	auth: "\(registry)": credentials
 
 	helperUrl:
 		"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"

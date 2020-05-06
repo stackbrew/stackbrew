@@ -15,7 +15,7 @@ case "${1}" in
     fmt)
         for component in ${COMPONENTS}; do
             (
-                echo "+++ FMT ${component}"
+                echo "+++ FMT ${component}" >&2
                 cd "${PKGDIR}/${component}"
                 # FIXME: fmt is broken with _test.cue files
                 #cue fmt -s
@@ -27,7 +27,7 @@ case "${1}" in
     lint)
         for component in ${COMPONENTS}; do
             (
-                echo "+++ LINTING ${component}"
+                echo "+++ LINTING ${component}" >&2
                 cd "${PKGDIR}/${component}"
                 cue fmt -s
                 cue trim -s
@@ -38,7 +38,7 @@ case "${1}" in
     test)
         for component in ${COMPONENTS}; do
             (
-                echo "+++ TESTING ${component}"
+                echo "+++ TESTING ${component}" >&2
                 cd "${PKGDIR}/${component}"
                 bl-runtime test -f "$TEST_CONFIG" -t "$TEST_TARGET:${component/\//.}"
             )
@@ -47,7 +47,7 @@ case "${1}" in
     publish)
         for component in ${COMPONENTS}; do
             (
-                echo "+++ PUBLISH stackbrew.io/${component}"
+                echo "+++ PUBLISH stackbrew.io/${component}" >&2
                 cd "${PKGDIR}/${component}"
                 bl-runtime publish "stackbrew.io/${component}"
             )
@@ -59,7 +59,7 @@ case "${1}" in
         echo "# Stackbrew Packages" > "$docs"
         for component in ${COMPONENTS}; do
             (
-                echo "+++ DOCUMENTING ${component}"
+                echo "+++ DOCUMENTING ${component}" >&2
                 cd "${PKGDIR}"
                 echo >> "$docs"
                 bl-runtime doc -c "${component}" -o md >> "$docs"
