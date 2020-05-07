@@ -112,16 +112,7 @@ Comment :: {
     commentId: [n.id for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)")]
 
     updateCommentQuery: json.Marshal({
-        query: """
-            mutation ($input: UpdateIssueCommentInput!) {
-                updateIssueComment(input: $input) {
-                    issueComment {
-                        ...CommentParts
-                    }
-                }
-            }
-            \(CommentFragment)
-            """
+        query: UpdateComment.query
         variables: input: {
             if len(commentId) > 0 {
                 id: commentId[0]
@@ -131,21 +122,7 @@ Comment :: {
     })
 
     addCommentQuery: json.Marshal({
-        query: """
-             mutation ($input: AddCommentInput!) {
-                 addComment(input: $input) {
-                     subject {
-                         id
-                     }
-                     commentEdge {
-                         node {
-                             ...CommentParts
-                         }
-                     }
-                 }
-             }
-             \(CommentFragment)
-             """
+        query: AddComment.query
         variables: input: {
             "subjectId": subjectId
             "body": "\(body)\n\(marker)"
