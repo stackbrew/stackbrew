@@ -17,24 +17,23 @@ Credentials :: {
 
 	// ECR credentials
 	credentials: bl.RegistryCredentials & {
-		username: run.output["/outputs/username"]
+		username: output["/outputs/username"]
 		secret:   bl.Secret & {
 			// FIXME: we should be able to output a bl.Secret directly
-			value: base64.Encode(null, run.output["/outputs/secret"])
+			value: base64.Encode(null, output["/outputs/secret"])
 		}
 	}
 
-	// ECR registry name associated with target
-	registry: run.output["/outputs/registry"]
-
 	// Authentication for ECR Registries
 	auth: bl.RegistryAuth
-	auth: registry: credentials
+	auth: "\(target)": credentials
 
 	helperUrl:
 		"https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/docker-credential-ecr-login"
 
-	run: bl.BashScript & {
+	output: _
+
+	bl.BashScript & {
 		runPolicy: "always"
 
 		input: {
