@@ -41,4 +41,21 @@ TestComment: {
         **UPDATED**
         """#
     }
+
+    commentWithMarker: Comment & {
+        token: TestConfig.githubToken
+        subjectId: query.pullRequest.id
+        body:      #"""
+        ## Stackbrew Test
+
+        Edit comment in place
+
+        ```
+        \#(json.Indent(
+            json.Marshal(query.pullRequest),
+            "", "  "
+        ))
+        ```
+        """#
+    }
 }
