@@ -1,3 +1,14 @@
 - Tasks are the escape hatch to an imperative programming model.
 - Over time, tasks can be wrapped with a declarative interface, but always
 available when needed.
+
+2020-May-11
+
+	- Actions are definitions
+	- Action parameters are also definitions
+	- Are those 2 uses of definitions confusing?
+	- Alternative: parameters are regular fields
+		- Objection: parameters are all exported, polluting the namespace
+			- Answer: maybe that's ok? ;) Most pollution is from the tasks, which can be hidden in a private definition.
+	
+
