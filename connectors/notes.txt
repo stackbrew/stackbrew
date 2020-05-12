@@ -1,0 +1,3 @@
+- Tasks are the escape hatch to an imperative programming model.
+- Over time, tasks can be wrapped with a declarative interface, but always
+available when needed.
