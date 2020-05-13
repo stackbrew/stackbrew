@@ -155,7 +155,7 @@ Elastic Beanstalk Environment
 |*out*                |``run.output["/outputs/out"]``                                                                                                                                   |N/A                                                     |
 |*environmentName*    |``string``                                                                                                                                                       |Beanstalk environment name                              |
 |*createOptions*      |``{ cname?: string tier?: string instance_type?: string instance_profile?: string service_role?: string keyname?: string scale?: string elb_type?: string }``    |Environment create options; check `eb create --help`    |
-|*cname*              |``run.output["/outputs/cname"]``                                                                                                                                 |N/A                                                     |
+|*cname*              |``strings.TrimRight(run.output["/outputs/cname"], "\n")``                                                                                                        |N/A                                                     |
 
 #### Deployment
 
@@ -163,13 +163,13 @@ Elastic Beanstalk Deployment
 
 ##### Fields
 
-| FIELD               | SPEC                               | DOC                          |
-| -------------       |:-------------:                     |:-------------:               |
-|*source*             |``bl.Directory``                    |Source code to deploy         |
-|*config*             |``aws.Config``                      |AWS Config                    |
-|*applicationName*    |``string``                          |Application name              |
-|*environmentName*    |``string``                          |Beanstalk environment name    |
-|*cname*              |``run.output["/outputs/cname"]``    |N/A                           |
+| FIELD               | SPEC                                                        | DOC                          |
+| -------------       |:-------------:                                              |:-------------:               |
+|*source*             |``bl.Directory``                                             |Source code to deploy         |
+|*config*             |``aws.Config``                                               |AWS Config                    |
+|*applicationName*    |``string``                                                   |Application name              |
+|*environmentName*    |``string``                                                   |Beanstalk environment name    |
+|*cname*              |``strings.TrimRight(run.output["/outputs/cname"], "\n")``    |N/A                           |
 
 ### s3
 

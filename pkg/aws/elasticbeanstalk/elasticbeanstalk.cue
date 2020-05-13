@@ -1,8 +1,8 @@
 package elasticbeanstalk
 
 import (
+	"strings"
 	"blocklayer.dev/bl"
-
 	"stackbrew.io/aws"
 )
 
@@ -90,9 +90,11 @@ Environment :: {
 	}
 
 	out:   run.output["/outputs/out"]
-	cname: run.output["/outputs/cname"]
+	cname: strings.TrimRight(run.output["/outputs/cname"], "\n")
 
 	run: bl.BashScript & {
+		runPolicy: "always"
+
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
@@ -210,9 +212,11 @@ Deployment :: {
 	// Application name
 	applicationName: string
 
-	cname: run.output["/outputs/cname"]
+	cname: strings.TrimRight(run.output["/outputs/cname"], "\n")
 
 	run: bl.BashScript & {
+		runPolicy: "always"
+
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
