@@ -39,12 +39,6 @@ TestECR: {
 		target: image
 	}
 
-	debug: {
-		source:      build.image
-		target:      image
-		auth:        login.auth
-	}
-
 	// Push the image
 	export: bl.Push & {
 		source:      build.image

@@ -51,7 +51,7 @@ TestEKS: {
         kubeconfig: authenticate.kubeconfig
         namespace: "stackbrew-test"
         source: bl.Directory & {
-            local: "./testdata"
+            source: "context://testdata"
         }
     }
 }
@@ -59,7 +59,7 @@ TestEKS: {
 TestKustomize: {
     kubeConfig: Kustomize & {
         source: bl.Directory & {
-            local: "./testdata"
+            source: "context://testdata"
         }
         kustomization: yaml.Marshal({
             resources: ["test.yaml"]

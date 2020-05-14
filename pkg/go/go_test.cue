@@ -5,7 +5,7 @@ import "blocklayer.dev/bl"
 testGoBuild: {
 	run: App & {
 		source: bl.Directory & {
-			local: "./testdata"
+			source: "context://testdata"
 		}
 	}
 

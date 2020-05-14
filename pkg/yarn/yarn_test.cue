@@ -5,7 +5,7 @@ import "blocklayer.dev/bl"
 TestYarn : {
 	run: App & {
 		source: bl.Directory & {
-			local: "./testdata/src"
+			source: "context://testdata/src"
 		}
 	}
 
@@ -20,7 +20,7 @@ TestYarn : {
 TestYarnEnvFile : {
 	run: App & {
 		source: bl.Directory & {
-			local: "./testdata/src"
+			source: "context://testdata/src"
 		}
 		loadEnv: true
 		environment: FOO: "BAR"
