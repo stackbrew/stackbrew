@@ -83,6 +83,10 @@ func vLookupTask(v cue.Value) (t *Task, err error) {
 
 }
 
+// Current limitations of the task scanner:
+//	- Does not follow references to definitions. Tasks in definitions will not be found, even
+//		if a concrete value depends on part of the definition.
+//	- @task(exec) must be set after the struct value (embedded attributes are broken ATM)
 func lookupTasks(v cue.Value) (tasks []*Task) {
 	// Does v have a @task attribute?
 	t, err := vLookupTask(v)
