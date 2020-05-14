@@ -36,7 +36,7 @@ App :: {
 
 	// Binary file output of the Go build
 	binary: bl.Directory & {
-		from: build.output["/outputs/out"]
+		source: build.output["/outputs/out"]
 		path: binaryName
 	}
 

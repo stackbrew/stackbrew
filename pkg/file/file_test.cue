@@ -7,7 +7,7 @@ import (
 TestRead: {
 	read: Read & {
 		source: bl.Directory & {
-			local: "./testdata"
+			source: "context://testdata"
 		}
 		filename: "/file"
 	}
@@ -23,7 +23,7 @@ TestRead: {
 TestCreate: {
 	create: Create & {
 		source: bl.Directory & {
-			local: "./testdata"
+			source: "context://testdata"
 		}
 		filename:    "/new"
 		contents:    "new file"
@@ -56,7 +56,7 @@ TestCreateNoSource: {
 TestAppend: {
 	append: Append & {
 		source: bl.Directory & {
-			local: "./testdata"
+			source: "context://testdata"
 		}
 		filename: "/file"
 		contents: "new content"
@@ -64,7 +64,7 @@ TestAppend: {
 
 	create: Append & {
 		source: bl.Directory & {
-			local: "./testdata"
+			source: "context://testdata"
 		}
 		filename:    "/new"
 		contents:    "new file"
@@ -86,7 +86,7 @@ TestAppend: {
 TestGlob: {
 	glob: Glob & {
 		source: bl.Directory & {
-			local: "./testdata"
+			source: "context://testdata"
 		}
 		glob: "f*"
 	}

@@ -45,7 +45,7 @@ TestHelmCustomChart: {
     install: Chart & {
         name: "stackbrew-test-helm-local"
         chart: bl.Directory & {
-            local: "./testdata/mychart"
+            source: "context://testdata/mychart"
         }
 
         namespace: "stackbrew-test"
