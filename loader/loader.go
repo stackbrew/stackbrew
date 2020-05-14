@@ -31,10 +31,15 @@ func main() {
 	}
 
 	tasks := lookupTasks(i.Value())
-
 	ui.Info("%d tasks detected", len(tasks))
 	for _, t := range(tasks) {
 		ui.Info("\t- %v", t)
+	}
+
+	conns := scanConnectors(i.Value())
+	ui.Info("%d connectors detected", len(conns))
+	for _, c := range(conns) {
+		ui.Info("\t- %v", c)
 	}
 
 	// Match contents of input with connector(s)
@@ -46,8 +51,74 @@ func main() {
 }
 
 
-func scanConnectors(root cue.Value) (conns []*Connector, err error) {
-	// FIXME
+func scanConnectors(v cue.Value) (conns []*Connector) {
+	// Is `v` a struct with a definition #ID ?
+	c := func (v cue.Value) (c *Connector) {
+		if v.Kind() != cue.StructKind {
+			return
+		}
+		s, err := v.Struct()
+		if err != nil {
+			return
+		}
+		_, err = s.FieldByName("#ID", true)
+		if err != nil {
+			return
+		}
+		return &Connector{
+			Value: v,
+		}
+	}(v)
+	if c != nil {
+		conns = append(conns, c)
+		return
+	}
+
+	// Recursively check references
+	refI, refP := v.Reference()
+	if len(refP) > 0 {
+		info, err := refI.LookupField(refP...)
+		if err != nil {
+			// FIXME: report error?
+			ui.Error("ERROR LOOKUP UP REFERENCE: %v: %s", refP, err)
+			return
+		}
+		if info.IsDefinition {
+			ui.Error("CANNOT FOLLOW REFERENCE TO DEFINITION: %v", refP)
+			// FIXME: LookupDef is tricky to use here
+		} else {
+			ui.Info("Following reference: %v", refP)
+			refTarget := refI.Lookup(refP...)
+			conns = append(conns, scanConnectors(refTarget)...)
+		}
+		return
+	}
+
+	switch v.Kind() {
+		// Recursively check struct fields
+		case cue.StructKind:
+			// Only iterate over "regular" fields (not hidden, eg. definitions)
+			for it, _ := v.Fields(); it.Next(); {
+				ui.Info("Following struct field: %s", it.Label())
+				conns = append(conns, scanConnectors(it.Value())...)
+			}
+		// Recursively check list elements
+		case cue.ListKind:
+			for it, _ := v.List(); it.Next(); {
+				ui.Info("Following list element: %s", it.Label())
+				conns = append(conns, scanConnectors(it.Value())...)
+			}
+	}
+
+	// If `v` is an expression, break it down and recursively inspect each component
+	exprOp, exprArgs:= v.Expr()
+	if exprOp != cue.NoOp && exprOp != cue.SelectorOp {
+		for argIdx, arg := range(exprArgs) {
+			// fakeLabel is used for human-friendly path display, only
+			ui.Info("Following expression '%v/%d'", exprOp, argIdx)
+			conns = append(conns, scanConnectors(arg)...)
+		}
+	}
 	return
 }
 

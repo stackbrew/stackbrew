@@ -3,7 +3,7 @@ import (
 )
 
 localhost: {
-	#ID: string
+	#ID: "324786327846328742"
 
 	#say: {
 		#message: string
