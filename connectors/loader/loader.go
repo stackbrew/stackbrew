@@ -30,10 +30,12 @@ func main() {
 		panic(err)
 	}
 
-	// walkTasks(i.Value())
+	tasks := lookupTasks(i.Value())
 
-	fmt.Printf("tasks = %v\n", vHasTasks(i.Value(), nil))
-	fmt.Printf("refs = %v\n", vHasRef(i.Value()))
+	ui.Info("%d tasks detected", len(tasks))
+	for _, t := range(tasks) {
+		ui.Info("\t- %v", t)
+	}
 
 	// Match contents of input with connector(s)
 		// Q. match algorithm?
@@ -81,47 +83,46 @@ func vLookupTask(v cue.Value) (t *Task, err error) {
 
 }
 
-// FIXME: return all tasks instead of returning just true/false
-func vHasTasks(v cue.Value, path []string) (result bool) {
-	ui.Info("%v\n\t%v", path, v)
-	defer func() { ui.Info(" %v -> %v", path, result) }()
-	// We are looking for a @task attribute anywhere within this value.
+func lookupTasks(v cue.Value) (tasks []*Task) {
 	// Does v have a @task attribute?
-	_, err := vLookupTask(v)
+	t, err := vLookupTask(v)
 	if err == nil {
-		ui.Info("TASK DETECTED: %v", path)
-		return true
+		ui.Info("TASK DETECTED: %v", v)
+		tasks = append(tasks, t)
 	}
 
-	// refI, refP := v.Reference()
-	// if len(refP) > 0 {
-	// 	info, err := refI.LookupField(refP...)
-	// 	if err != nil {
-	// 		ui.Info("error looking up reference %v: %s", refP, err)
-	// 		return false
-	// 	}
-	// 	ui.Info("%v following reference to %v", path, refP)
-	// 	if info.IsDefinition {
-	// 		return vHasTasks(refI.LookupDef(refP...), refP)
-	// 	}
-	// 	return vHasTasks(refI.Lookup(refP...), refP)
-	// }
+	// Check for references
+	refI, refP := v.Reference()
+	if len(refP) > 0 {
+		info, err := refI.LookupField(refP...)
+		if err != nil {
+			// FIXME: report error?
+			ui.Error("ERROR LOOKUP UP REFERENCE: %v: %s", refP, err)
+			return
+		}
+		if info.IsDefinition {
+			ui.Error("CANNOT FOLLOW REFERENCE TO DEFINITION: %v", refP)
+			// FIXME: LookupDef is tricky to use here
+		} else {
+			ui.Info("Following reference: %v", refP)
+			tasks = append(tasks, lookupTasks(refI.Lookup(refP...))...)
+		}
+		return
+	}
 
-	// If v is struct or list, recursively inspect its contents
-	ui.Info("%v kind = %v", path, v.Kind())
 	switch v.Kind() {
+		// Recursively check struct fields
 		case cue.StructKind:
 			// Only iterate over "regular" fields (not hidden, eg. definitions)
 			for it, _ := v.Fields(); it.Next(); {
-				if vHasTasks(it.Value(), append(path, it.Label())) {
-					return true
-				}
+				ui.Info("Following struct field: %s", it.Label())
+				tasks = append(tasks, lookupTasks(it.Value())...)
 			}
+		// Recursively check list elements
 		case cue.ListKind:
 			for it, _ := v.List(); it.Next(); {
-				if vHasTasks(it.Value(), append(path, it.Label())) {
-					return true
-				}
+				ui.Info("Following list element: %s", it.Label())
+				tasks = append(tasks, lookupTasks(it.Value())...)
 			}
 	}
 	// If v is an expression, recursively inspect its component parts
@@ -129,39 +130,12 @@ func vHasTasks(v cue.Value, path []string) (result bool) {
 	if exprOp != cue.NoOp && exprOp != cue.SelectorOp {
 		for argIdx, arg := range(exprArgs) {
 			// fakeLabel is used for human-friendly path display, only
-			ui.Info("[%v] Following expression '%V'", path, exprOp)
-			if vHasTasks(arg, append(path, fmt.Sprintf("%s/%d", exprOp.String(), argIdx))) {
-				return true
-			}
+			ui.Info("Following expression '%v/%d'", exprOp, argIdx)
+			tasks = append(tasks, lookupTasks(arg)...)
 		}
 	}
-	return false
-
+	return
 }
-
-func walkTasks_naive(root cue.Value) {
-	cueWalk(root, func(v cue.Value, path []string) (next bool) {
-		ui.Info("WALK %v", path)
-		next = true
-		attr := v.Attribute("task")
-		if err := attr.Err(); err != nil {
-			return
-		}
-		backend, err := attr.String(0)
-		if err != nil {
-			ui.Error("invalid task attribute: %s", err)
-			return
-		}
-		switch backend {
-			case "exec":
-				ui.Info("exec task detected  %v", path)
-			default:
-				ui.Error("unsupported task backend \"%s\": %v", backend, path)
-		}
-		return
-	}, nil, nil)
-}
-
 
 // CUE UTILITIES COPIED FROM 54-qd
 

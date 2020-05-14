@@ -5,6 +5,13 @@ import (
 localhost: {
 	#ID: string
 
+	#say: {
+		#message: string
+		t: {
+			cmd: ["echo", #message]
+		} @task(exec)
+	}
+
 	#ls: {
 		#path: [...string]
 
@@ -24,5 +31,7 @@ localhost: {
 	}
 
 	tmp: lsTmp.files
+
+	sayHello: #say & { #message: "hello!" }
 }
 
