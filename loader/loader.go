@@ -45,6 +45,17 @@ func main() {
 	// Write cue output to stdout
 }
 
+
+func scanConnectors(root cue.Value) (conns []*Connector, err error) {
+	// FIXME
+	return
+}
+
+type Connector struct {
+	ID string
+	Value cue.Value
+}
+
 // NEW CUE UTILITIES
 
 
@@ -53,6 +64,7 @@ type Task struct {
 	Backend string
 }
 
+// Load a task from a single value
 func vLookupTask(v cue.Value) (t *Task, err error) {
 	var (
 		attr cue.Attribute
