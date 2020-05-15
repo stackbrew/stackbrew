@@ -30,16 +30,14 @@ func main() {
 		panic(err)
 	}
 
-	tasks := lookupTasks(i.Value())
-	ui.Info("%d tasks detected", len(tasks))
-	for _, t := range(tasks) {
-		ui.Info("\t- %v", t)
-	}
-
 	conns := scanConnectors(i.Value())
 	ui.Info("%d connectors detected", len(conns))
 	for _, c := range(conns) {
 		ui.Info("\t- %v", c)
+		ui.Info("\t  %d tasks detected", len(c.tasks))
+		for _, t := range(c.tasks) {
+			ui.Info("\t\t- %v", t)
+		}
 	}
 
 	// Match contents of input with connector(s)
@@ -50,6 +48,18 @@ func main() {
 	// Write cue output to stdout
 }
 
+type Connector struct {
+	cue.Value
+	tasks []*Task
+}
+
+func NewConnector(v cue.Value) (c *Connector) {
+	c = &Connector{
+		Value: v,
+		tasks: lookupTasks(v),
+	}
+	return
+}
 
 func scanConnectors(v cue.Value) (conns []*Connector) {
 	// Is `v` a struct with a definition #ID ?
@@ -65,9 +75,8 @@ func scanConnectors(v cue.Value) (conns []*Connector) {
 		if err != nil {
 			return
 		}
-		return &Connector{
-			Value: v,
-		}
+		c = NewConnector(v)
+		return
 	}(v)
 	if c != nil {
 		conns = append(conns, c)
@@ -121,14 +130,6 @@ func scanConnectors(v cue.Value) (conns []*Connector) {
 	}
 	return
 }
-
-type Connector struct {
-	ID string
-	Value cue.Value
-}
-
-// NEW CUE UTILITIES
-
 
 type Task struct {
 	Value cue.Value
