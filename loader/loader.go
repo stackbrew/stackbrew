@@ -37,7 +37,7 @@ func main() {
 		panic(err)
 	}
 
-	conns := scanConnectors(i.Value())
+	conns := scanConnectors(i.Value(), nil)
 	for _, c := range(conns) {
 		tasks := c.Tasks()
 		ui.Info("Connector: %s (%d tasks)", c.String(), len(tasks))
@@ -57,6 +57,7 @@ func main() {
 
 type Connector struct {
 	cue.Value
+	Path []string
 }
 
 func (c *Connector) String() (msg string) {
@@ -66,11 +67,11 @@ func (c *Connector) String() (msg string) {
 		return
 	}
 	if set {
-		msg = fmt.Sprintf("[%s]", id)
+		msg = fmt.Sprintf("%s [%s]", strings.Join(c.Path, "."), id)
 		return
 	}
 	if !set {
-		msg = fmt.Sprintf("[disconnected]")
+		msg = fmt.Sprintf("%s [-]", strings.Join(c.Path, "."))
 		return
 	}
 	return
@@ -92,26 +93,32 @@ func (c *Connector) ID() (id string, set, exists bool) {
 	if err != nil {
 		return
 	}
+	exists = true
+	if !field.Value.IsConcrete() {
+		return
+	}
+	set = true
 	asString, err := field.Value.String()
 	if err != nil {
 		return
 	}
 	id = asString
-	exists = true
-	set = field.Value.IsConcrete()
 	return
 }
 
-func NewConnector(v cue.Value) *Connector {
+func NewConnector(v cue.Value, path ...string) *Connector {
 	return &Connector{
 		Value: v,
+		Path: path,
 	}
 }
 
-func scanConnectors(v cue.Value) (conns []*Connector) {
+func scanConnectors(v cue.Value, path []string) (conns []*Connector) {
+	debug("[scanning] %s", strings.Join(path, "."))
 	// Is `v` a struct with a definition #ID ?
-	c := NewConnector(v)
+	c := NewConnector(v, path...)
 	if _, _, idExists := c.ID(); idExists {
+		debug("\tconnector detected")
 		conns = append(conns, c)
 		// FIXME: continue scanning. this allows connectors
 		// to dynamically link to other connectors
@@ -130,9 +137,8 @@ func scanConnectors(v cue.Value) (conns []*Connector) {
 			// FIXME: LookupDef is tricky to use here
 			debug("FIXME: skipping reference to %s", strings.Join(refP, "."))
 		} else {
-			debug("Following reference: %v", refP)
 			refTarget := refI.Lookup(refP...)
-			conns = append(conns, scanConnectors(refTarget)...)
+			conns = append(conns, scanConnectors(refTarget, refP)...)
 		}
 		return
 	}
@@ -142,24 +148,21 @@ func scanConnectors(v cue.Value) (conns []*Connector) {
 		case cue.StructKind:
 			// Only iterate over "regular" fields (not hidden, eg. definitions)
 			for it, _ := v.Fields(); it.Next(); {
-				debug("Following struct field: %s", it.Label())
-				conns = append(conns, scanConnectors(it.Value())...)
+				conns = append(conns, scanConnectors(it.Value(), append(path, it.Label()))...)
 			}
 		// Recursively check list elements
 		case cue.ListKind:
 			for it, _ := v.List(); it.Next(); {
-				debug("Following list element: %s", it.Label())
-				conns = append(conns, scanConnectors(it.Value())...)
+				conns = append(conns, scanConnectors(it.Value(), append(path, it.Label()))...)
 			}
 	}
 
 	// If `v` is an expression, break it down and recursively inspect each component
 	exprOp, exprArgs:= v.Expr()
 	if exprOp != cue.NoOp && exprOp != cue.SelectorOp {
-		for argIdx, arg := range(exprArgs) {
+		for _, arg := range(exprArgs) {
 			// fakeLabel is used for human-friendly path display, only
-			debug("Following expression '%v/%d'", exprOp, argIdx)
-			conns = append(conns, scanConnectors(arg)...)
+			conns = append(conns, scanConnectors(arg, path)...)
 		}
 	}
 	return
@@ -236,7 +239,6 @@ func lookupTasks(v cue.Value) (tasks []*Task) {
 			// FIXME: LookupDef is tricky to use here
 			debug("FIXME: skipping reference to %s", strings.Join(refP, "."))
 		} else {
-			debug("Following reference: %v", refP)
 			tasks = append(tasks, lookupTasks(refI.Lookup(refP...))...)
 		}
 		return
@@ -247,22 +249,19 @@ func lookupTasks(v cue.Value) (tasks []*Task) {
 		case cue.StructKind:
 			// Only iterate over "regular" fields (not hidden, eg. definitions)
 			for it, _ := v.Fields(); it.Next(); {
-				debug("Following struct field: %s", it.Label())
 				tasks = append(tasks, lookupTasks(it.Value())...)
 			}
 		// Recursively check list elements
 		case cue.ListKind:
 			for it, _ := v.List(); it.Next(); {
-				debug("Following list element: %s", it.Label())
 				tasks = append(tasks, lookupTasks(it.Value())...)
 			}
 	}
 	// If v is an expression, recursively inspect its component parts
 	exprOp, exprArgs:= v.Expr()
 	if exprOp != cue.NoOp && exprOp != cue.SelectorOp {
-		for argIdx, arg := range(exprArgs) {
+		for _, arg := range(exprArgs) {
 			// fakeLabel is used for human-friendly path display, only
-			debug("Following expression '%v/%d'", exprOp, argIdx)
 			tasks = append(tasks, lookupTasks(arg)...)
 		}
 	}
