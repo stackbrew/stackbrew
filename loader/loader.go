@@ -1,15 +1,22 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
-	"fmt"
+	"strings"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
-	"github.com/pkg/errors"
-
 	"stackbrew.io/loader/ui"
 )
+
+func debug(fmt string, args ...interface{}) {
+	if os.Getenv("DEBUG") != "" {
+		ui.Info(fmt, args...)
+	}
+}
 
 func main() {
 	// Load connectors
@@ -31,12 +38,12 @@ func main() {
 	}
 
 	conns := scanConnectors(i.Value())
-	ui.Info("%d connectors detected", len(conns))
 	for _, c := range(conns) {
-		ui.Info("\t- %v", c)
-		ui.Info("\t  %d tasks detected", len(c.tasks))
-		for _, t := range(c.tasks) {
-			ui.Info("\t\t- %v", t)
+		tasks := c.Tasks()
+		ui.Info("Connector: %s (%d tasks)", c.String(), len(tasks))
+		for _, t := range(tasks) {
+			et := &ExecTask{ Task: *t }
+			ui.Info("\tTask %s", et.String())
 		}
 	}
 
@@ -50,36 +57,64 @@ func main() {
 
 type Connector struct {
 	cue.Value
-	tasks []*Task
 }
 
-func NewConnector(v cue.Value) (c *Connector) {
-	c = &Connector{
-		Value: v,
-		tasks: lookupTasks(v),
+func (c *Connector) String() (msg string) {
+	id, set, exists := c.ID()
+	if !exists {
+		msg = "not a connector"
+		return
+	}
+	if set {
+		msg = fmt.Sprintf("[%s]", id)
+		return
+	}
+	if !set {
+		msg = fmt.Sprintf("[disconnected]")
+		return
 	}
 	return
 }
 
+func (c *Connector) Tasks() []*Task {
+	return lookupTasks(c.Value)
+}
+
+func (c *Connector) ID() (id string, set, exists bool) {
+	if c.Kind() != cue.StructKind {
+		return
+	}
+	s, err := c.Struct()
+	if err != nil {
+		return
+	}
+	field, err := s.FieldByName("#ID", true)
+	if err != nil {
+		return
+	}
+	asString, err := field.Value.String()
+	if err != nil {
+		return
+	}
+	id = asString
+	exists = true
+	set = field.Value.IsConcrete()
+	return
+}
+
+func NewConnector(v cue.Value) *Connector {
+	return &Connector{
+		Value: v,
+	}
+}
+
 func scanConnectors(v cue.Value) (conns []*Connector) {
 	// Is `v` a struct with a definition #ID ?
-	c := func (v cue.Value) (c *Connector) {
-		if v.Kind() != cue.StructKind {
-			return
-		}
-		s, err := v.Struct()
-		if err != nil {
-			return
-		}
-		_, err = s.FieldByName("#ID", true)
-		if err != nil {
-			return
-		}
-		c = NewConnector(v)
-		return
-	}(v)
-	if c != nil {
+	c := NewConnector(v)
+	if _, _, idExists := c.ID(); idExists {
 		conns = append(conns, c)
+		// FIXME: continue scanning. this allows connectors
+		// to dynamically link to other connectors
 		return
 	}
 
@@ -88,15 +123,14 @@ func scanConnectors(v cue.Value) (conns []*Connector) {
 	if len(refP) > 0 {
 		info, err := refI.LookupField(refP...)
 		if err != nil {
-			// FIXME: report error?
-			ui.Error("ERROR LOOKUP UP REFERENCE: %v: %s", refP, err)
+			ui.Error("error looking up %v: %s", refP, err)
 			return
 		}
 		if info.IsDefinition {
-			ui.Error("CANNOT FOLLOW REFERENCE TO DEFINITION: %v", refP)
 			// FIXME: LookupDef is tricky to use here
+			debug("FIXME: skipping reference to %s", strings.Join(refP, "."))
 		} else {
-			ui.Info("Following reference: %v", refP)
+			debug("Following reference: %v", refP)
 			refTarget := refI.Lookup(refP...)
 			conns = append(conns, scanConnectors(refTarget)...)
 		}
@@ -108,13 +142,13 @@ func scanConnectors(v cue.Value) (conns []*Connector) {
 		case cue.StructKind:
 			// Only iterate over "regular" fields (not hidden, eg. definitions)
 			for it, _ := v.Fields(); it.Next(); {
-				ui.Info("Following struct field: %s", it.Label())
+				debug("Following struct field: %s", it.Label())
 				conns = append(conns, scanConnectors(it.Value())...)
 			}
 		// Recursively check list elements
 		case cue.ListKind:
 			for it, _ := v.List(); it.Next(); {
-				ui.Info("Following list element: %s", it.Label())
+				debug("Following list element: %s", it.Label())
 				conns = append(conns, scanConnectors(it.Value())...)
 			}
 	}
@@ -124,47 +158,60 @@ func scanConnectors(v cue.Value) (conns []*Connector) {
 	if exprOp != cue.NoOp && exprOp != cue.SelectorOp {
 		for argIdx, arg := range(exprArgs) {
 			// fakeLabel is used for human-friendly path display, only
-			ui.Info("Following expression '%v/%d'", exprOp, argIdx)
+			debug("Following expression '%v/%d'", exprOp, argIdx)
 			conns = append(conns, scanConnectors(arg)...)
 		}
 	}
 	return
 }
 
-type Task struct {
-	Value cue.Value
-	Backend string
+type ExecTask struct {
+	Task
 }
 
-// Load a task from a single value
-func vLookupTask(v cue.Value) (t *Task, err error) {
-	var (
-		attr cue.Attribute
-		backend string
-	)
-	attr = v.Attribute("task")
-	if attr.Err() != nil {
-		err = attr.Err()
-		return
+func (t *ExecTask) String() string {
+	cmd, cmdExists := t.Cmd()
+	if cmdExists {
+		return fmt.Sprintf("exec %v", cmd)
 	}
-	backend, err = attr.String(0)
-	if err != nil {
-		err = errors.Wrap(err, "invalid @task attribute")
-		return
-	}
-	switch backend {
-		case "exec":
-			t = &Task{
-				Backend: backend,
-				Value: v,
-			}
-			ui.Info("task detected, backend=%s: %v", backend, t.Value)
-		default:
-			err = fmt.Errorf("unsupported task backend: %s", backend)
-			ui.Error(err.Error())
-	}
-	return
+	return "exec <malformed>"
+}
 
+func (t *ExecTask) Cmd() (cmd []string, exists bool) {
+	cmdValue := t.Value.Lookup("cmd")
+	if !cmdValue.Exists() {
+		return
+	}
+	cmdJson, err := cmdValue.MarshalJSON()
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(cmdJson, &cmd)
+	if err != nil {
+		return
+	}
+	exists = true
+	return
+}
+
+type Task struct {
+	cue.Value
+}
+
+func (t *Task) Verb() (verb string, exists bool) {
+	var (
+		err error
+	)
+	attr := t.Value.Attribute("task")
+	if attr.Err() != nil {
+		return
+	}
+	verb, err = attr.String(0)
+	if err != nil {
+		return
+	}
+	exists = true
+	return
 }
 
 // Current limitations of the task scanner:
@@ -173,26 +220,23 @@ func vLookupTask(v cue.Value) (t *Task, err error) {
 //	- @task(exec) must be set after the struct value (embedded attributes are broken ATM)
 func lookupTasks(v cue.Value) (tasks []*Task) {
 	// Does v have a @task attribute?
-	t, err := vLookupTask(v)
-	if err == nil {
-		ui.Info("TASK DETECTED: %v", v)
+	t := &Task{Value: v}
+	if _, exists := t.Verb(); exists {
 		tasks = append(tasks, t)
 	}
-
 	// Check for references
 	refI, refP := v.Reference()
 	if len(refP) > 0 {
 		info, err := refI.LookupField(refP...)
 		if err != nil {
-			// FIXME: report error?
-			ui.Error("ERROR LOOKUP UP REFERENCE: %v: %s", refP, err)
+			ui.Error("error looking up %v: %s", refP, err)
 			return
 		}
 		if info.IsDefinition {
-			ui.Error("CANNOT FOLLOW REFERENCE TO DEFINITION: %v", refP)
 			// FIXME: LookupDef is tricky to use here
+			debug("FIXME: skipping reference to %s", strings.Join(refP, "."))
 		} else {
-			ui.Info("Following reference: %v", refP)
+			debug("Following reference: %v", refP)
 			tasks = append(tasks, lookupTasks(refI.Lookup(refP...))...)
 		}
 		return
@@ -203,13 +247,13 @@ func lookupTasks(v cue.Value) (tasks []*Task) {
 		case cue.StructKind:
 			// Only iterate over "regular" fields (not hidden, eg. definitions)
 			for it, _ := v.Fields(); it.Next(); {
-				ui.Info("Following struct field: %s", it.Label())
+				debug("Following struct field: %s", it.Label())
 				tasks = append(tasks, lookupTasks(it.Value())...)
 			}
 		// Recursively check list elements
 		case cue.ListKind:
 			for it, _ := v.List(); it.Next(); {
-				ui.Info("Following list element: %s", it.Label())
+				debug("Following list element: %s", it.Label())
 				tasks = append(tasks, lookupTasks(it.Value())...)
 			}
 	}
@@ -218,7 +262,7 @@ func lookupTasks(v cue.Value) (tasks []*Task) {
 	if exprOp != cue.NoOp && exprOp != cue.SelectorOp {
 		for argIdx, arg := range(exprArgs) {
 			// fakeLabel is used for human-friendly path display, only
-			ui.Info("Following expression '%v/%d'", exprOp, argIdx)
+			debug("Following expression '%v/%d'", exprOp, argIdx)
 			tasks = append(tasks, lookupTasks(arg)...)
 		}
 	}
