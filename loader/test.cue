@@ -14,25 +14,28 @@ monorepo: {
 		#ID: string
 
 		encrypted: string
-		value: #decrypt.stdout
 
 		// FIXME: support tasks in definitions
 		#decrypt: {
-			flag: "--decrypt": true
-			cmd: ["gpg"]
-			stdin: encrypted
-			stdout: string
-		} @task(exec)
+			#run: #Exec & {
+				cmd: ["base64", "-d"]
+				stdin: encrypted
+				stdout: string
+				error: _
+			}
+			result: #run.stdout
+			error: #run.error
+		}
 	}
-	
+
 	pr: listPullRequests.result
 
 	// FIXME: move to reference
 	listPullRequests: {
 
-		result: graphqlReq.result
+		result: #graphqlReq.result
 
-		graphqlReq: {
+		#graphqlReq: {
 			#token: token
 			#endpoint: "https://api.github.com/graphql"
 			#query:
@@ -48,36 +51,36 @@ monorepo: {
 				}
 				"""
 
-			result: json.Unmarshal(httpReq.response.body)
+			result: json.Unmarshal(#httpReq.response.body)
 			result: {
 				[prNumber=string]: {
 					...
 				}
 			}
 
-			httpReq: {
+			#httpReq: {
 				#url: "\(#endpoint)/query"
 				#method: "POST"
-				#header: Authorization: "Bearer \(#token.value)"
+				#header: Authorization: "Bearer \(#token.#decrypt.result)"
 				#body:
 					"""
 					{"query": "query \(#query)"}
 					"""
-				err: t.err
+				error: #t.error
 				response: {
-					body: t.stdout
+					body: #t.stdout
 					code: int
 					header: [string]: string
 				}
 
 				// Actual task executing curl
-				t: {
+				#t: {
 					cmd: ["curl", #url]
 					flag: {
 						"-s": true
 						"-X": #method
 					}
-					err: _
+					error: _
 					// FIXME: we are mocking output here
 					#mockResponse: {
 						"42": {
@@ -112,14 +115,14 @@ localhost: #linuxHost & {
 		#path: [...string]
 
 		// FIXME: support tasks in definitions
-		t: {
+		#t: {
 			error: _
 			stdout: string
 			cmd: ["/bin/ls", strings.Join(#path, "/")]
 		} @task(exec)
 
-		error: t.error
-		files: strings.Split(t.stdout, "\n")
+		error: #t.error
+		files: strings.Split(#t.stdout, "\n")
 	}
 
 	lsTmp: #ls & {
