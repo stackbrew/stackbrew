@@ -1,15 +1,22 @@
 package main
 
 import (
+	"path/filepath"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"bytes"
 	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"stackbrew.io/loader/ui"
+	"github.com/pkg/errors"
 )
 
 func debug(fmt string, args ...interface{}) {
@@ -23,6 +30,19 @@ func main() {
 		// Q. connector list in commandline args?
 
 	// Read cue input from stdin
+
+	i2, err := cueLoadDir(".")
+	if err != nil {
+		panic(err)
+	}
+	scanConnectors(i2.Value())
+	out, err := CueQueryInstance(i2, false, false)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("----\n%s\n----\n", out)
+	return
+
 	inputCue, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		panic(err)
@@ -272,3 +292,108 @@ func (t *Task) Verb() (verb string, exists bool) {
 	exists = true
 	return
 }
+
+
+func cueLoadDir(dirname string) (*cue.Instance, error) {
+	_, err := filepath.Abs(dirname)
+	if err != nil {
+		return nil, errors.Wrap(err, "filepath.Abs")
+	}
+
+	// 1. Create build instance
+	buildInstances := load.Instances([]string{"foo.cue"}, &load.Config{
+		Dir:        "/tmp",
+		ModuleRoot: "/tmp",
+		Overlay: map[string]load.Source{
+			"/tmp/cue.mod/pkg/stackbrew.io/pkg/netlify/netlify.cue": load.FromString(
+				`
+				package netlify
+
+				endpoint: "https://api.netlify.com"
+				`,
+			),
+			"/tmp/foo.cue": load.FromString(
+				`
+				import (
+					"stackbrew.io/pkg/netlify"
+				)
+
+				hello: "world!"
+				netlifyEndpoint: netlify.endpoint
+				`,
+			),
+		},
+	})
+	if len(buildInstances) != 1 {
+		return nil, errors.New("only one package is supported at a time")
+	}
+	buildInstance := buildInstances[0]
+
+	// 2. Create and merge cue instances (not the same as build instances)
+	instances := cue.Build([]*build.Instance{buildInstance})
+	root := cue.Merge(instances...)
+	if root.Err != nil {
+			return nil, errors.Wrap(root.Err, "cue merge")
+	}
+	if err := root.Value().Validate(); err != nil {
+			return nil, errors.Wrap(err, "cue validate")
+	}
+
+	// return the root instance
+	return root, nil
+}
+
+func CueQueryInstance(i *cue.Instance, exportJson, concrete bool, path ...string) (result string, err error) {
+	var (
+		v cue.Value
+		n ast.Node
+		b []byte
+	)
+	// FIXME: separate read lock
+	if i == nil {
+		result = "{}"
+		return
+	}
+	v = i.Lookup(path...)
+
+	if exportJson {
+		// Json export
+		b, err = JsonIndent(v.MarshalJSON())
+		if err != nil {
+			return
+		}
+	} else {
+		// Regular cue result
+		synOpts := []cue.Option{}
+		if concrete {
+			ui.Info("Query: setting Concrete opts to true")
+			synOpts = append(synOpts, cue.Concrete(true))
+		}
+		n = v.Syntax(synOpts...)
+		if n == nil {
+			err = fmt.Errorf("failed to extract cue AST")
+			return
+		}
+		b, err = format.Node(n, format.Simplify())
+		if err != nil {
+			return
+		}
+	}
+	result = string(b)
+	return
+}
+
+func JsonIndent(rawJson []byte, e error) (indentedJson []byte, err error) {
+	if e != nil {
+		err = e
+		return
+	}
+	var buf = new(bytes.Buffer)
+	err = json.Indent(buf, rawJson, "", "  ")
+	if err != nil {
+		return
+	}
+	indentedJson = buf.Bytes()
+	return
+}
+
