@@ -14,10 +14,10 @@ monorepo: {
 		#ID: string
 
 		encrypted: string
-		value: decrypt.stdout
+		value: #decrypt.stdout
 
 		// FIXME: support tasks in definitions
-		decrypt: {
+		#decrypt: {
 			flag: "--decrypt": true
 			cmd: ["gpg"]
 			stdin: encrypted
@@ -94,8 +94,12 @@ monorepo: {
 	}
 }
 
-localhost: {
-	#ID: "324786327846328742"
+localhost: #linuxHost & {
+	#ID: "sdfsdfdsfsdfd"
+}
+
+#linuxHost: {
+	#ID: string
 
 	#say: {
 		#message: string

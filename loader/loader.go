@@ -129,21 +129,7 @@ func lookup(v cue.Value, path...string) (result cue.Value, err error) {
 
 func scan(v cue.Value, get func(cue.Value, []string) bool, path []string) {
 	debug("[scanning] %s", strings.Join(path, "."))
-	if !get(v, path) {
-		return
-	}
-	// Recursively check references
-	refI, refP := v.Reference()
-	if len(refP) > 0 {
-		refTarget, err := lookup(refI.Value(), refP...)
-		if err != nil {
-			ui.Error("error looking up %v: %s", refP, err)
-			return
-		}
-		scan(refTarget, get, refP)
-		return
-	}
-
+	scanExpr(v, get, path, 0)
 	switch v.Kind() {
 		// Recursively check struct fields
 		case cue.StructKind:
@@ -157,15 +143,39 @@ func scan(v cue.Value, get func(cue.Value, []string) bool, path []string) {
 				scan(it.Value(), get, append(path, it.Label()))
 			}
 	}
+}
 
-	// If `v` is an expression, break it down and recursively inspect each component
+func scanExpr(v cue.Value, get func(cue.Value, []string) bool, path []string, depth int) {
 	exprOp, exprArgs:= v.Expr()
-	if exprOp != cue.NoOp && exprOp != cue.SelectorOp {
-		for _, arg := range(exprArgs) {
-			scan(arg, get, path)
-		}
+	debug("[scanExpr] %s %s@%d [ref=%v] [op=%d] [args=%d] -- %v",
+		strings.Join(path, "."),
+		"+" + strings.Repeat("---", depth),
+		depth,
+		isRef(v),
+		exprOp,
+		len(exprArgs),
+		exprArgs,
+	)
+	if exprOp == cue.NoOp {
+		get(v, path)
+		return
 	}
-	return
+	refI, refP := v.Reference()
+	if len(refP) > 0 {
+		refTarget, err := lookup(refI.Value(), refP...)
+		if err != nil {
+			return
+		}
+		scanExpr(refTarget, get, refP, depth+1)
+	}
+	for _, arg := range(exprArgs) {
+		scanExpr(arg, get, path, depth+1)
+	}
+}
+
+func isRef(v cue.Value) bool {
+	_, p := v.Reference()
+	return len(p) > 0
 }
 
 
