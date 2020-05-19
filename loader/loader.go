@@ -1,16 +1,15 @@
 package main
 
 import (
+	"io"
 	"path/filepath"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"bytes"
 	"strings"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/ast"
@@ -30,29 +29,7 @@ func main() {
 		// Q. connector list in commandline args?
 
 	// Read cue input from stdin
-
-	i2, err := cueLoadDir(".")
-	if err != nil {
-		panic(err)
-	}
-	scanConnectors(i2.Value())
-	out, err := CueQueryInstance(i2, false, false)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("----\n%s\n----\n", out)
-	return
-
-	inputCue, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		panic(err)
-	}
-	f, err := parser.ParseFile("stdin", string(inputCue))
-	if err != nil {
-		panic(err)
-	}
-	r := new(cue.Runtime)
-	i, err := r.CompileFile(f)
+	i, err := cueCompile(os.Stdin, ".")
 	if err != nil {
 		panic(err)
 	}
@@ -65,6 +42,19 @@ func main() {
 			et := &ExecTask{ Task: *t }
 			ui.Info("\tTask %s", et.String())
 		}
+	}
+
+	if len(os.Args) > 1 {
+		var queryPath []string
+		if os.Args[1] != "." {
+			queryPath = strings.Split(os.Args[1], ".")
+		}
+		out := i.Lookup(queryPath...)
+		outJson, err := JsonIndent(out.MarshalJSON())
+		if err != nil {
+			panic(err)
+		}
+		os.Stdout.Write(append(outJson, '\n'))
 	}
 
 	// Match contents of input with connector(s)
@@ -294,36 +284,26 @@ func (t *Task) Verb() (verb string, exists bool) {
 }
 
 
-func cueLoadDir(dirname string) (*cue.Instance, error) {
-	_, err := filepath.Abs(dirname)
+func cueCompile(src io.Reader, rootDir string) (result *cue.Instance, err error) {
+	rootDir, err = filepath.Abs(rootDir)
 	if err != nil {
-		return nil, errors.Wrap(err, "filepath.Abs")
+		return
+	}
+	cfg := &load.Config{
+		Stdin: src,
+		Dir: rootDir,
+		ModuleRoot: rootDir,
+		Overlay: make(map[string]load.Source),
 	}
 
-	// 1. Create build instance
-	buildInstances := load.Instances([]string{"foo.cue"}, &load.Config{
-		Dir:        "/tmp",
-		ModuleRoot: "/tmp",
-		Overlay: map[string]load.Source{
-			"/tmp/cue.mod/pkg/stackbrew.io/pkg/netlify/netlify.cue": load.FromString(
-				`
-				package netlify
-
-				endpoint: "https://api.netlify.com"
-				`,
-			),
-			"/tmp/foo.cue": load.FromString(
-				`
-				import (
-					"stackbrew.io/pkg/netlify"
-				)
-
-				hello: "world!"
-				netlifyEndpoint: netlify.endpoint
-				`,
-			),
-		},
-	})
+	var pkgOverlay = map[string]string {
+		//FIXME
+	}
+	for fName, fContents := range(pkgOverlay) {
+		absPath := fmt.Sprintf("%s/cue.mod/pkg/blocklayer.dev/%s", rootDir, fName)
+		cfg.Overlay[absPath] = load.FromString(fContents)
+	}
+	buildInstances := load.Instances([]string{"-"}, cfg)
 	if len(buildInstances) != 1 {
 		return nil, errors.New("only one package is supported at a time")
 	}
@@ -333,12 +313,11 @@ func cueLoadDir(dirname string) (*cue.Instance, error) {
 	instances := cue.Build([]*build.Instance{buildInstance})
 	root := cue.Merge(instances...)
 	if root.Err != nil {
-			return nil, errors.Wrap(root.Err, "cue merge")
+		return nil, errors.Wrap(root.Err, "cue merge")
 	}
 	if err := root.Value().Validate(); err != nil {
-			return nil, errors.Wrap(err, "cue validate")
+		return nil, errors.Wrap(err, "cue validate")
 	}
-
 	// return the root instance
 	return root, nil
 }
