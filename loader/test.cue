@@ -9,10 +9,11 @@ monorepo: github.#Repository & {
 	token: encrypted: "kjhsdfkjshdfkjsdfjk"
 }
 
-#say: unix.#Host.#exec & {
-	name: "echo"
-	#message: string
-	args: [#message]
-}
 
-hello: #say & { #message: "hello" }
+localhost: unix.#Host
+
+hello: localhost.#exec & {
+	name: "echo"
+	args: ["hello, world!"]
+	stdout: string
+}

@@ -169,34 +169,50 @@ func scanDown(v cue.Value, get func(cue.Value, []string) bool, path []string) {
 // Recursively scan a value and the individual components of its cue expression.
 func scanUp(v cue.Value, get func(cue.Value, []string) bool, path []string, depth int) {
 	exprOp, exprArgs:= v.Expr()
+	// Reference information
+	refInst, refPath := v.Reference()
+	var refTarget cue.Value
+	if len(refPath) > 0 {
+		var err error
+		refTarget, err = lookup(refInst.Value(), refPath...)
+		if err != nil {
+			return
+		}
+	}
+
 	// Display
-	switch exprOp {
-		// Leaf: show value details
-		case cue.NoOp:
-			var isRef string
-			_, refPath := v.Reference()
-			if len(refPath) > 0 {
-				isRef = "isref"
-			} else {
-				isRef = "isnotref"
-			}
-			debug("[%s] %s%s: %s: %s",
-				strings.Join(path, "."),
-				strings.Repeat("   ", depth),
-				v.Kind(), isRef, v,
-			)
-		// Node: show indented "stack"
-		default:
-			debug("[%s] %s%s ( %d args:",
-				strings.Join(path, "."),
-				strings.Repeat("   ", depth),
-				exprOp.String(),
-				len(exprArgs),
-			)
-			defer debug("[%s] %s)",
-				strings.Join(path, "."),
-				strings.Repeat("   ", depth),
-			)
+	if len(refPath) > 0 {
+		debug("[%s] %sref -> %s (",
+			strings.Join(path, "."),
+			strings.Repeat("   ", depth),
+			strings.Join(refPath, "."),
+		)
+		defer debug("[%s] %s) // pop ref",
+			strings.Join(path, "."),
+			strings.Repeat("   ", depth),
+		)
+	} else {
+		switch exprOp {
+			// Leaf: show value details
+			case cue.NoOp:
+				debug("[%s] %s%s",
+					strings.Join(path, "."),
+					strings.Repeat("   ", depth),
+					v,
+				)
+			// Node: show indented "stack"
+			default:
+				debug("[%s] %s%s ( %d args:",
+					strings.Join(path, "."),
+					strings.Repeat("   ", depth),
+					exprOp.String(),
+					len(exprArgs),
+				)
+				defer debug("[%s] %s)",
+					strings.Join(path, "."),
+					strings.Repeat("   ", depth),
+				)
+		}
 	}
 	// New values to check?
 	switch exprOp {
@@ -204,6 +220,10 @@ func scanUp(v cue.Value, get func(cue.Value, []string) bool, path []string, dept
 	}
 	// Recursively follow expr components (except noop)
 	if exprOp == cue.NoOp {
+		return
+	}
+	if len(refPath) > 0 {
+		scanUp(refTarget, get, refPath, depth + 1)
 		return
 	}
 	for _, arg := range(exprArgs) {
