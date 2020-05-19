@@ -1,5 +1,6 @@
 import (
 	"blocklayer.dev/github"
+	"blocklayer.dev/unix"
 )
 
 monorepo: github.#Repository & {
@@ -8,8 +9,10 @@ monorepo: github.#Repository & {
 	token: encrypted: "kjhsdfkjshdfkjsdfjk"
 }
 
-foo: {
-	for number, pr in monorepo.pr {
-		hello: "world"
-	}
+#say: unix.#Host.#exec & {
+	name: "echo"
+	#message: string
+	args: [#message]
 }
+
+hello: #say & { #message: "hello" }

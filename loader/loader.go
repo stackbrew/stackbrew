@@ -34,18 +34,34 @@ func main() {
 		panic(err)
 	}
 
-	conns := scanConnectors(i)
+	var conns []*Connector
+	scanDown(
+		i.Value(),
+		func(v cue.Value, path []string) bool {
+			scanUp(
+				v,
+				func(v cue.Value, path []string) bool {
+					c := NewConnector(v, path...)
+					if _, _, idExists := c.ID(); idExists {
+						debug("connector detected")
+						conns = append(conns, c)
+						return false
+					}
+					return true
+				},
+				path,
+				0,
+			)
+			return true
+		},
+		nil,
+	)
 	for _, c := range(conns) {
 		id, set, _ := c.ID()
 		if !set {
 			id="?"
 		}
 		fmt.Printf("Connector %s ID=%s\n", strings.Join(c.Path, "."), id)
-	}
-
-	incompletes := scanIncompletes(i)
-	for _, c := range(incompletes) {
-		fmt.Printf("Incomplete value: %s\n", strings.Join(c.Path, "."))
 	}
 
 	if len(os.Args) > 1 {
@@ -69,26 +85,6 @@ func main() {
 	// Write cue output to stdout
 }
 
-func scanIncompletes(root *cue.Instance) (result []Cursor) {
-	scan(
-		root.Value(),
-		func (v cue.Value, path []string) bool {
-			debug("scanning for incompletes: %v", path)
-			if !v.IsConcrete() {
-				result = append(result, Cursor{
-					Root: root,
-					Path: path,
-				})
-				return true
-			}
-			op, _:= v.Expr()
-			debug("OP=%d\n", op)
-			return true
-		},
-		nil,
-	)
-	return
-}
 
 type Cursor struct {
 	Root *cue.Instance
@@ -98,29 +94,6 @@ type Cursor struct {
 func (c Cursor) Value() cue.Value {
 	return c.Root.Lookup(c.Path...)
 }
-
-// A simple scan for connectors in a concrete configuration.
-// A connector is any struct which has the definition `#ID: string`
-// Connectors are attachment points for dynamic loading: a way to hand off
-// part of a config evaluation to another evaluator.
-func scanConnectors(root *cue.Instance) (conns []*Connector) {
-	scan(
-		root.Value(),
-		func(v cue.Value, path []string) bool {
-			// Is `v` a struct with a definition #ID ?
-			c := NewConnector(v, path...)
-			if _, _, idExists := c.ID(); idExists {
-				debug("\tconnector detected")
-				conns = append(conns, c)
-				return false
-			}
-			return true
-		},
-		nil,
-	)
-	return
-}
-
 
 type Connector struct {
 	cue.Value
@@ -173,51 +146,68 @@ func lookup(v cue.Value, path...string) (result cue.Value, err error) {
 }
 
 
-func scan(v cue.Value, get func(cue.Value, []string) bool, path []string) {
-	debug("[scanning] %s", strings.Join(path, "."))
+// Recursively scan a value and all struct fields and list elements.
+// Hidden fields and definitions are ignored.
+func scanDown(v cue.Value, get func(cue.Value, []string) bool, path []string) {
+	debug("[scan down] %s", strings.Join(path, "."))
 	get(v, path)
-	// FIXME: make configurable
-	// scanExpr(v, get, path, 0)
 	switch v.Kind() {
 		// Recursively check struct fields
 		case cue.StructKind:
 			// Only iterate over "regular" fields (not hidden, eg. definitions)
 			for it, _ := v.Fields(); it.Next(); {
-				scan(it.Value(), get, append(path, it.Label()))
+				scanDown(it.Value(), get, append(path, it.Label()))
 			}
 		// Recursively check list elements
 		case cue.ListKind:
 			for it, _ := v.List(); it.Next(); {
-				scan(it.Value(), get, append(path, it.Label()))
+				scanDown(it.Value(), get, append(path, it.Label()))
 			}
 	}
 }
 
-func scanExpr(v cue.Value, get func(cue.Value, []string) bool, path []string, depth int) {
+// Recursively scan a value and the individual components of its cue expression.
+func scanUp(v cue.Value, get func(cue.Value, []string) bool, path []string, depth int) {
 	exprOp, exprArgs:= v.Expr()
-	debug("[scanExpr] %s %s@%d [ref=%v] [op=%d] [args=%d] -- %v",
-		strings.Join(path, "."),
-		"+" + strings.Repeat("---", depth),
-		depth,
-		isRef(v),
-		exprOp,
-		len(exprArgs),
-		exprArgs,
-	)
+	// Display
+	switch exprOp {
+		// Leaf: show value details
+		case cue.NoOp:
+			var isRef string
+			_, refPath := v.Reference()
+			if len(refPath) > 0 {
+				isRef = "isref"
+			} else {
+				isRef = "isnotref"
+			}
+			debug("[%s] %s%s: %s: %s",
+				strings.Join(path, "."),
+				strings.Repeat("   ", depth),
+				v.Kind(), isRef, v,
+			)
+		// Node: show indented "stack"
+		default:
+			debug("[%s] %s%s ( %d args:",
+				strings.Join(path, "."),
+				strings.Repeat("   ", depth),
+				exprOp.String(),
+				len(exprArgs),
+			)
+			defer debug("[%s] %s)",
+				strings.Join(path, "."),
+				strings.Repeat("   ", depth),
+			)
+	}
+	// New values to check?
+	switch exprOp {
+		case cue.NoOp, cue.SelectorOp: get(v, path)
+	}
+	// Recursively follow expr components (except noop)
 	if exprOp == cue.NoOp {
-		get(v, path)
 		return
 	}
-	refI, refP := v.Reference()
-	if len(refP) > 0 {
-		refTarget, err := lookup(refI.Value(), refP...)
-		if err != nil {
-			return
-		}
-		scanExpr(refTarget, get, refP, depth+1)
-	}
 	for _, arg := range(exprArgs) {
-		scanExpr(arg, get, path, depth+1)
+		scanUp(arg, get, path, depth+1)
 	}
 }
 
