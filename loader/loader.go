@@ -43,6 +43,11 @@ func main() {
 		fmt.Printf("Connector %s ID=%s\n", strings.Join(c.Path, "."), id)
 	}
 
+	incompletes := scanIncompletes(i)
+	for _, c := range(incompletes) {
+		fmt.Printf("Incomplete value: %s\n", strings.Join(c.Path, "."))
+	}
+
 	if len(os.Args) > 1 {
 		var queryPath []string
 		if os.Args[1] != "." {
@@ -62,6 +67,36 @@ func main() {
 		// Q. can connectors be nested?
 
 	// Write cue output to stdout
+}
+
+func scanIncompletes(root *cue.Instance) (result []Cursor) {
+	scan(
+		root.Value(),
+		func (v cue.Value, path []string) bool {
+			debug("scanning for incompletes: %v", path)
+			if !v.IsConcrete() {
+				result = append(result, Cursor{
+					Root: root,
+					Path: path,
+				})
+				return true
+			}
+			op, _:= v.Expr()
+			debug("OP=%d\n", op)
+			return true
+		},
+		nil,
+	)
+	return
+}
+
+type Cursor struct {
+	Root *cue.Instance
+	Path []string
+}
+
+func (c Cursor) Value() cue.Value {
+	return c.Root.Lookup(c.Path...)
 }
 
 // A simple scan for connectors in a concrete configuration.
