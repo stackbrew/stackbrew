@@ -34,14 +34,13 @@ func main() {
 		panic(err)
 	}
 
-	conns := scanConnectors(i.Value())
+	conns := scanConnectors(i)
 	for _, c := range(conns) {
-		tasks := c.Tasks()
-		ui.Info("Connector: %s (%d tasks)", c.String(), len(tasks))
-		for _, t := range(tasks) {
-			et := &ExecTask{ Task: *t }
-			ui.Info("\tTask %s", et.String())
+		id, set, _ := c.ID()
+		if !set {
+			id="?"
 		}
+		fmt.Printf("Connector %s ID=%s\n", strings.Join(c.Path, "."), id)
 	}
 
 	if len(os.Args) > 1 {
@@ -65,30 +64,32 @@ func main() {
 	// Write cue output to stdout
 }
 
-type Connector struct {
-	cue.Value
-	Path []string
-}
-
-func (c *Connector) String() (msg string) {
-	id, set, exists := c.ID()
-	if !exists {
-		msg = "not a connector"
-		return
-	}
-	if set {
-		msg = fmt.Sprintf("%s [%s]", strings.Join(c.Path, "."), id)
-		return
-	}
-	if !set {
-		msg = fmt.Sprintf("%s [-]", strings.Join(c.Path, "."))
-		return
-	}
+// A simple scan for connectors in a concrete configuration.
+// A connector is any struct which has the definition `#ID: string`
+// Connectors are attachment points for dynamic loading: a way to hand off
+// part of a config evaluation to another evaluator.
+func scanConnectors(root *cue.Instance) (conns []*Connector) {
+	scan(
+		root.Value(),
+		func(v cue.Value, path []string) bool {
+			// Is `v` a struct with a definition #ID ?
+			c := NewConnector(v, path...)
+			if _, _, idExists := c.ID(); idExists {
+				debug("\tconnector detected")
+				conns = append(conns, c)
+				return false
+			}
+			return true
+		},
+		nil,
+	)
 	return
 }
 
-func (c *Connector) Tasks() []*Task {
-	return scanTasks(c.Value)
+
+type Connector struct {
+	cue.Value
+	Path []string
 }
 
 func (c *Connector) ID() (id string, set, exists bool) {
@@ -139,7 +140,9 @@ func lookup(v cue.Value, path...string) (result cue.Value, err error) {
 
 func scan(v cue.Value, get func(cue.Value, []string) bool, path []string) {
 	debug("[scanning] %s", strings.Join(path, "."))
-	scanExpr(v, get, path, 0)
+	get(v, path)
+	// FIXME: make configurable
+	// scanExpr(v, get, path, 0)
 	switch v.Kind() {
 		// Recursively check struct fields
 		case cue.StructKind:
@@ -186,101 +189,6 @@ func scanExpr(v cue.Value, get func(cue.Value, []string) bool, path []string, de
 func isRef(v cue.Value) bool {
 	_, p := v.Reference()
 	return len(p) > 0
-}
-
-
-func scanConnectors(v cue.Value) (conns []*Connector) {
-	scan(
-		v,
-		func(v cue.Value, path []string) bool {
-			// Is `v` a struct with a definition #ID ?
-			c := NewConnector(v, path...)
-			if _, _, idExists := c.ID(); idExists {
-				debug("\tconnector detected")
-				conns = append(conns, c)
-				return false
-			}
-			return true
-		},
-		nil,
-	)
-	return
-}
-
-
-func scanTasks(v cue.Value) (tasks []*Task) {
-	scan(
-		v,
-		func(v cue.Value, path []string) bool {
-			// Is `v` a struct with a definition #ID ?
-			t := NewTask(v, path...)
-			if _, exists := t.Verb(); exists {
-				debug("\ttask detected")
-				tasks = append(tasks, t)
-				return false
-			}
-			return true
-		},
-		nil,
-	)
-	return
-}
-
-type ExecTask struct {
-	Task
-}
-
-func (t *ExecTask) String() string {
-	cmd, cmdExists := t.Cmd()
-	if cmdExists {
-		return fmt.Sprintf("%s [exec %v]", strings.Join(t.Path, "."), cmd)
-	}
-	return "exec <malformed>"
-}
-
-func (t *ExecTask) Cmd() (cmd []string, exists bool) {
-	cmdValue := t.Value.Lookup("cmd")
-	if !cmdValue.Exists() {
-		return
-	}
-	cmdJson, err := cmdValue.MarshalJSON()
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(cmdJson, &cmd)
-	if err != nil {
-		return
-	}
-	exists = true
-	return
-}
-
-type Task struct {
-	cue.Value
-	Path []string
-}
-
-func NewTask(v cue.Value, path ...string) *Task {
-	return &Task{
-		Value: v,
-		Path: path,
-	}
-}
-
-func (t *Task) Verb() (verb string, exists bool) {
-	var (
-		err error
-	)
-	attr := t.Value.Attribute("task")
-	if attr.Err() != nil {
-		return
-	}
-	verb, err = attr.String(0)
-	if err != nil {
-		return
-	}
-	exists = true
-	return
 }
 
 
