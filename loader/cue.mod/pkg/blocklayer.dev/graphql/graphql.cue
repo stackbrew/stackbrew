@@ -3,7 +3,7 @@ package graphql
 import (
 	"encoding/json"
 
-	"blocklayer.dev/exec"
+	"blocklayer.dev/unix"
 )
 
 #Endpoint : {
@@ -18,13 +18,20 @@ import (
 		result: json.Unmarshal(#curl.stdout).data
 		error: #curl.error
 
-		#curl: exec.#Exec & {
-			flag: "-X": "POST"
-			flag: "--silent": true
-			for k, v in header {
-				flag: "-H": "\(k): \(v)": true
+		#host: unix.#Host
+
+		#curl: #host.#exec & {
+			name: "curl"
+			args: [url]
+			flag: {
+				"-X": "POST"
+				"--silent": true
+				"-H": {
+					for k, v in header {
+						"\(k)": "\(v)": true
+					}
+				}
 			}
-			cmd: ["curl", url] 
 			stdout: string
 			error: _
 		}
