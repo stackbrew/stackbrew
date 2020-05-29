@@ -12,19 +12,23 @@ import (
 Container :: {
 	Name:       string
 	Image:      string
-	Command:    [string, ...]
+	Command:    [...string]
 	Essential?: bool
-	PortMappings?: [{
+	Environment?: [...{
+		Name: string
+		Value: string
+	}]
+	PortMappings?: [...{
 		ContainerPort?: uint
 		HostPort?:      uint
 		Protocol?:      string
-	}, ...]
+	}]
 	LogConfiguration?: {
 		LogDriver: *"awslogs" | string
 		Options: [string]: string
 	}
 	HealthCheck?: {
-		Command: [string, ...]
+		Command: [...string]
 		Timeout?:     uint
 		Interval?:    uint
 		Retries?:     uint
@@ -36,7 +40,7 @@ Task :: {
 	cpu:         *256 | uint
 	memory:      *512 | uint
 	networkMode: *"bridge" | string
-	containers: [Container, ...]
+	containers: [...Container]
 	roleArn?: string
 
 	resources: ECSTaskDefinition: {
