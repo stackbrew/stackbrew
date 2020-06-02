@@ -171,8 +171,9 @@ func scanUp(v cue.Value, get func(cue.Value, []string) bool, path []string, dept
 	exprOp, exprArgs:= v.Expr()
 	// Reference information
 	refInst, refPath := v.Reference()
+	debug("Reference -> %v, %v", refInst, refPath)
 	var refTarget cue.Value
-	if len(refPath) > 0 {
+	if refInst != nil && len(refPath) > 0 {
 		var err error
 		refTarget, err = lookup(refInst.Value(), refPath...)
 		if err != nil {
