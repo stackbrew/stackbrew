@@ -1,0 +1,12 @@
+
+
+
+
+$ sb install blocklayer.dev/templates/paaskit hello/platform
+Creating new block 'hello/platform', configured with template 'Blocklayer PaaS kit'
+
+$ sb install . hello/app1
+Creating new block 'hello/app1' configured with local directory '.'
+Building configuration...
+
+$ sb 
