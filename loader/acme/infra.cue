@@ -2,7 +2,7 @@
 package infra
 
 // Platform connector: how to use this environment as a platform for other environments
-#Platform: {
+#Tenant: {
 	env: [ID=string]: {
 		shortname: string
 		web: {
@@ -13,6 +13,17 @@ package infra
 			source: fs.#Directory
 			url: deploy.api[shortname].url
 		}
+	}
+
+	#Settings: {
+		// Human-friendly name for this deployment
+		appName: string
+	
+		// Path to WEB frontend source code (relative to context)
+		webPath: string | *"./crate/code/web"
+	
+		// Path to API source code (relative to context)
+		apiPath: string | *"./crate/code/api"
 	}
 }
 
@@ -60,25 +71,9 @@ deploy: {
 	}
 }
 
-//////// move to separate packages
-
-pkg: secret: #Vault: {
-
-	// Public key for this vault
-	pubKey: string
-
-	#Secret: {
-		#schema: _ | *string
-		encrypted: string
-
-		"pubKey": pubKey
-
-		#decrypt: {
-			#result: #schema
+sharedAPI: acme.#API & {
+			hostname: "staging.\(#Settings.apiDomain)"
+			aws: #Settings.aws
+			kub: auth: #Settings.kubernetes.auth
+			db: adminAuth: #Settings.db
 		}
-	}
-}
-
-
-pkg: linux: #Host: {
-}
