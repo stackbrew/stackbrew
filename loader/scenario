@@ -1,5 +1,22 @@
 
+# Environments are created from Templates
+# Templates are packaged from source directories.
+# Source directories contain configuration files and, optionally, attachments.
+# Attachments are any files and directories contained in a source directory, other than configuration files.
 
+
+$ sb init hello/platform --template blocklayer.dev/templates/paaskit
+--- New environment ID: 23595b2a205b5c3d8aba3d51b624d082d6dbd6ba
+--- New environment name: hello/platform
+--- Applying template from remote source: blocklayer.dev/templates/paaskit
+
+$ sb init hello/dev --template .
+--- New environment ID: 8168d2f2a9739d6c0eea4027ebd899613a56e087
+--- New environment name: hello/dev
+--- Applying template from local source: .
+
+
+$ sb update hello/app1 .
 
 
 $ sb install blocklayer.dev/templates/paaskit hello/platform
