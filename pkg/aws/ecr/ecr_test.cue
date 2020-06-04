@@ -6,7 +6,7 @@ import (
 )
 
 TestConfig : {
-	awsConfig:     aws.Config
+	awsConfig:     aws.#Config
 	ecrRepository: string
 }
 
@@ -34,7 +34,7 @@ TestECR: {
 	}
 
 	// Get the ECR credentials
-	login: Credentials & {
+	login: #Credentials & {
 		config: TestConfig.awsConfig
 		target: image
 	}
@@ -51,7 +51,7 @@ TestECR: {
 		dockerfile:  #"""
 			FROM \#(image)
 			# create a dependency between this task and export
-			RUN echo \#(export.ref)
+			RUN echo \#(export.source)
 			RUN cat /test
 			RUN test "$(cat /test)" = "\#(rand)"
 		"""#

@@ -5,10 +5,6 @@ import (
 	"stackbrew.io/git"
 )
 
-// Possible references to this location:
-// github/pull_request.cue:73:18
-// github/pull_request.cue:79:18
-// github/pull_request.cue:123:23
 #PullRequest: {
 	id:     string
 	state:  string
@@ -24,13 +20,9 @@ import (
 		target: oid: string
 	}
 }
-PullRequest: #PullRequest @tmpNoExportNewDef(6b8b)
 
 // INTERNAL: GraphQL fragment shared across queries related to PullRequest
 
-// Possible references to this location:
-// github/pull_request.cue:63:15
-// github/pull_request.cue:112:15
 #PullRequestParts: """
     fragment PullRequestParts on PullRequest {
         id
@@ -50,7 +42,7 @@ PullRequest: #PullRequest @tmpNoExportNewDef(6b8b)
         }
     }
     """
-PullRequestParts: #PullRequestParts @tmpNoExportNewDef(a95b)
+
 #GetPullRequest: {
 	number: int
 
@@ -69,7 +61,7 @@ PullRequestParts: #PullRequestParts @tmpNoExportNewDef(a95b)
                     }
                 }
             }
-            \(PullRequestParts)
+            \(#PullRequestParts)
             """
 		variable: {
 			owner:    repo.owner
@@ -79,18 +71,18 @@ PullRequestParts: #PullRequestParts @tmpNoExportNewDef(a95b)
 	}
 
 	data:        _
-	pullRequest: PullRequest
+	pullRequest: #PullRequest
 	pullRequest: data.repository.pullRequest
 }
 
 // FIXME: this should be PullRequest::Checkout
 #CheckoutPullRequest: {
-	pullRequest: PullRequest
+	pullRequest: #PullRequest
 
 	// Github API token
 	token: bl.Secret
 
-	git.Repository & {
+	git.#Repository & {
 		url:          pullRequest.headRepository.url
 		ref:          pullRequest.headRef.target.oid
 		username:     "apikey"
@@ -117,7 +109,7 @@ PullRequestParts: #PullRequestParts @tmpNoExportNewDef(a95b)
                     }
                 }
             }
-            \(PullRequestParts)
+            \(#PullRequestParts)
             """
 		variable: {
 			owner:    repo.owner
@@ -128,6 +120,6 @@ PullRequestParts: #PullRequestParts @tmpNoExportNewDef(a95b)
 	}
 
 	data: _
-	pullRequests: [...PullRequest]
+	pullRequests: [...#PullRequest]
 	pullRequests: data.repository.pullRequests.nodes
 }

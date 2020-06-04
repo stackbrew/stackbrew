@@ -10,15 +10,13 @@ package github
 	login: string
 }
 
-// Possible references to this location:
-// github/user.cue:30:11
 #UserFragment: """
     fragment UserParts on User {
         id
         login
     }
     """
-UserFragment: #UserFragment @tmpNoExportNewDef(e3f4)
+
 #GetViewer: {
 	#Query & {
 		query: """
@@ -27,7 +25,7 @@ UserFragment: #UserFragment @tmpNoExportNewDef(e3f4)
                 ...UserParts
             }
         }
-        \(UserFragment)
+        \(#UserFragment)
         """
 	}
 

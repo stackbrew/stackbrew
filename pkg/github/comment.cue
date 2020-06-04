@@ -6,14 +6,11 @@ import (
 	"strings"
 )
 
-// Possible references to this location:
-// github/comment.cue:26:14
-// github/comment.cue:58:14
 #CommentFields: {
 	id:   string
 	body: string
 }
-CommentFields: #CommentFields @tmpNoExportNewDef(ac77)
+
 
 // Possible references to this location:
 // github/comment.cue:43:11
@@ -25,7 +22,6 @@ CommentFields: #CommentFields @tmpNoExportNewDef(ac77)
         body
     }
     """
-CommentFragment: #CommentFragment @tmpNoExportNewDef(c2d8)
 
 // Possible references to this location:
 // github/comment.cue:125:16
@@ -34,7 +30,7 @@ CommentFragment: #CommentFragment @tmpNoExportNewDef(c2d8)
 	body:      string
 
 	data:    _
-	comment: CommentFields
+	comment: #CommentFields
 	comment: data.addComment.commentEdge.node
 
 	#Query & {
@@ -51,7 +47,7 @@ CommentFragment: #CommentFragment @tmpNoExportNewDef(c2d8)
                 }
             }
         }
-        \(CommentFragment)
+        \(#CommentFragment)
         """
 
 		variable: input: {
@@ -60,7 +56,6 @@ CommentFragment: #CommentFragment @tmpNoExportNewDef(c2d8)
 		}
 	}
 }
-AddComment: #AddComment @tmpNoExportNewDef(9b3d)
 
 // Possible references to this location:
 // github/comment.cue:115:16
@@ -69,7 +64,7 @@ AddComment: #AddComment @tmpNoExportNewDef(9b3d)
 	body:      string
 
 	data:    _
-	comment: CommentFields
+	comment: #CommentFields
 	comment: data.updateIssueComment.issueComment
 
 	#Query & {
@@ -81,7 +76,7 @@ AddComment: #AddComment @tmpNoExportNewDef(9b3d)
                 }
             }
         }
-        \(CommentFragment)
+        \(#CommentFragment)
         """
 
 		variable: input: {
@@ -90,7 +85,7 @@ AddComment: #AddComment @tmpNoExportNewDef(9b3d)
 		}
 	}
 }
-UpdateComment: #UpdateComment @tmpNoExportNewDef(3f1)
+
 #Comment: {
 	subjectId: string
 	marker:    *"<!-- bl-marker-do-not-remove -->" | string
@@ -115,7 +110,7 @@ UpdateComment: #UpdateComment @tmpNoExportNewDef(3f1)
                     }
                 }
             }
-            \(CommentFragment)
+            \(#CommentFragment)
             """
 		variable: {
 			nodeId: subjectId
@@ -126,7 +121,7 @@ UpdateComment: #UpdateComment @tmpNoExportNewDef(3f1)
 	commentId: [ for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)") { n.id } ]
 
 	updateCommentQuery: json.Marshal({
-		query: UpdateComment.query
+		query: #UpdateComment.query
 		variables: input: {
 			if len(commentId) > 0 {
 				id: commentId[0]
@@ -136,7 +131,7 @@ UpdateComment: #UpdateComment @tmpNoExportNewDef(3f1)
 	})
 
 	addCommentQuery: json.Marshal({
-		query: AddComment.query
+		query: #AddComment.query
 		variables: input: {
 			"subjectId": subjectId
 			"body":      "\(body)\n\(marker)"

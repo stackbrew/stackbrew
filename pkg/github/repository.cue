@@ -4,8 +4,6 @@ import (
 	"blocklayer.dev/bl"
 )
 
-// Possible references to this location:
-// github/pull_request.cue:84:9
 #Repository: {
 	// Github repository name
 	name: string
@@ -23,4 +21,3 @@ import (
 		}
 	}
 }
-Repository: #Repository @tmpNoExportNewDef(aff1)

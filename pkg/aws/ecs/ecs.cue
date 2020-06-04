@@ -9,9 +9,6 @@ import (
 	"stackbrew.io/aws/cloudformation"
 )
 
-// Possible references to this location:
-// aws/ecs/ecs.cue:39:15
-// aws/ecs/ecs.cue:149:17
 #Container: {
 	Name:  string
 	Image: string
@@ -34,12 +31,12 @@ import (
 		StartPeriod?: uint
 	}
 }
-Container: #Container @tmpNoExportNewDef(2b3e)
+
 #Task: {
 	cpu:         *256 | uint
 	memory:      *512 | uint
 	networkMode: *"bridge" | string
-	containers: [Container, ...]
+	containers: [#Container, ...]
 	roleArn?: string
 
 	resources: ECSTaskDefinition: {
@@ -148,7 +145,7 @@ Container: #Container @tmpNoExportNewDef(2b3e)
 
 	resources: {
 		(#Task & {
-			containers: [Container & {
+			containers: [#Container & {
 				Name:      subDomain
 				Image:     containerImage
 				Essential: true

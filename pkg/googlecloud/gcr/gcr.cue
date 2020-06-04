@@ -10,7 +10,7 @@ import (
 #Credentials: {
 
 	// GCP Config
-	config: googlecloud.Config
+	config: googlecloud.#Config
 
 	// Target is the GCR image
 	target: string
