@@ -7,7 +7,7 @@ import (
 )
 
 // Credentials retriever for GCR
-Credentials :: {
+#Credentials: {
 
 	// GCP Config
 	config: googlecloud.Config

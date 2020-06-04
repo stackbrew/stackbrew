@@ -8,10 +8,10 @@ import (
 )
 
 // AWS CloudFormation Stack
-Stack :: {
+#Stack: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Source is the Cloudformation template, either a Cue struct or a JSON/YAML string
 	source: string
@@ -33,7 +33,7 @@ Stack :: {
 			"/inputs/source":         source
 			"/inputs/stack_name":     stackName
 			if len(parameters) > 0 {
-				"/inputs/parameters": strings.Join([ "\(key)=\(val)" for key, val in parameters ], " ")
+				"/inputs/parameters": strings.Join([ for key, val in parameters { "\(key)=\(val)" } ], " ")
 			}
 		}
 

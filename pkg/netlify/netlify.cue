@@ -7,7 +7,7 @@ import (
 )
 
 // A Netlify account
-Account :: {
+#Account: {
 	// Use this Netlify account name
 	// (also referred to as "team" in the Netlify docs)
 	name: string | *""
@@ -17,9 +17,9 @@ Account :: {
 }
 
 // A Netlify site
-Site :: {
+#Site: {
 	// Netlify account this site is attached to
-	account: Account
+	account: #Account
 
 	// Contents of the application to deploy
 	contents: bl.Directory

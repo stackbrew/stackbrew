@@ -3,7 +3,7 @@ package go
 import "blocklayer.dev/bl"
 
 // Go application built with `go build`
-App :: {
+#App: {
 
 	// Source Directory to build
 	source: bl.Directory
@@ -37,7 +37,7 @@ App :: {
 	// Binary file output of the Go build
 	binary: bl.Directory & {
 		source: build.output["/outputs/out"]
-		path: binaryName
+		path:   binaryName
 	}
 
 	build: bl.BashScript & {

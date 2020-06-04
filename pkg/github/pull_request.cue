@@ -1,28 +1,37 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
-    "stackbrew.io/git"
+	"blocklayer.dev/bl"
+	"stackbrew.io/git"
 )
 
-PullRequest :: {
-    id:     string
-    state:  string
-    number: int
-    title:  string
-    headRepository: {
-        sshUrl: string
-        url:    string
-    }
-    headRef: {
-        name:   string
-        prefix: string
-        target: oid: string
-    }
+// Possible references to this location:
+// github/pull_request.cue:73:18
+// github/pull_request.cue:79:18
+// github/pull_request.cue:123:23
+#PullRequest: {
+	id:     string
+	state:  string
+	number: int
+	title:  string
+	headRepository: {
+		sshUrl: string
+		url:    string
+	}
+	headRef: {
+		name:   string
+		prefix: string
+		target: oid: string
+	}
 }
+PullRequest: #PullRequest @tmpNoExportNewDef(6b8b)
 
 // INTERNAL: GraphQL fragment shared across queries related to PullRequest
-PullRequestParts :: """
+
+// Possible references to this location:
+// github/pull_request.cue:63:15
+// github/pull_request.cue:112:15
+#PullRequestParts: """
     fragment PullRequestParts on PullRequest {
         id
         state
@@ -41,18 +50,18 @@ PullRequestParts :: """
         }
     }
     """
+PullRequestParts: #PullRequestParts @tmpNoExportNewDef(a95b)
+#GetPullRequest: {
+	number: int
 
-GetPullRequest :: {
-    number: int
+	repo: {
+		owner: string
+		name:  string
+	}
 
-    repo: {
-        owner: string
-        name:  string
-    }
-
-    Query & {
-        query:
-            """
+	#Query & {
+		query:
+			"""
             query($owner: String!, $name: String!, $number: Int!) {
                 repository(owner: $owner, name: $name) {
                     pullRequest(number: $number) {
@@ -62,44 +71,43 @@ GetPullRequest :: {
             }
             \(PullRequestParts)
             """
-        variable: {
-            owner:    repo.owner
-            name:     repo.name
-            "number": number
-        }
-    }
+		variable: {
+			owner:    repo.owner
+			name:     repo.name
+			"number": number
+		}
+	}
 
-    data:        _
-    pullRequest: PullRequest
-    pullRequest: data.repository.pullRequest
+	data:        _
+	pullRequest: PullRequest
+	pullRequest: data.repository.pullRequest
 }
 
 // FIXME: this should be PullRequest::Checkout
-CheckoutPullRequest :: {
-    pullRequest: PullRequest
+#CheckoutPullRequest: {
+	pullRequest: PullRequest
 
-    // Github API token
-    token: bl.Secret
+	// Github API token
+	token: bl.Secret
 
-    git.Repository & {
-        url:          pullRequest.headRepository.url
-        ref:          pullRequest.headRef.target.oid
-        username:     "apikey"
-        httpPassword: token
-    }
+	git.Repository & {
+		url:          pullRequest.headRepository.url
+		ref:          pullRequest.headRef.target.oid
+		username:     "apikey"
+		httpPassword: token
+	}
 }
+#ListPullRequests: {
+	repo: {
+		owner: string
+		name:  string
+	}
+	pageSize: int | *25
+	states:   [string] | *[]
 
-ListPullRequests :: {
-    repo: {
-        owner: string
-        name:  string
-    }
-    pageSize: int | *25
-    states:   [string] | *[]
-
-    Query & {
-        query:
-            """
+	#Query & {
+		query:
+			"""
             query($owner: String!, $name: String!, $last: Int, $states: [PullRequestState!]) {
                 repository(owner: $owner, name: $name) {
                     pullRequests(last: $last, states: $states) {
@@ -111,15 +119,15 @@ ListPullRequests :: {
             }
             \(PullRequestParts)
             """
-        variable: {
-            owner:    repo.owner
-            name:     repo.name
-            last:     pageSize
-            "states": states
-        }
-    }
+		variable: {
+			owner:    repo.owner
+			name:     repo.name
+			last:     pageSize
+			"states": states
+		}
+	}
 
-    data: _
-    pullRequests: [...PullRequest]
-    pullRequests: data.repository.pullRequests.nodes
+	data: _
+	pullRequests: [...PullRequest]
+	pullRequests: data.repository.pullRequests.nodes
 }

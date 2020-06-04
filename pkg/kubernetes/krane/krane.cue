@@ -5,7 +5,7 @@ import (
 )
 
 // Render a Krane template
-Render :: {
+#Render: {
 	// Kubernetes config to render
 	source: string | bl.Directory
 
@@ -46,7 +46,7 @@ Render :: {
 }
 
 // Deploy a Kubernetes configuration using Krane
-Deploy :: {
+#Deploy: {
 	// Kubernetes config to deploy
 	source: string | bl.Directory
 

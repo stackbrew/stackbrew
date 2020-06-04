@@ -5,7 +5,7 @@ import (
 )
 
 // Exposes `kubectl kustomize`
-Kustomize :: {
+#Kustomize: {
 	// Kubernetes config to take as input
 	source: string | bl.Directory
 
@@ -20,7 +20,7 @@ Kustomize :: {
 
 	kustomize: bl.BashScript & {
 		input: {
-			"/kube/source": source
+			"/kube/source":             source
 			"/kube/kustomization.yaml": kustomization
 		}
 
@@ -45,7 +45,7 @@ Kustomize :: {
 }
 
 // Apply a Kubernetes configuration
-Apply :: {
+#Apply: {
 	// Kubernetes config to deploy
 	source: string | bl.Directory
 

@@ -7,7 +7,7 @@ import (
 )
 
 // Read reads the contents of a file.
-Read :: {
+#Read: {
 	// source directory
 	source: bl.Directory
 
@@ -28,7 +28,7 @@ Read :: {
 }
 
 // Create writes contents to the given file.
-Create :: {
+#Create: {
 	// source directory
 	source?: bl.Directory
 
@@ -65,7 +65,7 @@ Create :: {
 }
 
 // Append writes contents to the given file.
-Append :: {
+#Append: {
 	// source directory
 	source: bl.Directory
 
@@ -102,7 +102,7 @@ Append :: {
 }
 
 // Glob returns a list of files.
-Glob :: {
+#Glob: {
 	// source directory
 	source: bl.Directory
 

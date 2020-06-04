@@ -5,23 +5,23 @@ package github
 //
 // This package matches the raw Github types and queries as closely as possible.
 // For a higher-level package, see the top-level `github` package.
-
-User :: {
-    id: string
-    login: string
+#User: {
+	id:    string
+	login: string
 }
 
-UserFragment :: """
+// Possible references to this location:
+// github/user.cue:30:11
+#UserFragment: """
     fragment UserParts on User {
         id
         login
     }
     """
-
-
-GetViewer :: {
-    Query & {
-        query: """
+UserFragment: #UserFragment @tmpNoExportNewDef(e3f4)
+#GetViewer: {
+	#Query & {
+		query: """
         query {
             viewer {
                 ...UserParts
@@ -29,9 +29,8 @@ GetViewer :: {
         }
         \(UserFragment)
         """
-    }
+	}
 
-    data:  _
-    user: data.viewer
+	data: _
+	user: data.viewer
 }
-

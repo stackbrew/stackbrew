@@ -9,10 +9,13 @@ import (
 	"stackbrew.io/aws/cloudformation"
 )
 
-Container :: {
-	Name:       string
-	Image:      string
-	Command:    [string, ...]
+// Possible references to this location:
+// aws/ecs/ecs.cue:39:15
+// aws/ecs/ecs.cue:149:17
+#Container: {
+	Name:  string
+	Image: string
+	Command: [string, ...]
 	Essential?: bool
 	PortMappings?: [{
 		ContainerPort?: uint
@@ -31,8 +34,8 @@ Container :: {
 		StartPeriod?: uint
 	}
 }
-
-Task :: {
+Container: #Container @tmpNoExportNewDef(2b3e)
+#Task: {
 	cpu:         *256 | uint
 	memory:      *512 | uint
 	networkMode: *"bridge" | string
@@ -52,8 +55,7 @@ Task :: {
 		}
 	}
 }
-
-Service :: {
+#Service: {
 	// ECS cluster name or ARN
 	cluster: string
 
@@ -131,8 +133,8 @@ Service :: {
 }
 
 // SimpleECSApp is a simplified interface for ECS
-SimpleECSApp :: {
-	inputConfig=config:               aws.Config
+#SimpleECSApp: {
+	inputConfig=config:               aws.#Config
 	hostname:                         string
 	containerImage:                   string
 	inputContainerPort=containerPort: *80 | uint
@@ -145,7 +147,7 @@ SimpleECSApp :: {
 	out:       cfn.stackOutput
 
 	resources: {
-		(Task & {
+		(#Task & {
 			containers: [Container & {
 				Name:      subDomain
 				Image:     containerImage
@@ -157,7 +159,7 @@ SimpleECSApp :: {
 			}]
 		}).resources
 
-		(Service & {
+		(#Service & {
 			cluster:        infra.cluster
 			containerPort:  inputContainerPort
 			containerName:  subDomain
@@ -170,7 +172,7 @@ SimpleECSApp :: {
 		}).resources
 	}
 
-	cfn: cloudformation.Stack & {
+	cfn: cloudformation.#Stack & {
 		config: inputConfig
 		source: json.Marshal({
 			AWSTemplateFormatVersion: "2010-09-09"
