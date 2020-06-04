@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-TEST_TARGET="${TARGET:-bl-registry:5001/stackbrew-test}"
+TEST_TARGET="${TARGET:-localhost:5001/stackbrew-test}"
 PKGDIR="./pkg"
 
 COMPONENTS="${COMPONENTS:=$(find "${PKGDIR}" -type f -name "*.cue" | grep -v cue.mod | cut -d/ -f3- | sed -E 's=/[^/]+$==' | uniq | sort -n)}"
