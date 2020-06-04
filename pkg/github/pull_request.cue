@@ -1,8 +1,8 @@
 package github
 
 import (
-	"blocklayer.dev/bl"
-	"stackbrew.io/git"
+    "blocklayer.dev/bl"
+    "blocklayer.dev/git"
 )
 
 #PullRequest: {

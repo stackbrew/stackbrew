@@ -2,8 +2,8 @@ package gke
 
 import (
 	"blocklayer.dev/bl"
-	"stackbrew.io/googlecloud"
-	"stackbrew.io/kubernetes"
+	"blocklayer.dev/googlecloud"
+	"blocklayer.dev/kubernetes"
 )
 
 TestConfig: {

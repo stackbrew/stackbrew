@@ -2,7 +2,7 @@ package ecr
 
 import (
 	"blocklayer.dev/bl"
-	"stackbrew.io/aws"
+	"blocklayer.dev/aws"
 )
 
 TestConfig : {

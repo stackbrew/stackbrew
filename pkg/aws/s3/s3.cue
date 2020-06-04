@@ -2,7 +2,7 @@ package s3
 
 import (
 	"blocklayer.dev/bl"
-	"stackbrew.io/aws"
+	"blocklayer.dev/aws"
 )
 
 // S3 file or Directory upload
