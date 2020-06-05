@@ -10,12 +10,12 @@ import (
 )
 
 Container :: {
-	Name:       string
-	Image:      string
-	Command:    [...string]
+	Name:  string
+	Image: string
+	Command: [...string]
 	Essential?: bool
 	Environment?: [...{
-		Name: string
+		Name:  string
 		Value: string
 	}]
 	PortMappings?: [...{

@@ -1,38 +1,38 @@
 package rds
 
 import (
-    "blocklayer.dev/bl"
-    "stackbrew.io/aws"
+	"blocklayer.dev/bl"
+	"stackbrew.io/aws"
 )
 
 CreateDB :: {
 	// AWS Config
 	config: aws.Config
 
-    // DB name
-    name: string
+	// DB name
+	name: string
 
-    // ARN of the database instance
-    dbArn: string
+	// ARN of the database instance
+	dbArn: string
 
-    // ARN of the database secret (for connecting via rds api)
-    secretArn: string
+	// ARN of the database secret (for connecting via rds api)
+	secretArn: string
 
-    dbCreated: output["/outputs/dbCreated"]
+	dbCreated: output["/outputs/dbCreated"]
 
-    output: _
+	output: _
 
 	bl.BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
 			"/inputs/name":           name
-            "/inputs/db_arn": dbArn
-            "/inputs/secret_arn": secretArn
+			"/inputs/db_arn":         dbArn
+			"/inputs/secret_arn":     secretArn
 		}
 
 		output: {
-            "/outputs/dbCreated": string
+			"/outputs/dbCreated": string
 		}
 
 		os: {
@@ -68,43 +68,43 @@ CreateDB :: {
             fi
             cp /inputs/name /outputs/dbCreated
             """#
-    }
+	}
 }
 
 CreateUser :: {
 	// AWS Config
 	config: aws.Config
 
-    // Username
-    username: string
+	// Username
+	username: string
 
-    // Password
-    password: string
+	// Password
+	password: string
 
-    // ARN of the database instance
-    dbArn: string
+	// ARN of the database instance
+	dbArn: string
 
-    // ARN of the database secret (for connecting via rds api)
-    secretArn: string
+	// ARN of the database secret (for connecting via rds api)
+	secretArn: string
 
-    grantDatabase: string | *""
+	grantDatabase: string | *""
 
-    output: _
+	output: _
 
 	bl.BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/inputs/username":           username
-            "/inputs/password":  password
-            "/inputs/db_arn": dbArn
-            "/inputs/secret_arn": secretArn
-            "/inputs/grant_database": grantDatabase
+			"/inputs/username":       username
+			"/inputs/password":       password
+			"/inputs/db_arn":         dbArn
+			"/inputs/secret_arn":     secretArn
+			"/inputs/grant_database": grantDatabase
 		}
 
 		output: {
-            "/outputs/username": string
-            "/outputs/password": string
+			"/outputs/username": string
+			"/outputs/password": string
 		}
 
 		os: {
@@ -155,5 +155,5 @@ CreateUser :: {
                     --no-include-result-metadata
             fi
             """#
-    }
+	}
 }

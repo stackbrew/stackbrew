@@ -32,7 +32,7 @@ App :: {
 	// Binary file output of the Go build
 	binary: bl.Directory & {
 		source: build.output["/outputs/out"]
-		path: binaryName
+		path:   binaryName
 	}
 
 	build: bl.BashScript & {
@@ -54,8 +54,8 @@ App :: {
 
 		os: package: {
 			"libc6-compat": true
-			"gcc": true
-			"musl-dev": true
+			"gcc":          true
+			"musl-dev":     true
 		}
 
 		code: #"""

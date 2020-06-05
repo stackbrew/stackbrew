@@ -11,7 +11,7 @@ Archive :: {
 	// Archive file output
 	archive: bl.Directory & {
 		source: run.output["/outputs/out"]
-		path: "file.zip"
+		path:   "file.zip"
 	}
 
 	run: bl.BashScript & {
