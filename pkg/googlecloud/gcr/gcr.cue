@@ -2,7 +2,7 @@ package gcr
 
 import (
 	"blocklayer.dev/bl"
-	"stackbrew.io/googlecloud"
+	"blocklayer.dev/googlecloud"
 	"encoding/base64"
 )
 

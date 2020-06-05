@@ -2,9 +2,9 @@ package krane
 
 import (
 	"blocklayer.dev/bl"
-	"stackbrew.io/file"
-	"stackbrew.io/aws"
-	"stackbrew.io/aws/eks"
+	"blocklayer.dev/file"
+	"blocklayer.dev/aws"
+	"blocklayer.dev/aws/eks"
 )
 
 TestConfig: {

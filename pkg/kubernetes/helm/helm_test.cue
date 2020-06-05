@@ -4,8 +4,8 @@ import (
     "encoding/yaml"
 
     "blocklayer.dev/bl"
-	"stackbrew.io/aws"
-	"stackbrew.io/aws/eks"
+	"blocklayer.dev/aws"
+	"blocklayer.dev/aws/eks"
 )
 
 TestConfig: {

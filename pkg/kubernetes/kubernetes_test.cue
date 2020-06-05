@@ -3,8 +3,8 @@ package kubernetes
 import (
 	"blocklayer.dev/bl"
     "encoding/yaml"
-	"stackbrew.io/aws"
-	"stackbrew.io/aws/eks"
+	"blocklayer.dev/aws"
+	"blocklayer.dev/aws/eks"
 )
 
 TestConfig: {

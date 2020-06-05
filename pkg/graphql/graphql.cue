@@ -2,7 +2,7 @@ package graphql
 
 import (
 	"encoding/json"
-	"stackbrew.io/http"
+	"blocklayer.dev/http"
 )
 
 #Query: {

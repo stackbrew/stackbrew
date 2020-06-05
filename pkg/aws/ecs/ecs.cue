@@ -5,8 +5,8 @@ import (
 	"strings"
 	"encoding/json"
 
-	"stackbrew.io/aws"
-	"stackbrew.io/aws/cloudformation"
+	"blocklayer.dev/aws"
+	"blocklayer.dev/aws/cloudformation"
 )
 
 #Container: {

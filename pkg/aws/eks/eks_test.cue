@@ -2,8 +2,8 @@ package eks
 
 import (
 	"blocklayer.dev/bl"
-	"stackbrew.io/aws"
-	"stackbrew.io/kubernetes"
+	"blocklayer.dev/aws"
+	"blocklayer.dev/kubernetes"
 )
 
 TestConfig: {

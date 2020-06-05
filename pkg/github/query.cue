@@ -5,7 +5,7 @@ package github
 
 import (
 	"blocklayer.dev/bl"
-	"stackbrew.io/graphql"
+	"blocklayer.dev/graphql"
 )
 
 // GitHub v4 GraphQL Query
