@@ -49,6 +49,8 @@ CreateDB :: {
 		environment: AWS_DEFAULT_REGION: config.region
 
 		code: #"""
+            set +o pipefail
+
             export AWS_ACCESS_KEY_ID="$(cat /inputs/aws/access_key)"
             export AWS_SECRET_ACCESS_KEY="$(cat /inputs/aws/secret_key)"
 
@@ -66,6 +68,7 @@ CreateDB :: {
             fi
             cp /inputs/name /outputs/dbCreated
             """#
+    }
 }
 
 CreateUser :: {
@@ -76,7 +79,7 @@ CreateUser :: {
     username: string
 
     // Password
-    password: bl.Secret
+    password: string
 
     // ARN of the database instance
     dbArn: string
@@ -85,8 +88,6 @@ CreateUser :: {
     secretArn: string
 
     grantDatabase: string | *""
-
-    dbCreated: output["/outputs/dbCreated"]
 
     output: _
 
@@ -98,6 +99,7 @@ CreateUser :: {
             "/inputs/password":  password
             "/inputs/db_arn": dbArn
             "/inputs/secret_arn": secretArn
+            "/inputs/grant_database": grantDatabase
 		}
 
 		output: {
@@ -119,6 +121,8 @@ CreateUser :: {
 		environment: AWS_DEFAULT_REGION: config.region
 
 		code: #"""
+            set +o pipefail
+
             export AWS_ACCESS_KEY_ID="$(cat /inputs/aws/access_key)"
             export AWS_SECRET_ACCESS_KEY="$(cat /inputs/aws/secret_key)"
 
@@ -151,5 +155,5 @@ CreateUser :: {
                     --no-include-result-metadata
             fi
             """#
-
+    }
 }
