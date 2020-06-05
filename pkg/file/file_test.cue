@@ -5,7 +5,7 @@ import (
 )
 
 TestRead: {
-	read: Read & {
+	read: #Read & {
 		source: bl.Directory & {
 			source: "context://testdata"
 		}
@@ -21,7 +21,7 @@ TestRead: {
 }
 
 TestCreate: {
-	create: Create & {
+	create: #Create & {
 		source: bl.Directory & {
 			source: "context://testdata"
 		}
@@ -40,7 +40,7 @@ TestCreate: {
 }
 
 TestCreateNoSource: {
-	create: Create & {
+	create: #Create & {
 		filename: "/new"
 		contents: "new file"
 	}
@@ -54,7 +54,7 @@ TestCreateNoSource: {
 }
 
 TestAppend: {
-	append: Append & {
+	append: #Append & {
 		source: bl.Directory & {
 			source: "context://testdata"
 		}
@@ -62,7 +62,7 @@ TestAppend: {
 		contents: "new content"
 	}
 
-	create: Append & {
+	create: #Append & {
 		source: bl.Directory & {
 			source: "context://testdata"
 		}
@@ -84,7 +84,7 @@ TestAppend: {
 }
 
 TestGlob: {
-	glob: Glob & {
+	glob: #Glob & {
 		source: bl.Directory & {
 			source: "context://testdata"
 		}

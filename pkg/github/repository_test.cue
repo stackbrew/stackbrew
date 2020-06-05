@@ -7,17 +7,17 @@ import (
 TestConfig: githubToken: bl.Secret
 
 TestRepository: {
-    repository: Repository & {
+    repository: #Repository & {
         name:  "gh-test"
         owner: "stackbrew-test"
         token: TestConfig.githubToken
     }
 
-    pr: repository.GetPullRequest & {
+    pr: repository.#GetPullRequest & {
         number: 2
     }
 
-    checkout: CheckoutPullRequest & {
+    checkout: #CheckoutPullRequest & {
         pullRequest: pr.pullRequest
         token: TestConfig.githubToken
     }

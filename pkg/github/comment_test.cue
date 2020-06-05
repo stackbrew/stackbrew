@@ -8,7 +8,7 @@ import (
 TestConfig: githubToken: bl.Secret
 
 TestComment: {
-    query: GetPullRequest & {
+    query: #GetPullRequest & {
         token:  TestConfig.githubToken
         number: 2
         repo: {
@@ -17,7 +17,7 @@ TestComment: {
         }
     }
 
-    addComment: AddComment & {
+    addComment: #AddComment & {
         token:     TestConfig.githubToken
         subjectId: query.pullRequest.id
         body:      #"""
@@ -32,7 +32,7 @@ TestComment: {
         """#
     }
 
-    updateComment: UpdateComment & {
+    updateComment: #UpdateComment & {
         token:     TestConfig.githubToken
         commentId: addComment.comment.id
         body:      #"""
@@ -42,7 +42,7 @@ TestComment: {
         """#
     }
 
-    commentWithMarker: Comment & {
+    commentWithMarker: #Comment & {
         token: TestConfig.githubToken
         subjectId: query.pullRequest.id
         body:      #"""

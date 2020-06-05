@@ -3,7 +3,7 @@ package git
 import "blocklayer.dev/bl"
 
 testClone: {
-	run: Repository & {
+	run: #Repository & {
 		url: "https://github.com/blocklayerhq/actions"
 		ref: "2dd1ba045e7dc4e382ae89529b0e9e2107a076bb"
 	}
@@ -25,7 +25,7 @@ testClone: {
 }
 
 testCloneWithGitDir: {
-	run: Repository & {
+	run: #Repository & {
 		url:        "https://github.com/blocklayerhq/actions"
 		ref:        "2dd1ba045e7dc4e382ae89529b0e9e2107a076bb"
 		keepGitDir: true
@@ -41,13 +41,13 @@ testCloneWithGitDir: {
 }
 
 testPathCommit: {
-	repos: Repository & {
+	repos: #Repository & {
 		url:        "https://github.com/blocklayerhq/actions"
 		ref:        "2dd1ba045e7dc4e382ae89529b0e9e2107a076bb"
 		keepGitDir: true
 	}
 
-	run: PathCommit & {
+	run: #PathCommit & {
 		from: repos.out
 	}
 

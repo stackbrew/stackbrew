@@ -7,7 +7,7 @@ import (
 TestConfig: githubToken: bl.Secret
 
 TestGetPullRequestMerged: {
-    query: GetPullRequest & {
+    query: #GetPullRequest & {
         token:  TestConfig.githubToken
         number: 1
         repo: {
@@ -26,7 +26,7 @@ TestGetPullRequestMerged: {
 }
 
 TestGetPullRequestOpen: {
-    query: GetPullRequest & {
+    query: #GetPullRequest & {
         token:  TestConfig.githubToken
         number: 2
         repo: {
@@ -51,7 +51,7 @@ TestGetPullRequestOpen: {
 }
 
 TestCheckoutPullRequest: {
-    query: GetPullRequest & {
+    query: #GetPullRequest & {
         token:  TestConfig.githubToken
         number: 2
         repo: {
@@ -60,7 +60,7 @@ TestCheckoutPullRequest: {
         }
     }
 
-    checkout: CheckoutPullRequest & {
+    checkout: #CheckoutPullRequest & {
         token: TestConfig.githubToken
         pullRequest: query.pullRequest
     }
@@ -75,7 +75,7 @@ TestCheckoutPullRequest: {
 }
 
 TestListPullRequests: {
-    query: ListPullRequests & {
+    query: #ListPullRequests & {
         token:    TestConfig.githubToken
         pageSize: 10
         states:   ["MERGED"]

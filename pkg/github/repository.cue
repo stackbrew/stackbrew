@@ -12,9 +12,8 @@ Repository :: {
 	owner: string
 
 	// Github API token
-	token: bl.Secret
-
-	"GetPullRequest" :: GetPullRequest & {
+	token:           bl.Secret
+	"#GetPullRequest": #GetPullRequest & {
 		"token": token
 		repo: {
 			"owner": owner

@@ -7,7 +7,7 @@ import (
 TestConfig: githubToken: bl.Secret
 
 TestViewer: {
-    query: GetViewer & {
+    query: #GetViewer & {
         token: TestConfig.githubToken
     }
 

@@ -5,7 +5,7 @@ import (
 )
 
 TestConfig : {
-	dockerHubConfig:     Credentials.config
+	dockerHubConfig:     #Credentials.config
 	dockerHubRepository: string
 }
 
@@ -33,7 +33,7 @@ TestDockerHub: {
 	}
 
 	// Get the GCR credentials
-	login: Credentials & {
+	login: #Credentials & {
 		config: TestConfig.dockerHubConfig
 		target: image
 	}
