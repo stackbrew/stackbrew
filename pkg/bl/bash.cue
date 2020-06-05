@@ -39,12 +39,12 @@ BashScript :: {
 		dockerfile: """
 			from alpine:\(os.alpineVersion)@\(os.alpineDigest)
 
-			\(strings.Join([
-				"run apk add -U --no-cache \(pkg)" for pkg, _ in os.package
+			\(strings.Join([ for pkg, _ in os.package {
+				"run apk add -U --no-cache \(pkg)" }
 		], "\n"))
 
-			\(strings.Join([
-			"run \(cmd)" for cmd in os.extraCommand
+			\(strings.Join([ for cmd in os.extraCommand {
+			"run \(cmd)" }
 		], "\n"))
 			"""
 	}

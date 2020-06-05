@@ -4,8 +4,8 @@ package github
 // Reference: https://developer.github.com/v4/
 
 import (
-    "blocklayer.dev/bl"
-    "blocklayer.dev/graphql"
+	"blocklayer.dev/bl"
+	"blocklayer.dev/graphql"
 )
 
 // GitHub v4 GraphQL Query
