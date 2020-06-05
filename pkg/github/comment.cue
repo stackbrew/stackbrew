@@ -109,7 +109,7 @@ Comment :: {
 	}
 
 	// Contains a list of comment ID matching the marker
-	commentId: [ for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)") { n.id } ]
+	commentId: [n.id for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)")]
 
 	updateCommentQuery: json.Marshal({
 		query: UpdateComment.query
