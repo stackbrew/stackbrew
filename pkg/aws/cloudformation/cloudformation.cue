@@ -8,10 +8,10 @@ import (
 )
 
 // AWS CloudFormation Stack
-Stack :: {
+#Stack: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Source is the Cloudformation template, either a Cue struct or a JSON/YAML string
 	source: string

@@ -5,7 +5,7 @@ import (
 	"stackbrew.io/http"
 )
 
-Query :: {
+#Query: {
 	// Contents of the graphql query
 	query: string
 	// graphql variables

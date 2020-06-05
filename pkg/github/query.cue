@@ -9,10 +9,10 @@ import (
 )
 
 // GitHub v4 GraphQL Query
-Query :: {
+#Query: {
 	token: bl.Secret
 
-	graphql.Query & {
+	graphql.#Query & {
 		url: "https://api.github.com/graphql"
 
 		request: {

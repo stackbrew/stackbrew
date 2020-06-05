@@ -4,7 +4,7 @@ import (
 	"blocklayer.dev/bl"
 )
 
-Container :: {
+#Container: {
 	buildScript: string
 	runScript:   string
 	environment: [string]: string

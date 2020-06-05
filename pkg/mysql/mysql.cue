@@ -1,12 +1,11 @@
 package mysql
 
-Database :: {
+#Database: {
 	name:   string
 	create: *true | bool
-	server: Server
+	server: #Server
 }
-
-Server :: {
+#Server: {
 	host:          string
 	port:          *3306 | int
 	adminUser:     string

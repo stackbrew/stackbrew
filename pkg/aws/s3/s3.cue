@@ -6,10 +6,10 @@ import (
 )
 
 // S3 file or Directory upload
-Put :: {
+#Put: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Source Directory, File or String to Upload to S3
 	source: string | bl.Directory

@@ -1,9 +1,11 @@
 package aws
 
-import "blocklayer.dev/bl"
+import ( "blocklayer.dev/bl"
 
-// AWS Config shared by all AWS packages
-Config :: {
+	// AWS Config shared by all AWS packages
+)
+
+#Config: {
 	region:    string
 	accessKey: bl.Secret
 	secretKey: bl.Secret

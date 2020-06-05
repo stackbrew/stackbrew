@@ -7,9 +7,9 @@ import (
 )
 
 // KubeConfig config outputs a valid kube-auth-config for kubectl client
-KubeConfig :: {
+#KubeConfig: {
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// EKS cluster name
 	cluster: string

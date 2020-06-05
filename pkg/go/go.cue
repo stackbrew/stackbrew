@@ -3,7 +3,7 @@ package go
 import "blocklayer.dev/bl"
 
 // Go application built with `go build`
-App :: {
+#App: {
 
 	// Source Directory to build
 	source: bl.Directory

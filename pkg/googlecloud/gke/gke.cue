@@ -7,9 +7,9 @@ import (
 )
 
 // KubeConfig config outputs a valid kube-auth-config for kubectl client
-KubeConfig :: {
+#KubeConfig: {
 	// GCP Config
-	config: googlecloud.Config
+	config: googlecloud.#Config
 
 	// GKE cluster name
 	cluster: string

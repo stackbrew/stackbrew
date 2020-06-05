@@ -3,7 +3,7 @@ package zip
 import "blocklayer.dev/bl"
 
 // Zip archive
-Archive :: {
+#Archive: {
 
 	// Source Directory, File or String to Zip from
 	source: bl.Directory | string

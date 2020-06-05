@@ -5,7 +5,7 @@ import (
 )
 
 // Credentials retriever for Docker Hub
-Credentials :: {
+#Credentials: {
 
 	// Docker Hub Config
 	config: {

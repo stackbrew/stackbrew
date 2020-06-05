@@ -7,10 +7,10 @@ import (
 )
 
 // Credentials retriever for ECR
-Credentials :: {
+#Credentials: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Target is the ECR image
 	target: string

@@ -7,19 +7,19 @@ import (
 )
 
 // Git repository
-Repository :: {
+#Repository: {
 
 	// URL of the Repository
 	url: string
 
 	// SSH key for private repositories
-	sshKey?: bl.Secret
+	sshKey?: bl.#Secret
 
 	// SSH or HTTP username to use in the git URL
 	username?: string
 
 	// HTTP password
-	httpPassword?: bl.Secret
+	httpPassword?: bl.#Secret
 
 	// Git Ref to checkout
 	ref: *"master" | string
@@ -37,7 +37,7 @@ Repository :: {
 	// Output short-commit ID of the Repository
 	shortCommit: strings.TrimRight(output["/outputs/short-commit"], "\n")
 
-	bl.BashScript & {
+	bl.#BashScript & {
 		os: package: {
 			git:     true
 			openssh: true
@@ -60,11 +60,11 @@ Repository :: {
 			if (httpPassword & bl.Secret) != _|_ {
 				"/inputs/http-password": httpPassword
 			}
-			"/cache/git": bl.Cache
+			"/cache/git": bl.#Cache
 		}
 
 		output: {
-			"/outputs/out":          bl.Directory
+			"/outputs/out":          bl.#Directory
 			"/outputs/commit":       string
 			"/outputs/short-commit": string
 		}
@@ -121,10 +121,10 @@ Repository :: {
 }
 
 // Retrieve commit IDs from a git working copy (ie. cloned repository)
-PathCommit :: {
+#PathCommit: {
 
 	// Source Directory (git working copy)
-	from: bl.Directory
+	from: bl.#Directory
 
 	// Optional path to retrieve git commit IDs from
 	path: *"./" | string
@@ -135,7 +135,7 @@ PathCommit :: {
 	// Output short-commit ID of the Repository
 	shortCommit: strings.TrimRight(pathCommit.output["/outputs/short-commit"], "\n")
 
-	pathCommit: bl.BashScript & {
+	pathCommit: bl.#BashScript & {
 		os: package: git: true
 
 		workdir: "/workdir"
