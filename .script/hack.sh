@@ -49,7 +49,7 @@ case "${1}" in
             (
                 echo "+++ PUBLISH stackbrew.io/${component}" >&2
                 cd "${PKGDIR}/${component}"
-                bl-runtime publish "stackbrew.io/${component}"
+                bl-runtime publish "blocklayer.dev/${component}"
             )
         done
     ;;
