@@ -7,7 +7,7 @@ import (
 )
 
 // A javascript application built by Yarn
-#App: {
+App :: {
 	// Source code of the javascript application
 	source: bl.Directory
 
@@ -52,7 +52,7 @@ import (
 			// FIXME: set a cache key?
 			"/cache/yarn": bl.Cache
 			if writeEnvFile != "" {
-				"/app/src/\(writeEnvFile)": strings.Join([ for k, v in appEnv {"\(k)=\(v)"}], "\n")
+				"/app/src/\(writeEnvFile)": strings.Join([ for k, v in appEnv { "\(k)=\(v)" } ], "\n")
 			}
 		}
 

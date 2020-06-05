@@ -6,34 +6,27 @@ import (
 	"strings"
 )
 
-#CommentFields: {
+CommentFields :: {
 	id:   string
 	body: string
 }
 
-// Possible references to this location:
-// github/comment.cue:43:11
-// github/comment.cue:70:11
-// github/comment.cue:104:15
-#CommentFragment: """
+CommentFragment :: """
     fragment CommentParts on IssueComment {
         id
         body
     }
     """
 
-// Possible references to this location:
-// github/comment.cue:125:16
-#AddComment: {
+AddComment :: {
 	subjectId: string
 	body:      string
 
 	data:    _
-
-	comment: #CommentFields
+	comment: CommentFields
 	comment: data.addComment.commentEdge.node
 
-	#Query & {
+	Query & {
 		query: """
         mutation ($input: AddCommentInput!) {
             addComment(input: $input) {
@@ -47,7 +40,7 @@ import (
                 }
             }
         }
-        \(#CommentFragment)
+        \(CommentFragment)
         """
 
 		variable: input: {
@@ -57,18 +50,15 @@ import (
 	}
 }
 
-// Possible references to this location:
-// github/comment.cue:115:16
-#UpdateComment: {
+UpdateComment :: {
 	commentId: string
 	body:      string
 
 	data:    _
-
-	comment: #CommentFields
+	comment: CommentFields
 	comment: data.updateIssueComment.issueComment
 
-	#Query & {
+	Query & {
 		query: """
         mutation ($input: UpdateIssueCommentInput!) {
             updateIssueComment(input: $input) {
@@ -77,7 +67,7 @@ import (
                 }
             }
         }
-        \(#CommentFragment)
+        \(CommentFragment)
         """
 
 		variable: input: {
@@ -87,14 +77,13 @@ import (
 	}
 }
 
-
-#Comment: {
+Comment :: {
 	subjectId: string
 	marker:    *"<!-- bl-marker-do-not-remove -->" | string
 	token:     bl.Secret
 	body:      string
 
-	listComments: #Query & {
+	listComments: Query & {
 		"token": token
 
 		query:
@@ -112,7 +101,7 @@ import (
                     }
                 }
             }
-            \(#CommentFragment)
+            \(CommentFragment)
             """
 		variable: {
 			nodeId: subjectId
@@ -120,10 +109,10 @@ import (
 	}
 
 	// Contains a list of comment ID matching the marker
-	commentId: [ for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)") {n.id}]
+	commentId: [ for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)") { n.id } ]
 
 	updateCommentQuery: json.Marshal({
-		query: #UpdateComment.query
+		query: UpdateComment.query
 		variables: input: {
 			if len(commentId) > 0 {
 				id: commentId[0]
@@ -133,7 +122,7 @@ import (
 	})
 
 	addCommentQuery: json.Marshal({
-		query: #AddComment.query
+		query: AddComment.query
 		variables: input: {
 			"subjectId": subjectId
 			"body":      "\(body)\n\(marker)"

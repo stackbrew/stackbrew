@@ -7,10 +7,10 @@ import (
 )
 
 // Elastic Beanstalk Application
-#Application: {
+Application :: {
 
 	// AWS Config
-	config: aws.#Config
+	config: aws.Config
 
 	// Beanstalk application name
 	applicationName: string
@@ -60,10 +60,10 @@ import (
 }
 
 // Elastic Beanstalk Environment
-#Environment: {
+Environment :: {
 
 	// AWS Config
-	config: aws.#Config
+	config: aws.Config
 
 	// Source code to deploy
 	source: bl.Directory
@@ -198,10 +198,10 @@ import (
 }
 
 // Elastic Beanstalk Deployment
-#Deployment: {
+Deployment :: {
 
 	// AWS Config
-	config: aws.#Config
+	config: aws.Config
 
 	// Source code to deploy
 	source: bl.Directory

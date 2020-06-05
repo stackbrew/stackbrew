@@ -7,7 +7,7 @@ import (
 )
 
 // Install a Helm chart
-#Chart: {
+Chart :: {
 	// Helm deployment name
 	name: string
 
