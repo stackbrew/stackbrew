@@ -1,8 +1,9 @@
 package googlecloud
 
-import "blocklayer.dev/bl"
+import ( "blocklayer.dev/bl"
 
-// Google Cloud Config shared by all packages
+	// Google Cloud Config shared by all packages
+)
 
 #Config: {
 	region:     string

@@ -11,7 +11,6 @@ import (
 	body: string
 }
 
-
 // Possible references to this location:
 // github/comment.cue:43:11
 // github/comment.cue:70:11
@@ -118,7 +117,7 @@ import (
 	}
 
 	// Contains a list of comment ID matching the marker
-	commentId: [ for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)") { n.id } ]
+	commentId: [ for n in listComments.data.node.comments.nodes if strings.Contains(n.body, "\(marker)") {n.id}]
 
 	updateCommentQuery: json.Marshal({
 		query: #UpdateComment.query
