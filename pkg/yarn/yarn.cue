@@ -52,7 +52,7 @@ App :: {
 			// FIXME: set a cache key?
 			"/cache/yarn": bl.Cache
 			if writeEnvFile != "" {
-				"/app/src/\(writeEnvFile)": strings.Join([ "\(k)=\(v)" for k, v in appEnv ], "\n")
+				"/app/src/\(writeEnvFile)": strings.Join([ for k, v in appEnv { "\(k)=\(v)" } ], "\n")
 			}
 		}
 

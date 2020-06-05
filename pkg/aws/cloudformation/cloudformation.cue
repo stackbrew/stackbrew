@@ -33,7 +33,7 @@ Stack :: {
 			"/inputs/source":         source
 			"/inputs/stack_name":     stackName
 			if len(parameters) > 0 {
-				"/inputs/parameters": strings.Join([ "\(key)=\(val)" for key, val in parameters ], " ")
+				"/inputs/parameters": strings.Join([ for key, val in parameters { "\(key)=\(val)" } ], " ")
 			}
 		}
 

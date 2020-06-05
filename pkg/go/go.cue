@@ -27,17 +27,12 @@ App :: {
 	ldflags: *"-w -extldflags \"-static\"" | string
 
 	// Specify the targeted binary name
-	binaryName?: string
-
-	// FIXME: specifying a default value above breaks (non-concrete value binaryName)
-	if (binaryName & string) == _|_ {
-		binaryName: "app"
-	}
+	binaryName: string
 
 	// Binary file output of the Go build
 	binary: bl.Directory & {
 		source: build.output["/outputs/out"]
-		path: binaryName
+		path:   binaryName
 	}
 
 	build: bl.BashScript & {
@@ -57,7 +52,11 @@ App :: {
 
 		output: "/outputs/out": bl.Directory
 
-		os: package: "libc6-compat": true
+		os: package: {
+			"libc6-compat": true
+			"gcc":          true
+			"musl-dev":     true
+		}
 
 		code: #"""
             goVersion="$(cat /inputs/version)"

@@ -7,8 +7,8 @@ package github
 // For a higher-level package, see the top-level `github` package.
 
 User :: {
-    id: string
-    login: string
+	id:    string
+	login: string
 }
 
 UserFragment :: """
@@ -18,10 +18,9 @@ UserFragment :: """
     }
     """
 
-
 GetViewer :: {
-    Query & {
-        query: """
+	Query & {
+		query: """
         query {
             viewer {
                 ...UserParts
@@ -29,9 +28,8 @@ GetViewer :: {
         }
         \(UserFragment)
         """
-    }
+	}
 
-    data:  _
-    user: data.viewer
+	data: _
+	user: data.viewer
 }
-

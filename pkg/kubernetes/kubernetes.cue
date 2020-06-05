@@ -20,7 +20,7 @@ Kustomize :: {
 
 	kustomize: bl.BashScript & {
 		input: {
-			"/kube/source": source
+			"/kube/source":             source
 			"/kube/kustomization.yaml": kustomization
 		}
 

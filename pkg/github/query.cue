@@ -4,19 +4,19 @@ package github
 // Reference: https://developer.github.com/v4/
 
 import (
-    "blocklayer.dev/bl"
-    "stackbrew.io/graphql"
+	"blocklayer.dev/bl"
+	"stackbrew.io/graphql"
 )
 
 // GitHub v4 GraphQL Query
 Query :: {
-    token: bl.Secret
+	token: bl.Secret
 
-    graphql.Query & {
-        url: "https://api.github.com/graphql"
+	graphql.Query & {
+		url: "https://api.github.com/graphql"
 
-        request: {
-            "token": token
-        }
-    }
+		request: {
+			"token": token
+		}
+	}
 }
