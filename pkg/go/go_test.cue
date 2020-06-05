@@ -7,6 +7,7 @@ testGoBuild: {
 		source: bl.Directory & {
 			source: "context://testdata"
 		}
+		binaryName: "app"
 	}
 
 	test: bl.BashScript & {

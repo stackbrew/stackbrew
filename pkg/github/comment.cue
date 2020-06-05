@@ -29,6 +29,7 @@ import (
 	body:      string
 
 	data:    _
+
 	comment: #CommentFields
 	comment: data.addComment.commentEdge.node
 
@@ -63,6 +64,7 @@ import (
 	body:      string
 
 	data:    _
+
 	comment: #CommentFields
 	comment: data.updateIssueComment.issueComment
 
@@ -84,6 +86,7 @@ import (
 		}
 	}
 }
+
 
 #Comment: {
 	subjectId: string

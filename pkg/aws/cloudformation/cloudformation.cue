@@ -33,7 +33,7 @@ import (
 			"/inputs/source":         source
 			"/inputs/stack_name":     stackName
 			if len(parameters) > 0 {
-				"/inputs/parameters": strings.Join([ for key, val in parameters {"\(key)=\(val)"}], " ")
+				"/inputs/parameters": strings.Join([ for key, val in parameters { "\(key)=\(val)" } ], " ")
 			}
 		}
 

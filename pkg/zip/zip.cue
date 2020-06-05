@@ -9,9 +9,9 @@ import "blocklayer.dev/bl"
 	source: bl.Directory | string
 
 	// Archive file output
-	archive: {
-		from: run.output["/outputs/out"]
-		path: "file.zip"
+	archive: bl.Directory & {
+		source: run.output["/outputs/out"]
+		path:   "file.zip"
 	}
 
 	run: bl.BashScript & {

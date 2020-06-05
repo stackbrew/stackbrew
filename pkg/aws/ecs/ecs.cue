@@ -12,19 +12,23 @@ import (
 #Container: {
 	Name:  string
 	Image: string
-	Command: [string, ...]
+	Command: [...string]
 	Essential?: bool
-	PortMappings?: [{
+	Environment?: [...{
+		Name:  string
+		Value: string
+	}]
+	PortMappings?: [...{
 		ContainerPort?: uint
 		HostPort?:      uint
 		Protocol?:      string
-	}, ...]
+	}]
 	LogConfiguration?: {
 		LogDriver: *"awslogs" | string
 		Options: [string]: string
 	}
 	HealthCheck?: {
-		Command: [string, ...]
+		Command: [...string]
 		Timeout?:     uint
 		Interval?:    uint
 		Retries?:     uint
@@ -36,7 +40,7 @@ import (
 	cpu:         *256 | uint
 	memory:      *512 | uint
 	networkMode: *"bridge" | string
-	containers: [#Container, ...]
+	containers: [...#Container]
 	roleArn?: string
 
 	resources: ECSTaskDefinition: {
@@ -45,14 +49,17 @@ import (
 			Cpu:    strconv.FormatUint(cpu, 10)
 			Memory: strconv.FormatUint(memory, 10)
 			if (roleArn & string) != _|_ {
-				ExecutionRoleArn: roleArn
+				TaskRoleArn: roleArn
 			}
 			NetworkMode:          networkMode
 			ContainerDefinitions: containers
 		}
 	}
 }
+
 #Service: {
+	config: aws.Config
+
 	// ECS cluster name or ARN
 	cluster: string
 
@@ -74,6 +81,9 @@ import (
 	// ARN of the ELB listener
 	elbListenerArn: string
 
+	// ELB rule priority
+	elbRulePriority: uint | *100
+
 	// Hostname of the publicly accessible service
 	hostName: string
 
@@ -85,7 +95,7 @@ import (
 			Type: "AWS::ElasticLoadBalancingV2::ListenerRule"
 			Properties: {
 				ListenerArn: elbListenerArn
-				Priority:    100
+				Priority:    elbRulePriority
 				Conditions: [{
 					Field: "host-header"
 					Values: [hostName]
