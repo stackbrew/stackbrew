@@ -9,8 +9,8 @@ Archive :: {
 	source: bl.Directory | string
 
 	// Archive file output
-	archive: {
-		from: run.output["/outputs/out"]
+	archive: bl.Directory & {
+		source: run.output["/outputs/out"]
 		path: "file.zip"
 	}
 
