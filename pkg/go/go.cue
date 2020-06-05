@@ -29,11 +29,6 @@ App :: {
 	// Specify the targeted binary name
 	binaryName: string
 
-	// FIXME: specifying a default value above breaks (non-concrete value binaryName)
-	if (binaryName & string) == _|_ {
-		binaryName: "app"
-	}
-
 	// Binary file output of the Go build
 	binary: bl.Directory & {
 		source: build.output["/outputs/out"]

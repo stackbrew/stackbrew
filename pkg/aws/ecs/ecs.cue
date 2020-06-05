@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 
 	"stackbrew.io/aws"
-	"stackbrew.io/aws/elb"
 	"stackbrew.io/aws/cloudformation"
 )
 
