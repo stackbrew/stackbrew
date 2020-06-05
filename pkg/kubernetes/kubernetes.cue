@@ -5,7 +5,7 @@ import (
 )
 
 // Exposes `kubectl kustomize`
-#Kustomize: {
+Kustomize :: {
 	// Kubernetes config to take as input
 	source: string | bl.Directory
 
@@ -45,7 +45,7 @@ import (
 }
 
 // Apply a Kubernetes configuration
-#Apply: {
+Apply :: {
 	// Kubernetes config to deploy
 	source: string | bl.Directory
 

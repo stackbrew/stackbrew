@@ -2,7 +2,7 @@ package github
 
 // GitHub Event
 // https://developer.github.com/v3/activity/events
-#Event: {
+Event :: {
 	name: string
 
 	sender: {...}
@@ -12,13 +12,13 @@ package github
 	// FIXME: handle other events
 	{
 		name: "pull_request"
-		#PullRequestEvent
+		PullRequestEvent
 	}
 }
 
 // PullRequestEvent
 // https://developer.github.com/v3/activity/events/types/#pullrequestevent
-#PullRequestEvent: {
+PullRequestEvent :: {
 	action:
 		"assigned" |
 		"unassigned" |

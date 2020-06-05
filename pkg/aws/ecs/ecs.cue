@@ -9,7 +9,7 @@ import (
 	"blocklayer.dev/aws/cloudformation"
 )
 
-#Container: {
+Container :: {
 	Name:  string
 	Image: string
 	Command: [...string]
@@ -36,11 +36,11 @@ import (
 	}
 }
 
-#Task: {
+Task :: {
 	cpu:         *256 | uint
 	memory:      *512 | uint
 	networkMode: *"bridge" | string
-	containers: [...#Container]
+	containers: [...Container]
 	roleArn?: string
 
 	resources: ECSTaskDefinition: {
@@ -57,7 +57,7 @@ import (
 	}
 }
 
-#Service: {
+Service :: {
 	config: aws.Config
 
 	// ECS cluster name or ARN
@@ -140,8 +140,8 @@ import (
 }
 
 // SimpleECSApp is a simplified interface for ECS
-#SimpleECSApp: {
-	inputConfig=config:               aws.#Config
+SimpleECSApp :: {
+	inputConfig=config:               aws.Config
 	hostname:                         string
 	containerImage:                   string
 	inputContainerPort=containerPort: *80 | uint
@@ -154,8 +154,8 @@ import (
 	out:       cfn.stackOutput
 
 	resources: {
-		(#Task & {
-			containers: [#Container & {
+		(Task & {
+			containers: [Container & {
 				Name:      subDomain
 				Image:     containerImage
 				Essential: true
@@ -166,7 +166,7 @@ import (
 			}]
 		}).resources
 
-		(#Service & {
+		(Service & {
 			cluster:        infra.cluster
 			containerPort:  inputContainerPort
 			containerName:  subDomain
@@ -179,7 +179,7 @@ import (
 		}).resources
 	}
 
-	cfn: cloudformation.#Stack & {
+	cfn: cloudformation.Stack & {
 		config: inputConfig
 		source: json.Marshal({
 			AWSTemplateFormatVersion: "2010-09-09"

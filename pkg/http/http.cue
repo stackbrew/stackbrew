@@ -6,11 +6,12 @@ import (
 	"strconv"
 )
 
-Get:    #Do & {method: "GET"}
-Post:   #Do & {method: "POST"}
-Put:    #Do & {method: "PUT"}
-Delete: #Do & {method: "DELETE"}
-#Do: {
+Get:    Do & {method: "GET"}
+Post:   Do & {method: "POST"}
+Put:    Do & {method: "PUT"}
+Delete: Do & {method: "DELETE"}
+
+Do :: {
 	url:    string
 	method: "GET" | "POST" | "PUT" | "DELETE" | "PATH" | "HEAD"
 
