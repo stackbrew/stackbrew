@@ -90,6 +90,11 @@ Service :: {
 	// Name of the service
 	serviceName: string
 
+	deploymentConfig: {
+		MaximumPercent:        *100 | uint
+		MinimumHealthyPercent: *50 | uint
+	}
+
 	resources: {
 		ECSListenerRule: {
 			Type: "AWS::ElasticLoadBalancingV2::ListenerRule"
@@ -129,10 +134,7 @@ Service :: {
 				}]
 				ServiceName: serviceName
 				TaskDefinition: Ref: "ECSTaskDefinition"
-				DeploymentConfiguration: {
-					MaximumPercent:        100
-					MinimumHealthyPercent: 50
-				}
+				DeploymentConfiguration: deploymentConfig
 			}
 			DependsOn: "ECSListenerRule"
 		}
