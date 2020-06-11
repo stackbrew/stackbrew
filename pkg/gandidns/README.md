@@ -67,11 +67,11 @@ Zone:: {
   // In the "merge" mode, only the records that have the same "type" and "name" will be replaced,
   // and the others will be kept.
   // Note that NS records are ALWAYS left untouched and you can't specify them right now
-  mode: =~ "^(replace|merge)$" | * "replace"
+  mode: *"replace" | "merge"
 
   provider: {
     settings: {
-      // Your Gandi API key - see Gandi documentation
+      // Your Gandi API key - see Gandi documentation: https://docs.gandi.net/en/domain_names/advanced_users/api.html
       apikey: string
       // Desired log level for the bot
       log_level: =~ "^(debug|info|warning|error)$" | *"info"

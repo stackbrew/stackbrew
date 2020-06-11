@@ -18,7 +18,7 @@ Zone:: dns.AbstractZone & {
   domain: string
 
   // whether to replace the zone entirely, or merge with existing records
-  mode: =~ "^(replace|merge)$" | * "replace"
+  mode: *"replace" | "merge"
 
   provider: {
     // ApiKey for gandi service, and log level for our internal library

@@ -93,7 +93,7 @@ AbstractZone:: {
 
   domain: string
 
-  mode: =~ "^(replace|merge)$" | * "replace"
+  mode: *"replace" | "merge"
 
   provider: trixcue
 
