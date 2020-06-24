@@ -157,3 +157,52 @@ CreateUser :: {
             """#
 	}
 }
+
+Instance :: {
+	// AWS Config
+	config: aws.Config
+
+	// ARN of the database instance
+	dbArn: string
+
+	hostname: output["/outputs/hostname"]
+	port: output["/outputs/port"]
+
+	output: _
+
+	bl.BashScript & {
+		input: {
+			"/inputs/aws/access_key": config.accessKey
+			"/inputs/aws/secret_key": config.secretKey
+			"/inputs/db_arn":         dbArn
+		}
+
+		output: {
+			"/outputs/hostname": string
+			"/outputs/port": string
+		}
+
+		os: {
+			package: {
+				python:    true
+				coreutils: true
+			}
+
+			extraCommand: [
+				"apk add --no-cache py-pip && pip install awscli && apk del py-pip",
+			]
+		}
+
+		environment: AWS_DEFAULT_REGION: config.region
+
+		code: #"""
+            export AWS_ACCESS_KEY_ID="$(cat /inputs/aws/access_key)"
+            export AWS_SECRET_ACCESS_KEY="$(cat /inputs/aws/secret_key)"
+
+            db_arn="$(cat /inputs/db_arn)"
+            data=$(aws rds describe-db-clusters --filters "Name=db-cluster-id,Values=$db_arn" )
+            echo "$data" | jq -j '.DBClusters[].Endpoint' > /outputs/hostname
+            echo "$data" | jq -j '.DBClusters[].Port' > /outputs/port
+            """#
+	}
+}
