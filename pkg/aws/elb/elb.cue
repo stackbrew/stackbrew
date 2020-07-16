@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"blocklayer.dev/bl"
-	"stackbrew.io/aws"
+	"blocklayer.dev/aws"
 )
 
 // Returns a non-taken rule priority
