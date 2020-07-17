@@ -7,21 +7,21 @@ import (
 )
 
 // Elastic Beanstalk Application
-Application :: {
+#Application: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Beanstalk application name
 	applicationName: string
 
 	out: run.output["/outputs/out"]
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             bl.#Cache
 		}
 
 		output: "/outputs/out": string
@@ -60,13 +60,13 @@ Application :: {
 }
 
 // Elastic Beanstalk Environment
-Environment :: {
+#Environment: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Source code to deploy
-	source: bl.Directory
+	source: bl.#Directory
 
 	// Beanstalk environment name
 	environmentName: string
@@ -92,13 +92,13 @@ Environment :: {
 	out:   run.output["/outputs/out"]
 	cname: strings.TrimRight(run.output["/outputs/cname"], "\n")
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             bl.#Cache
 			"/inputs/source":         source
 
 			// Maps createOptions optionnally
@@ -198,13 +198,13 @@ Environment :: {
 }
 
 // Elastic Beanstalk Deployment
-Deployment :: {
+#Deployment: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Source code to deploy
-	source: bl.Directory
+	source: bl.#Directory
 
 	// Beanstalk environment name
 	environmentName: string
@@ -214,13 +214,13 @@ Deployment :: {
 
 	cname: strings.TrimRight(run.output["/outputs/cname"], "\n")
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             bl.#Cache
 			"/inputs/source":         source
 		}
 

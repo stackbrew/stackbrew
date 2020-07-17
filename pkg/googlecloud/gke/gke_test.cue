@@ -7,13 +7,13 @@ import (
 )
 
 TestConfig: {
-	gcpConfig:     googlecloud.Config
-    gkeClusterName: string
+	gcpConfig:      googlecloud.#Config
+	gkeClusterName: string
 }
 
 TestGKE: {
 	// Generate some random
-	genRandom: bl.BashScript & {
+	genRandom: bl.#BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand
@@ -23,17 +23,17 @@ TestGKE: {
 
 	random: genRandom.output["/rand"]
 
-    // Authenticate against GKE
-    authenticate: KubeConfig & {
-        config: TestConfig.gcpConfig
-        cluster: TestConfig.gkeClusterName
-    }
+	// Authenticate against GKE
+	authenticate: #KubeConfig & {
+		config:  TestConfig.gcpConfig
+		cluster: TestConfig.gkeClusterName
+	}
 
-    // Deploy a dummy config
-    deploy: kubernetes.Apply & {
-        kubeconfig: authenticate.kubeconfig
-        namespace: "stackbrew-test"
-        source: #"""
+	// Deploy a dummy config
+	deploy: kubernetes.#Apply & {
+		kubeconfig: authenticate.kubeconfig
+		namespace:  "stackbrew-test"
+		source:     #"""
             apiVersion: v1
             kind: Pod
             metadata:
@@ -44,5 +44,5 @@ TestGKE: {
                     - name: test
                       image: hello-world
             """#
-    }
+	}
 }

@@ -4,10 +4,10 @@ import (
 	"blocklayer.dev/bl"
 )
 
-Container :: {
+#Container: {
 	buildScript: string
 	runScript:   string
 	environment: [string]: string
-	source: bl.Directory
-	image:  bl.Directory
+	source: bl.#Directory
+	image:  bl.#Directory
 }

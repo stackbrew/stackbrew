@@ -2,19 +2,19 @@ package kubernetes
 
 import (
 	"blocklayer.dev/bl"
-    "encoding/yaml"
+	"encoding/yaml"
 	"blocklayer.dev/aws"
 	"blocklayer.dev/aws/eks"
 )
 
 TestConfig: {
-	awsConfig:     aws.Config
-    eksClusterName: string
+	awsConfig:      aws.#Config
+	eksClusterName: string
 }
 
 TestEKS: {
 	// Generate some random
-	genRandom: bl.BashScript & {
+	genRandom: bl.#BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand
@@ -24,17 +24,17 @@ TestEKS: {
 
 	random: genRandom.output["/rand"]
 
-    // Authenticate against EKS
-    authenticate: eks.KubeConfig & {
-        config: TestConfig.awsConfig
-        cluster: TestConfig.eksClusterName
-    }
+	// Authenticate against EKS
+	authenticate: eks.#KubeConfig & {
+		config:  TestConfig.awsConfig
+		cluster: TestConfig.eksClusterName
+	}
 
-    // Deploy a dummy inline config
-    deployString: Apply & {
-        kubeconfig: authenticate.kubeconfig
-        namespace: "stackbrew-test"
-        source: #"""
+	// Deploy a dummy inline config
+	deployString: #Apply & {
+		kubeconfig: authenticate.kubeconfig
+		namespace:  "stackbrew-test"
+		source:     #"""
             apiVersion: v1
             kind: Pod
             metadata:
@@ -45,35 +45,35 @@ TestEKS: {
                     - name: test
                       image: hello-world
             """#
-    }
+	}
 
-    deployDirectory: Apply & {
-        kubeconfig: authenticate.kubeconfig
-        namespace: "stackbrew-test"
-        source: bl.Directory & {
-            source: "context://testdata"
-        }
-    }
+	deployDirectory: #Apply & {
+		kubeconfig: authenticate.kubeconfig
+		namespace:  "stackbrew-test"
+		source:     bl.#Directory & {
+			source: "context://testdata"
+		}
+	}
 }
 
 TestKustomize: {
-    kubeConfig: Kustomize & {
-        source: bl.Directory & {
-            source: "context://testdata"
-        }
-        kustomization: yaml.Marshal({
-            resources: ["test.yaml"]
-            images: [{
-                name: "hello-world"
-                newTag: "linux"
-            }]
-        })
-    }
+	kubeConfig: #Kustomize & {
+		source: bl.#Directory & {
+			source: "context://testdata"
+		}
+		kustomization: yaml.Marshal({
+			resources: ["test.yaml"]
+			images: [{
+				name:   "hello-world"
+				newTag: "linux"
+			}]
+		})
+	}
 
-    changeImageName: bl.BashScript & {
+	changeImageName: bl.#BashScript & {
 		runPolicy: "always"
 
-        input: "/kube/config.yaml": kubeConfig.out
+		input: "/kube/config.yaml": kubeConfig.out
 
 		code: """
         grep hello-world:linux /kube/config.yaml

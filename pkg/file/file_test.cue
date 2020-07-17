@@ -5,14 +5,14 @@ import (
 )
 
 TestRead: {
-	read: Read & {
-		source: bl.Directory & {
+	read: #Read & {
+		source: bl.#Directory & {
 			source: "context://testdata"
 		}
 		filename: "/file"
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/test": read.contents
 		code: """
         test "$(cat /test)" = "testfile"
@@ -21,8 +21,8 @@ TestRead: {
 }
 
 TestCreate: {
-	create: Create & {
-		source: bl.Directory & {
+	create: #Create & {
+		source: bl.#Directory & {
 			source: "context://testdata"
 		}
 		filename:    "/new"
@@ -30,7 +30,7 @@ TestCreate: {
 		permissions: 0o755
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/test": create.result
 		code: """
         test -x "/test/new"
@@ -40,12 +40,12 @@ TestCreate: {
 }
 
 TestCreateNoSource: {
-	create: Create & {
+	create: #Create & {
 		filename: "/new"
 		contents: "new file"
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/test": create.result
 		code: """
         test "$(cat /test/new)" = "new file"
@@ -54,16 +54,16 @@ TestCreateNoSource: {
 }
 
 TestAppend: {
-	append: Append & {
-		source: bl.Directory & {
+	append: #Append & {
+		source: bl.#Directory & {
 			source: "context://testdata"
 		}
 		filename: "/file"
 		contents: "new content"
 	}
 
-	create: Append & {
-		source: bl.Directory & {
+	create: #Append & {
+		source: bl.#Directory & {
 			source: "context://testdata"
 		}
 		filename:    "/new"
@@ -71,7 +71,7 @@ TestAppend: {
 		permissions: 0o755
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/append": append.result
 		input: "/create": create.result
 		code: """
@@ -84,14 +84,14 @@ TestAppend: {
 }
 
 TestGlob: {
-	glob: Glob & {
-		source: bl.Directory & {
+	glob: #Glob & {
+		source: bl.#Directory & {
 			source: "context://testdata"
 		}
 		glob: "f*"
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/result.json": glob.files[0]
 		code: """
         test "$(cat /result.json)" = "file"

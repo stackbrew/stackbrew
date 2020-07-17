@@ -7,22 +7,22 @@ import (
 )
 
 // A Netlify account
-Account :: {
+#Account: {
 	// Use this Netlify account name
 	// (also referred to as "team" in the Netlify docs)
 	name: string | *""
 
 	// Netlify authentication token
-	token: bl.Secret
+	token: bl.#Secret
 }
 
 // A Netlify site
-Site :: {
+#Site: {
 	// Netlify account this site is attached to
-	account: Account
+	account: #Account
 
 	// Contents of the application to deploy
-	contents: bl.Directory
+	contents: bl.#Directory
 
 	// Deploy to this Netlify site
 	name: string
@@ -36,7 +36,7 @@ Site :: {
 	// Deployment url
 	url: strings.TrimRight(deploy.output["/info/url"], "\n")
 
-	deploy: bl.BashScript & {
+	deploy: bl.#BashScript & {
 		runPolicy: "always"
 
 		workdir: "/site/contents"

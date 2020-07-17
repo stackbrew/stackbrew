@@ -3,21 +3,21 @@ package zip
 import "blocklayer.dev/bl"
 
 // Zip archive
-Archive :: {
+#Archive: {
 
 	// Source Directory, File or String to Zip from
-	source: bl.Directory | string
+	source: bl.#Directory | string
 
 	// Archive file output
-	archive: bl.Directory & {
+	archive: bl.#Directory & {
 		source: run.output["/outputs/out"]
 		path:   "file.zip"
 	}
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		input: "/inputs/source": source
 
-		output: "/outputs/out": bl.Directory
+		output: "/outputs/out": bl.#Directory
 
 		os: package: zip: true
 

@@ -8,10 +8,10 @@ import (
 )
 
 // AWS CloudFormation Stack
-Stack :: {
+#Stack: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Source is the Cloudformation template, either a Cue struct or a JSON/YAML string
 	source: string
@@ -25,15 +25,15 @@ Stack :: {
 	// Output of the stack apply
 	stackOutput: run.output["/outputs/stack_output"]
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             bl.#Cache
 			"/inputs/source":         source
 			"/inputs/stack_name":     stackName
 			if len(parameters) > 0 {
-				"/inputs/parameters": strings.Join([ for key, val in parameters { "\(key)=\(val)" } ], " ")
+				"/inputs/parameters": strings.Join([ for key, val in parameters {"\(key)=\(val)"}], " ")
 			}
 		}
 

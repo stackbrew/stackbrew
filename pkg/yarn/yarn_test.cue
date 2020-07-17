@@ -2,14 +2,14 @@ package yarn
 
 import "blocklayer.dev/bl"
 
-TestYarn : {
-	run: App & {
-		source: bl.Directory & {
+TestYarn: {
+	run: #App & {
+		source: bl.#Directory & {
 			source: "context://testdata/src"
 		}
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/build": run.build
 		code: """
         test "$(cat /build/test)" = "output"
@@ -17,9 +17,9 @@ TestYarn : {
 	}
 }
 
-TestYarnEnvFile : {
-	run: App & {
-		source: bl.Directory & {
+TestYarnEnvFile: {
+	run: #App & {
+		source: bl.#Directory & {
 			source: "context://testdata/src"
 		}
 		loadEnv: true
@@ -27,7 +27,7 @@ TestYarnEnvFile : {
 		writeEnvFile: ".env"
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/build": run.build
 		code: """
         grep "FOO=BAR" /build/.env

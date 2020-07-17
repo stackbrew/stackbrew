@@ -5,9 +5,9 @@ import (
 	"blocklayer.dev/aws"
 )
 
-CreateDB :: {
+#CreateDB: {
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// DB name
 	name: string
@@ -22,7 +22,7 @@ CreateDB :: {
 
 	output: _
 
-	bl.BashScript & {
+	bl.#BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey
@@ -70,10 +70,9 @@ CreateDB :: {
             """#
 	}
 }
-
-CreateUser :: {
+#CreateUser: {
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Username
 	username: string
@@ -91,7 +90,7 @@ CreateUser :: {
 
 	output: _
 
-	bl.BashScript & {
+	bl.#BashScript & {
 		input: {
 			"/inputs/aws/access_key": config.accessKey
 			"/inputs/aws/secret_key": config.secretKey

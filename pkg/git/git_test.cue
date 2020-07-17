@@ -3,12 +3,12 @@ package git
 import "blocklayer.dev/bl"
 
 testClone: {
-	run: Repository & {
+	run: #Repository & {
 		url: "https://github.com/blocklayerhq/actions"
 		ref: "2dd1ba045e7dc4e382ae89529b0e9e2107a076bb"
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: {
 			"/inputs/out":          run.out
 			"/inputs/commit":       run.commit
@@ -25,13 +25,13 @@ testClone: {
 }
 
 testCloneWithGitDir: {
-	run: Repository & {
+	run: #Repository & {
 		url:        "https://github.com/blocklayerhq/actions"
 		ref:        "2dd1ba045e7dc4e382ae89529b0e9e2107a076bb"
 		keepGitDir: true
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: "/inputs/out": run.out
 
 		code: #"""
@@ -41,17 +41,17 @@ testCloneWithGitDir: {
 }
 
 testPathCommit: {
-	repos: Repository & {
+	repos: #Repository & {
 		url:        "https://github.com/blocklayerhq/actions"
 		ref:        "2dd1ba045e7dc4e382ae89529b0e9e2107a076bb"
 		keepGitDir: true
 	}
 
-	run: PathCommit & {
+	run: #PathCommit & {
 		from: repos.out
 	}
 
-	test: bl.BashScript & {
+	test: bl.#BashScript & {
 		input: {
 			"/inputs/commit":       run.commit
 			"/inputs/short-commit": run.shortCommit

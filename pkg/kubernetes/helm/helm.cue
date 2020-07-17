@@ -7,12 +7,12 @@ import (
 )
 
 // Install a Helm chart
-Chart :: {
+#Chart: {
 	// Helm deployment name
 	name: string
 
 	// Helm chart to install
-	chart: string | bl.Directory
+	chart: string | bl.#Directory
 
 	// Helm chart repository (defaults to stable)
 	repository: *"https://kubernetes-charts.storage.googleapis.com/" | string
@@ -40,12 +40,12 @@ Chart :: {
 	atomic: *true | bool
 
 	// Kube config file
-	kubeconfig: bl.Secret
+	kubeconfig: bl.#Secret
 
 	// Helm version
 	version: string | *"3.1.2"
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		runPolicy: "always"
 
 		os: {

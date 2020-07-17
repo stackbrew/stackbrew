@@ -5,24 +5,24 @@ import (
 )
 
 // Credentials retriever for Docker Hub
-Credentials :: {
+#Credentials: {
 
 	// Docker Hub Config
 	config: {
 		username: string
-		password: bl.Secret
+		password: bl.#Secret
 	}
 
 	// Target is the Docker Hub image
 	target: string
 
 	// Registry Credentials
-	credentials: bl.RegistryCredentials & {
+	credentials: bl.#RegistryCredentials & {
 		username: config.username
 		secret:   config.password
 	}
 
 	// Authentication for Docker Hub
-	auth: bl.RegistryAuth
+	auth: bl.#RegistryAuth
 	auth: "https://index.docker.io/v1/": credentials
 }

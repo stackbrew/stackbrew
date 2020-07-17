@@ -7,25 +7,26 @@ import (
 )
 
 // KubeConfig config outputs a valid kube-auth-config for kubectl client
-KubeConfig :: {
+
+#KubeConfig: {
 	// GCP Config
-	config: googlecloud.Config
+	config: googlecloud.#Config
 
 	// GKE cluster name
 	cluster: string
 
 	// kubeconfig is the generated kube configuration file
-	kubeconfig: bl.Secret & {
+	kubeconfig: bl.#Secret & {
 		// FIXME: we should be able to output a bl.Secret directly
 		value: base64.Encode(null, run.output["/outputs/kubeconfig"])
 	}
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {
 			"/inputs/service_key": config.serviceKey
-			"/cache/googlecloud":  bl.Cache
+			"/cache/googlecloud":  bl.#Cache
 		}
 
 		output: "/outputs/kubeconfig": string

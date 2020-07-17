@@ -6,7 +6,7 @@ import (
 )
 
 // A SSH endpoint
-Endpoint :: {
+#Endpoint: {
 	// Endpoint hostname
 	host: string
 
@@ -17,17 +17,17 @@ Endpoint :: {
 	user: string
 
 	// Endpoint private key
-	key: bl.Secret
+	key: bl.#Secret
 
 	// Run a command remotely on this endpoint
-	RunCommand :: {
+	#RunCommand: {
 		cmd: [...string]
 		stdout: output["/output/stdout"]
 		stderr: output["/output/stderr"]
 
 		output: _
 
-		bl.BashScript & {
+		bl.#BashScript & {
 			input: {
 				"/key": key
 			}

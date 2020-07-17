@@ -8,13 +8,12 @@ import (
 )
 
 TestConfig: {
-	awsConfig:     aws.Config
-    eksClusterName: string
+	awsConfig:      aws.#Config
+	eksClusterName: string
 }
 
-
 TestRender: {
-    kubeCfgString : #"""
+	kubeCfgString: #"""
         apiVersion: v1
         kind: Pod
         metadata:
@@ -26,18 +25,18 @@ TestRender: {
                   image: hello-world
         """#
 
-    kubeCfgDirectory: file.Create & {
-        filename: "/test.yaml.erb"
-        contents: kubeCfgString
-    }
+	kubeCfgDirectory: file.#Create & {
+		filename: "/test.yaml.erb"
+		contents: kubeCfgString
+	}
 
-    renderString: Render & {
-        source: kubeCfgString
-    }
+	renderString: #Render & {
+		source: kubeCfgString
+	}
 
-    testString: bl.BashScript & {
-        input: "/config": renderString.result
-        code: #"""
+	testString: bl.#BashScript & {
+		input: "/config": renderString.result
+		code: #"""
         grep -q kubernetes-test- /config
 
         # Make sure the template was rendered
@@ -46,16 +45,16 @@ TestRender: {
         # Make sure that deployment_id is not empty
         test -z "$(grep "test--end" /config)"
         """#
-    }
+	}
 
-    // Render a simple config
-    renderDirectory: Render & {
-        source: kubeCfgDirectory.contents
-    }
+	// Render a simple config
+	renderDirectory: #Render & {
+		source: kubeCfgDirectory.contents
+	}
 
-    testDirectory: bl.BashScript & {
-        input: "/config": renderString.result
-        code: #"""
+	testDirectory: bl.#BashScript & {
+		input: "/config": renderString.result
+		code: #"""
         grep -q kubernetes-test- /config
 
         # Make sure the template was rendered
@@ -64,12 +63,12 @@ TestRender: {
         # Make sure that deployment_id is not empty
         test -z "$(grep "test--end" /config)"
         """#
-    }
+	}
 }
 
 TestDeploy: {
 	// Generate some random
-	genRandom1: bl.BashScript & {
+	genRandom1: bl.#BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand
@@ -77,8 +76,7 @@ TestDeploy: {
 		output: "/rand": string
 	}
 
-
-	genRandom2: bl.BashScript & {
+	genRandom2: bl.#BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand
@@ -89,7 +87,7 @@ TestDeploy: {
 	random1: genRandom1.output["/rand"]
 	random2: genRandom2.output["/rand"]
 
-    kubeCfgString : #"""
+	kubeCfgString: #"""
         apiVersion: v1
         kind: Pod
         metadata:
@@ -101,9 +99,9 @@ TestDeploy: {
                   image: hello-world
         """#
 
-    kubeCfgDirectory: file.Create & {
-        filename: "/test.yaml"
-        contents : #"""
+	kubeCfgDirectory: file.#Create & {
+		filename: "/test.yaml"
+		contents: #"""
             apiVersion: v1
             kind: Pod
             metadata:
@@ -114,24 +112,24 @@ TestDeploy: {
                     - name: test
                       image: hello-world
             """#
-    }
+	}
 
-    authenticate: eks.KubeConfig & {
-        config: TestConfig.awsConfig
-        cluster: TestConfig.eksClusterName
-    }
+	authenticate: eks.#KubeConfig & {
+		config:  TestConfig.awsConfig
+		cluster: TestConfig.eksClusterName
+	}
 
-    deployString: Deploy & {
-        kubeconfig: authenticate.kubeconfig
-        namespace: "stackbrew-test"
-        source: kubeCfgString
-        prune: false
-    }
+	deployString: #Deploy & {
+		kubeconfig: authenticate.kubeconfig
+		namespace:  "stackbrew-test"
+		source:     kubeCfgString
+		prune:      false
+	}
 
-    deployDirectory: Deploy & {
-        kubeconfig: authenticate.kubeconfig
-        namespace: "stackbrew-test"
-        source: kubeCfgDirectory.result
-        prune: false
-    }
+	deployDirectory: #Deploy & {
+		kubeconfig: authenticate.kubeconfig
+		namespace:  "stackbrew-test"
+		source:     kubeCfgDirectory.result
+		prune:      false
+	}
 }

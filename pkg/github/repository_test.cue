@@ -1,32 +1,32 @@
 package github
 
 import (
-    "blocklayer.dev/bl"
+	"blocklayer.dev/bl"
 )
 
-TestConfig: githubToken: bl.Secret
+TestConfig: githubToken: bl.#Secret
 
 TestRepository: {
-    repository: Repository & {
-        name:  "gh-test"
-        owner: "stackbrew-test"
-        token: TestConfig.githubToken
-    }
+	repository: #Repository & {
+		name:  "gh-test"
+		owner: "stackbrew-test"
+		token: TestConfig.githubToken
+	}
 
-    pr: repository.GetPullRequest & {
-        number: 2
-    }
+	pr: repository.#GetPullRequest & {
+		number: 2
+	}
 
-    checkout: CheckoutPullRequest & {
-        pullRequest: pr.pullRequest
-        token: TestConfig.githubToken
-    }
+	checkout: #CheckoutPullRequest & {
+		pullRequest: pr.pullRequest
+		token:       TestConfig.githubToken
+	}
 
-    test: bl.BashScript & {
-        runPolicy: "always"
-        input: "/checkout": checkout.out
-        code: """
+	test: bl.#BashScript & {
+		runPolicy: "always"
+		input: "/checkout": checkout.out
+		code: """
         grep -q "FROM PR2" /checkout/README.md
         """
-    }
+	}
 }

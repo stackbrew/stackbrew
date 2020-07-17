@@ -5,9 +5,9 @@ import (
 )
 
 // Render a Krane template
-Render :: {
+#Render: {
 	// Kubernetes config to render
-	source: string | bl.Directory
+	source: string | bl.#Directory
 
 	// Krane version
 	version: string | *"1.1.2"
@@ -15,7 +15,7 @@ Render :: {
 	// Rendered config
 	result: run.output["/krane/result"]
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		runPolicy: "always"
 
 		os: {
@@ -46,15 +46,15 @@ Render :: {
 }
 
 // Deploy a Kubernetes configuration using Krane
-Deploy :: {
+#Deploy: {
 	// Kubernetes config to deploy
-	source: string | bl.Directory
+	source: string | bl.#Directory
 
 	// Kubernetes Namespace to deploy to
 	namespace: string
 
 	// Kube config file
-	kubeconfig: bl.Secret
+	kubeconfig: bl.#Secret
 
 	// Krane version
 	version: string | *"1.1.2"
@@ -62,7 +62,7 @@ Deploy :: {
 	// Prune resources that are no longer in your Kubernetes template set
 	prune: bool | *true
 
-	deploy: bl.BashScript & {
+	deploy: bl.#BashScript & {
 		runPolicy: "always"
 
 		os: {

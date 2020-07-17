@@ -5,9 +5,9 @@ import (
 )
 
 // Exposes `kubectl kustomize`
-Kustomize :: {
+#Kustomize: {
 	// Kubernetes config to take as input
-	source: string | bl.Directory
+	source: string | bl.#Directory
 
 	// Optionnal kustomization.yaml
 	kustomization: *"" | string
@@ -18,7 +18,7 @@ Kustomize :: {
 	// Output of kustomize
 	out: kustomize.output["/kube/out"]
 
-	kustomize: bl.BashScript & {
+	kustomize: bl.#BashScript & {
 		input: {
 			"/kube/source":             source
 			"/kube/kustomization.yaml": kustomization
@@ -45,9 +45,10 @@ Kustomize :: {
 }
 
 // Apply a Kubernetes configuration
-Apply :: {
+
+#Apply: {
 	// Kubernetes config to deploy
-	source: string | bl.Directory
+	source: string | bl.#Directory
 
 	// Kubernetes Namespace to deploy to
 	namespace: string
@@ -56,9 +57,9 @@ Apply :: {
 	version: *"v1.14.7" | string
 
 	// Kube config file
-	kubeconfig: bl.Secret
+	kubeconfig: bl.#Secret
 
-	deploy: bl.BashScript & {
+	deploy: bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {

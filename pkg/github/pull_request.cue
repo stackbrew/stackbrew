@@ -5,7 +5,7 @@ import (
 	"blocklayer.dev/git"
 )
 
-PullRequest :: {
+#PullRequest: {
 	id:     string
 	state:  string
 	number: int
@@ -22,7 +22,7 @@ PullRequest :: {
 }
 
 // INTERNAL: GraphQL fragment shared across queries related to PullRequest
-PullRequestParts :: """
+#PullRequestParts: """
     fragment PullRequestParts on PullRequest {
         id
         state
@@ -41,8 +41,7 @@ PullRequestParts :: """
         }
     }
     """
-
-GetPullRequest :: {
+#GetPullRequest: {
 	number: int
 
 	repo: {
@@ -50,7 +49,7 @@ GetPullRequest :: {
 		name:  string
 	}
 
-	Query & {
+	#Query & {
 		query:
 			"""
             query($owner: String!, $name: String!, $number: Int!) {
@@ -60,7 +59,7 @@ GetPullRequest :: {
                     }
                 }
             }
-            \(PullRequestParts)
+            \(#PullRequestParts)
             """
 		variable: {
 			owner:    repo.owner
@@ -70,26 +69,25 @@ GetPullRequest :: {
 	}
 
 	data:        _
-	pullRequest: PullRequest
+	pullRequest: #PullRequest
 	pullRequest: data.repository.pullRequest
 }
 
 // FIXME: this should be PullRequest::Checkout
-CheckoutPullRequest :: {
-	pullRequest: PullRequest
+#CheckoutPullRequest: {
+	pullRequest: #PullRequest
 
 	// Github API token
-	token: bl.Secret
+	token: bl.#Secret
 
-	git.Repository & {
+	git.#Repository & {
 		url:          pullRequest.headRepository.url
 		ref:          pullRequest.headRef.target.oid
 		username:     "apikey"
 		httpPassword: token
 	}
 }
-
-ListPullRequests :: {
+#ListPullRequests: {
 	repo: {
 		owner: string
 		name:  string
@@ -97,7 +95,7 @@ ListPullRequests :: {
 	pageSize: int | *25
 	states:   [string] | *[]
 
-	Query & {
+	#Query & {
 		query:
 			"""
             query($owner: String!, $name: String!, $last: Int, $states: [PullRequestState!]) {
@@ -109,7 +107,7 @@ ListPullRequests :: {
                     }
                 }
             }
-            \(PullRequestParts)
+            \(#PullRequestParts)
             """
 		variable: {
 			owner:    repo.owner
@@ -120,6 +118,6 @@ ListPullRequests :: {
 	}
 
 	data: _
-	pullRequests: [...PullRequest]
+	pullRequests: [...#PullRequest]
 	pullRequests: data.repository.pullRequests.nodes
 }

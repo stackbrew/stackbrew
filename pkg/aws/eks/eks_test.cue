@@ -7,13 +7,13 @@ import (
 )
 
 TestConfig: {
-	awsConfig:     aws.Config
-    eksClusterName: string
+	awsConfig:      aws.#Config
+	eksClusterName: string
 }
 
 TestEKS: {
 	// Generate some random
-	genRandom: bl.BashScript & {
+	genRandom: bl.#BashScript & {
 		runPolicy: "always"
 		code: """
 		echo -n $RANDOM > /rand
@@ -23,17 +23,17 @@ TestEKS: {
 
 	random: genRandom.output["/rand"]
 
-    // Authenticate against EKS
-    authenticate: KubeConfig & {
-        config: TestConfig.awsConfig
-        cluster: TestConfig.eksClusterName
-    }
+	// Authenticate against EKS
+	authenticate: #KubeConfig & {
+		config:  TestConfig.awsConfig
+		cluster: TestConfig.eksClusterName
+	}
 
-    // Deploy a dummy config
-    deploy: kubernetes.Apply & {
-        kubeconfig: authenticate.kubeconfig
-        namespace: "stackbrew-test"
-        source: #"""
+	// Deploy a dummy config
+	deploy: kubernetes.#Apply & {
+		kubeconfig: authenticate.kubeconfig
+		namespace:  "stackbrew-test"
+		source:     #"""
             apiVersion: v1
             kind: Pod
             metadata:
@@ -44,5 +44,5 @@ TestEKS: {
                     - name: test
                       image: hello-world
             """#
-    }
+	}
 }

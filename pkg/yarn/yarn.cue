@@ -7,9 +7,9 @@ import (
 )
 
 // A javascript application built by Yarn
-App :: {
+#App: {
 	// Source code of the javascript application
-	source: bl.Directory
+	source: bl.#Directory
 
 	// Load the contents of `environment` into the yarn process?
 	loadEnv: bool | *true
@@ -29,7 +29,7 @@ App :: {
 	buildDirectory: string | *"build"
 
 	// Execute this script to build the app
-	action: build: bl.BashScript & {
+	action: build: bl.#BashScript & {
 		code: """
 			yarn install --network-timeout 1000000
 			yarn run "$YARN_BUILD_SCRIPT"
@@ -50,13 +50,13 @@ App :: {
 		input: {
 			"/app/src": source
 			// FIXME: set a cache key?
-			"/cache/yarn": bl.Cache
+			"/cache/yarn": bl.#Cache
 			if writeEnvFile != "" {
-				"/app/src/\(writeEnvFile)": strings.Join([ for k, v in appEnv { "\(k)=\(v)" } ], "\n")
+				"/app/src/\(writeEnvFile)": strings.Join([ for k, v in appEnv {"\(k)=\(v)"}], "\n")
 			}
 		}
 
-		output: "/app/build": bl.Directory
+		output: "/app/build": bl.#Directory
 
 		os: package: {
 			rsync: true

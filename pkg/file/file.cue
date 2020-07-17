@@ -7,9 +7,9 @@ import (
 )
 
 // Read reads the contents of a file.
-Read :: {
+#Read: {
 	// source directory
-	source: bl.Directory
+	source: bl.#Directory
 
 	// filename names the file to read.
 	filename: !=""
@@ -17,7 +17,7 @@ Read :: {
 	// contents is the read contents.
 	contents: script.output["/output"]
 
-	script: bl.BashScript & {
+	script: bl.#BashScript & {
 		input: "/src":         source
 		output: "/output":     string
 		environment: FILENAME: filename
@@ -28,9 +28,10 @@ Read :: {
 }
 
 // Create writes contents to the given file.
-Create :: {
+
+#Create: {
 	// source directory
-	source?: bl.Directory
+	source?: bl.#Directory
 
 	// result directory
 	result: script.output["/result"]
@@ -44,12 +45,12 @@ Create :: {
 	// contents specifies the bytes to be written.
 	contents: bytes | string
 
-	script: bl.BashScript & {
-		if (source & bl.Directory) != _|_ {
+	script: bl.#BashScript & {
+		if (source & bl.#Directory) != _|_ {
 			input: "/src": source
 		}
 		input: "/contents": contents
-		output: "/result":  bl.Directory
+		output: "/result":  bl.#Directory
 		environment: {
 			FILENAME: filename
 			PERM:     strconv.FormatInt(permissions, 8)
@@ -65,9 +66,9 @@ Create :: {
 }
 
 // Append writes contents to the given file.
-Append :: {
+#Append: {
 	// source directory
-	source: bl.Directory
+	source: bl.#Directory
 
 	// result directory
 	result: script.output["/result"]
@@ -81,10 +82,10 @@ Append :: {
 	// contents specifies the bytes to be written.
 	contents: bytes | string
 
-	script: bl.BashScript & {
+	script: bl.#BashScript & {
 		input: "/src":      source
 		input: "/contents": contents
-		output: "/result":  bl.Directory
+		output: "/result":  bl.#Directory
 		environment: {
 			FILENAME: filename
 			PERM:     strconv.FormatInt(permissions, 8)
@@ -102,9 +103,9 @@ Append :: {
 }
 
 // Glob returns a list of files.
-Glob :: {
+#Glob: {
 	// source directory
-	source: bl.Directory
+	source: bl.#Directory
 
 	// glob specifies the pattern to match files with.
 	glob: !=""
@@ -113,7 +114,7 @@ Glob :: {
 	files: [...string]
 	files: json.Unmarshal(script.output["/result.json"])
 
-	script: bl.BashScript & {
+	script: bl.#BashScript & {
 		input: "/src":          source
 		output: "/result.json": string
 		environment: GLOB:      glob

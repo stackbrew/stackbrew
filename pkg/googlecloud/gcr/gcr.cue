@@ -7,32 +7,32 @@ import (
 )
 
 // Credentials retriever for GCR
-Credentials :: {
+#Credentials: {
 
 	// GCP Config
-	config: googlecloud.Config
+	config: googlecloud.#Config
 
 	// Target is the GCR image
 	target: string
 
 	// Registry Credentials
-	credentials: bl.RegistryCredentials & {
+	credentials: bl.#RegistryCredentials & {
 		username: output["/outputs/username"]
-		secret:   bl.Secret & {
+		secret:   bl.#Secret & {
 			// FIXME: we should be able to output a bl.Secret directly
 			value: base64.Encode(null, output["/outputs/secret"])
 		}
 	}
 
 	// Authentication for GCR Registries
-	auth: bl.RegistryAuth
+	auth: bl.#RegistryAuth
 	auth: "\(target)": credentials
 
 	helperUrl:
 		"https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.1/docker-credential-gcr_linux_amd64-2.0.1.tar.gz"
 
 	output: _
-	bl.BashScript & {
+	bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {

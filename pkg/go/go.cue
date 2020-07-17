@@ -3,10 +3,10 @@ package go
 import "blocklayer.dev/bl"
 
 // Go application built with `go build`
-App :: {
+#App: {
 
 	// Source Directory to build
-	source: bl.Directory
+	source: bl.#Directory
 
 	// Go version to use
 	version: *"1.14.1" | string
@@ -30,12 +30,12 @@ App :: {
 	binaryName: string
 
 	// Binary file output of the Go build
-	binary: bl.Directory & {
+	binary: bl.#Directory & {
 		source: build.output["/outputs/out"]
 		path:   binaryName
 	}
 
-	build: bl.BashScript & {
+	build: bl.#BashScript & {
 		input: {
 			"/inputs/source":  source
 			"/inputs/version": version
@@ -47,10 +47,10 @@ App :: {
 			"/inputs/os":         osInput
 			"/inputs/tags":       tags
 			"/inputs/ldflags":    ldflags
-			"/cache/go":          bl.Cache
+			"/cache/go":          bl.#Cache
 		}
 
-		output: "/outputs/out": bl.Directory
+		output: "/outputs/out": bl.#Directory
 
 		os: package: {
 			"libc6-compat": true

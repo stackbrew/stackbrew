@@ -5,7 +5,7 @@ import (
 )
 
 // BashScript is a helper to run bash scripts within an alpine environment.
-BashScript :: {
+#BashScript: {
 	code: string
 	os: {
 		alpineVersion: "latest"
@@ -18,7 +18,7 @@ BashScript :: {
 		extraCommand: [...string]
 	}
 
-	Run & {
+	#Run & {
 		fs: build.image
 		input: "/entrypoint.sh": code
 		command: [
@@ -34,17 +34,19 @@ BashScript :: {
 	build: {
 		// FIXME: this should be Build &``
 		// However, this doesn't work with cue 0.0.15
-		Build
+		#Build
 
 		dockerfile: """
 			from alpine:\(os.alpineVersion)@\(os.alpineDigest)
 
 			\(strings.Join([ for pkg, _ in os.package {
-				"run apk add -U --no-cache \(pkg)" }
+			"run apk add -U --no-cache \(pkg)"
+		},
 		], "\n"))
 
 			\(strings.Join([ for cmd in os.extraCommand {
-			"run \(cmd)" }
+			"run \(cmd)"
+		},
 		], "\n"))
 			"""
 	}

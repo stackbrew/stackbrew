@@ -9,10 +9,10 @@ import (
 )
 
 // Returns a non-taken rule priority
-NextRulePriority :: {
+#NextRulePriority: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// ListenerArn
 	listenerArn: string
@@ -24,7 +24,7 @@ NextRulePriority :: {
 	priority: strconv.Atoi(strings.TrimRight(output["/outputs/priority"], "\n"))
 
 	output: _
-	bl.BashScript & {
+	bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {
@@ -32,7 +32,7 @@ NextRulePriority :: {
 			"/inputs/aws/secret_key": config.secretKey
 			"/inputs/listenerArn":    listenerArn
 			"/inputs/vhost":          vhost
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             bl.#Cache
 		}
 
 		output: "/outputs/priority": string

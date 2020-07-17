@@ -6,13 +6,13 @@ import (
 )
 
 // S3 file or Directory upload
-Put :: {
+#Put: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Source Directory, File or String to Upload to S3
-	source: string | bl.Directory
+	source: string | bl.#Directory
 
 	// Target S3 URL (eg. s3://<bucket-name>/<path>/<sub-path>)
 	target: string
@@ -20,7 +20,7 @@ Put :: {
 	// URL of the uploaded S3 object
 	url: run.output["/outputs/url"]
 
-	run: bl.BashScript & {
+	run: bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {
@@ -28,7 +28,7 @@ Put :: {
 			"/inputs/aws/secret_key": config.secretKey
 			"/inputs/source":         source
 			"/inputs/target":         target
-			"/cache/aws":             bl.Cache
+			"/cache/aws":             bl.#Cache
 		}
 
 		output: "/outputs/url": string

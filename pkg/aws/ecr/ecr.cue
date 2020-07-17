@@ -7,25 +7,25 @@ import (
 )
 
 // Credentials retriever for ECR
-Credentials :: {
+#Credentials: {
 
 	// AWS Config
-	config: aws.Config
+	config: aws.#Config
 
 	// Target is the ECR image
 	target: string
 
 	// ECR credentials
-	credentials: bl.RegistryCredentials & {
+	credentials: bl.#RegistryCredentials & {
 		username: output["/outputs/username"]
-		secret:   bl.Secret & {
+		secret:   bl.#Secret & {
 			// FIXME: we should be able to output a bl.Secret directly
 			value: base64.Encode(null, output["/outputs/secret"])
 		}
 	}
 
 	// Authentication for ECR Registries
-	auth: bl.RegistryAuth
+	auth: bl.#RegistryAuth
 	auth: "\(target)": credentials
 
 	helperUrl:
@@ -33,7 +33,7 @@ Credentials :: {
 
 	output: _
 
-	bl.BashScript & {
+	bl.#BashScript & {
 		runPolicy: "always"
 
 		input: {
