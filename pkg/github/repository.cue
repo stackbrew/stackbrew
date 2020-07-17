@@ -4,6 +4,10 @@ import (
 	"blocklayer.dev/bl"
 )
 
+
+// FIXME: weird behavior, talk to Marcel
+let tlGetPullRequest=#GetPullRequest
+
 #Repository: {
 	// Github repository name
 	name: string
@@ -13,7 +17,7 @@ import (
 
 	// Github API token
 	token:           bl.#Secret
-	#GetPullRequest: #GetPullRequest & {
+	#GetPullRequest: tlGetPullRequest & {
 		"token": token
 		repo: {
 			"owner": owner
